@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-28T15:40:51Z
+- **Last updated:** 2026-08-28T16:05:49Z
 
 ## Log
 
@@ -48,3 +48,28 @@ retuned from a dark night palette to a bright ivory, lilac, and apricot
 storybook theme (`src/App.css`, `src/index.css`). This OpenAI proof is verified
 on the dev deployment only; production has not received this slice. Firecrawl
 and AgentMail runtime integrations remain unimplemented and are not claimed.
+
+### 2026-08-29 - production checkpoint
+
+Deployed the Companion Manifestation backend to production and published the
+matching daylight frontend through Convex Static Hosting (deployment
+`bd361568-307c-4465-983d-7ab3c8be110e`). Verified signed-out access to `/` and
+`/talk`, the production Convex URL in the client bundle, and a live JSON response
+from `/api/health`.
+
+Ran one real production Manifestation from a fresh anonymous browser session.
+For the prompt `A tiny dawn archivist with an apricot scarf, lavender light,
+and a brave but gentle smile.`, Convex realtime state advanced through
+`generating_brief`, `generating_image`, and `ready`. OpenAI produced an original
+apricot-and-lavender Webtoon-style archivist; visual inspection found no famous
+character logo or signature costume. The stored companion survived a full page
+reload and appeared in Talk without re-generation.
+
+Production Convex logs link `beginGeneration`, `markBriefGenerated`, and
+`completeGeneration` to the successful `manifestation:generate` and
+`manifestationOpenai:generateAssets` actions; the provider action completed in
+about 61 seconds. This verifies Manifestation through real OpenAI work, Convex
+Storage, queries, mutations, actions, and live UI state on the public deployment.
+Firecrawl, AgentMail, living-memory extraction, matching, consent outreach,
+inbound reply, and the complete end-to-end chain remain unimplemented and are
+not claimed.
