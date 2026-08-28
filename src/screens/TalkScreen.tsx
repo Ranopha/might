@@ -1,8 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { useMutation, useQuery } from 'convex/react'
+import { useAction, useMutation, useQuery } from 'convex/react'
 import { AnimatePresence, motion } from 'motion/react'
 import { api } from '../../convex/_generated/api'
-import { Orb } from '../components/companion/Orb'
+import { CompanionPresence } from '../components/companion/CompanionPresence'
 import { getOrCreateSessionKey } from '../lib/session'
 
 type TalkPhase = 'manifestation' | 'chat'
@@ -13,10 +13,16 @@ export function TalkScreen() {
   const [phase, setPhase] = useState<TalkPhase>('manifestation')
   const [message, setMessage] = useState('')
   const [isSending, setIsSending] = useState(false)
+  const [isManifesting, setIsManifesting] = useState(false)
+  const [manifestationError, setManifestationError] = useState<string | null>(null)
   const [sessionError, setSessionError] = useState<string | null>(null)
   const [sessionKey] = useState(getOrCreateSessionKey)
   const ensureSession = useMutation(api.talk.ensureSession)
   const appendUserMessage = useMutation(api.talk.appendUserMessage)
+  const generateManifestation = useAction(api.manifestation.generate)
+  const manifestation = useQuery(api.manifestation.current, {
+    clientSessionKey: sessionKey,
+  })
   const messages = useQuery(api.talk.listMessages, {
     clientSessionKey: sessionKey,
     limit: 50,
@@ -36,6 +42,31 @@ export function TalkScreen() {
     }
   }, [ensureSession, sessionKey])
 
+  async function manifestCompanion(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const companionDescription = description.trim()
+    if (companionDescription.length < 8 || isManifesting) return
+
+    setIsManifesting(true)
+    setManifestationError(null)
+    try {
+      const result = await generateManifestation({
+        clientSessionKey: sessionKey,
+        clientRequestId: crypto.randomUUID(),
+        description: companionDescription,
+      })
+      if (result.status === 'failed') {
+        setManifestationError(manifestationFailureCopy(result.errorCode))
+      }
+    } catch {
+      setManifestationError(
+        'Might could not hold onto that new form. The orb is safe—please try once more.',
+      )
+    } finally {
+      setIsManifesting(false)
+    }
+  }
+
   async function sendMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const content = message.trim()
@@ -54,6 +85,16 @@ export function TalkScreen() {
   }
 
   const activePhase: TalkPhase = messages?.length ? 'chat' : phase
+  const isGenerating =
+    isManifesting ||
+    manifestation?.status === 'generating_brief' ||
+    manifestation?.status === 'generating_image'
+  const isReady = manifestation?.status === 'ready' && manifestation.imageUrl !== null
+  const persistedFailure =
+    manifestation?.status === 'failed'
+      ? manifestationFailureCopy(manifestation.errorCode)
+      : null
+  const visibleManifestationError = manifestationError ?? persistedFailure
 
   if (activePhase === 'chat') {
     return (
@@ -67,9 +108,15 @@ export function TalkScreen() {
 
         <div className="chat-layout">
           <aside className="chat-companion">
-            <Orb />
+            <CompanionPresence />
             <span>Might</span>
-            <p>Still in its original form.</p>
+            <p>
+              {isReady
+                ? 'In the form you imagined.'
+                : isGenerating
+                  ? 'Taking shape while you talk.'
+                  : 'Still in its original form.'}
+            </p>
           </aside>
 
           <div className="chat-column">
@@ -134,8 +181,14 @@ export function TalkScreen() {
 
       <div className="talk-hero">
         <div className="talk-hero__visual">
-          <Orb />
-          <p className="orb-caption">Your Might, before it takes shape.</p>
+          <CompanionPresence />
+          <p className="orb-caption">
+            {isReady
+              ? 'Your original Might, safely remembered.'
+              : isGenerating
+                ? 'Your Might is finding an original shape.'
+                : 'Your Might, before it takes shape.'}
+          </p>
         </div>
 
         <motion.div
@@ -152,17 +205,55 @@ export function TalkScreen() {
           </p>
 
           <AnimatePresence mode="wait" initial={false}>
-            {shaping ? (
+            {isReady ? (
+              <motion.div
+                key="manifestation-ready"
+                className="manifestation-result"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+              >
+                <span className="manifestation-result__status">Original form created</span>
+                <h2>There you are.</h2>
+                <p>
+                  {manifestation.adaptationNote ??
+                    'Might kept the feeling you described and became something entirely its own.'}
+                </p>
+                <button className="primary-action" type="button" onClick={() => setPhase('chat')}>
+                  Start talking <span aria-hidden="true">→</span>
+                </button>
+              </motion.div>
+            ) : isGenerating ? (
+              <motion.div
+                key="manifestation-progress"
+                className="manifestation-progress"
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                aria-live="polite"
+              >
+                <span className="manifestation-progress__pulse" aria-hidden="true" />
+                <div>
+                  <span className="manifestation-result__status">OpenAI is creating</span>
+                  <h2>
+                    {manifestation?.status === 'generating_image'
+                      ? 'Giving that feeling a face…'
+                      : 'Finding an original visual language…'}
+                  </h2>
+                  <p>This can take a little while. Might will keep its light until the image is safely stored.</p>
+                </div>
+                <button className="text-action" type="button" onClick={() => setPhase('chat')}>
+                  Talk while I wait
+                </button>
+              </motion.div>
+            ) : shaping || manifestation?.status === 'failed' ? (
               <motion.form
                 key="shape-form"
                 className="shape-form"
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                onSubmit={(event) => {
-                  event.preventDefault()
-                  setPhase('chat')
-                }}
+                onSubmit={manifestCompanion}
               >
                 <label htmlFor="companion-description">
                   What would you like me to feel like?
@@ -174,12 +265,18 @@ export function TalkScreen() {
                     onChange={(event) => setDescription(event.target.value)}
                     placeholder="A tiny night guardian with a soft glow…"
                     autoFocus
+                    maxLength={1000}
                   />
-                  <button type="submit" disabled={description.trim().length < 8}>
-                    Continue for now
+                  <button type="submit" disabled={description.trim().length < 8 || isManifesting}>
+                    {manifestation?.status === 'failed' ? 'Try again' : 'Manifest with OpenAI'}
                   </button>
                 </div>
-                <button className="text-action" type="button" onClick={() => setShaping(false)}>
+                {visibleManifestationError ? (
+                  <p className="manifestation-error" role="alert">
+                    {visibleManifestationError}
+                  </p>
+                ) : null}
+                <button className="text-action" type="button" onClick={() => setPhase('chat')}>
                   Keep the orb instead
                 </button>
               </motion.form>
@@ -206,7 +303,7 @@ export function TalkScreen() {
           </p>
           {shaping ? (
             <p className="integration-note">
-              Nothing is uploaded or saved until live OpenAI image generation is connected.
+              Your description is used only to create this companion. The image is stored with your private Convex session.
             </p>
           ) : null}
         </motion.div>
@@ -218,4 +315,14 @@ export function TalkScreen() {
       </footer>
     </section>
   )
+}
+
+function manifestationFailureCopy(errorCode: string | null): string {
+  if (errorCode === 'OPENAI_CONFIGURATION_MISSING') {
+    return 'Image generation is not configured on this deployment yet. Might will stay safely in its orb.'
+  }
+  if (errorCode === 'STORAGE_WRITE_FAILED') {
+    return 'The new form arrived, but Might could not save it safely. The orb is still here.'
+  }
+  return 'That new form could not arrive this time. Might kept its light, and you can try again.'
 }

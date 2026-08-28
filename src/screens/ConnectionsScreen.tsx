@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { Orb } from '../components/companion/Orb'
+import { CompanionPresence } from '../components/companion/CompanionPresence'
 
 const steps = ['Noticed', 'You agreed', 'Reached out', 'They replied', 'Connected']
 
@@ -8,7 +8,7 @@ export function ConnectionsScreen() {
     <section className="screen editorial-screen" aria-labelledby="connections-title">
       <header className="screen-topline">
         <span className="eyebrow">Human, eventually</span>
-        <Orb compact />
+        <CompanionPresence compact />
       </header>
 
       <div className="editorial-heading">

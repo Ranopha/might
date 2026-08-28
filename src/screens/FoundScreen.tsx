@@ -1,12 +1,12 @@
 import { motion } from 'motion/react'
-import { Orb } from '../components/companion/Orb'
+import { CompanionPresence } from '../components/companion/CompanionPresence'
 
 export function FoundScreen() {
   return (
     <section className="screen editorial-screen" aria-labelledby="found-title">
       <header className="screen-topline">
         <span className="eyebrow">World signals</span>
-        <Orb compact state="thinking" />
+        <CompanionPresence compact state="thinking" />
       </header>
 
       <div className="editorial-heading">

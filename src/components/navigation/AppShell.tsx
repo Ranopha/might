@@ -2,7 +2,7 @@ import { useState, type PropsWithChildren } from 'react'
 import { useQuery } from 'convex/react'
 import { NavLink } from 'react-router-dom'
 import { api } from '../../../convex/_generated/api'
-import { Orb } from '../companion/Orb'
+import { CompanionPresence } from '../companion/CompanionPresence'
 
 const navigation = [
   { to: '/talk', label: 'Talk', marker: '◌' },
@@ -22,7 +22,7 @@ export function AppShell({ children }: PropsWithChildren) {
 
       <aside className="side-rail">
         <NavLink className="brand" to="/talk" aria-label="Might home">
-          <Orb compact />
+          <CompanionPresence compact />
           <span>Might</span>
         </NavLink>
 

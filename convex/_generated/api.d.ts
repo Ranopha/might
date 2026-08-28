@@ -9,6 +9,8 @@
  */
 
 import type * as http from "../http.js";
+import type * as manifestation from "../manifestation.js";
+import type * as manifestationOpenai from "../manifestationOpenai.js";
 import type * as talk from "../talk.js";
 
 import type {
@@ -19,6 +21,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   http: typeof http;
+  manifestation: typeof manifestation;
+  manifestationOpenai: typeof manifestationOpenai;
   talk: typeof talk;
 }>;
 

@@ -1,16 +1,16 @@
 :root {
-  --bg: #15131b;
-  --surface: rgba(31, 28, 40, 0.72);
-  --surface-elevated: rgba(42, 37, 53, 0.86);
-  --text-primary: #f5f0e7;
-  --text-secondary: #afa8b6;
-  --accent: #c7a6ff;
-  --accent-soft: rgba(171, 130, 244, 0.16);
-  --apricot: #f5bb91;
-  --success: #a8d7bd;
-  --warning: #e8c98f;
-  --border-soft: rgba(255, 255, 255, 0.09);
-  --glow: rgba(161, 112, 246, 0.38);
+  --bg: #f8f4ef;
+  --surface: rgba(255, 252, 249, 0.76);
+  --surface-elevated: rgba(255, 253, 250, 0.94);
+  --text-primary: #33283d;
+  --text-secondary: #746a7a;
+  --accent: #8559bd;
+  --accent-soft: rgba(133, 89, 189, 0.11);
+  --apricot: #e89266;
+  --success: #4f8b68;
+  --warning: #b5813f;
+  --border-soft: rgba(91, 70, 101, 0.12);
+  --glow: rgba(141, 95, 202, 0.24);
   --font-display: 'Avenir Next', 'SF Pro Display', 'Helvetica Neue', sans-serif;
   --font-body: 'Avenir Next', 'SF Pro Text', 'PingFang TC', 'Helvetica Neue', sans-serif;
   color: var(--text-primary);
@@ -78,8 +78,8 @@ button:disabled {
 }
 
 ::selection {
-  color: #17121f;
-  background: var(--accent);
+  color: #2d2038;
+  background: #d9c4f3;
 }
 
 @media (prefers-reduced-motion: reduce) {
