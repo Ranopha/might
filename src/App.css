@@ -802,6 +802,44 @@
   font-size: 12px;
 }
 
+.message--thinking p {
+  display: flex;
+  min-width: 38px;
+  gap: 5px;
+  align-items: center;
+  padding: 4px 1px;
+}
+
+.message--thinking i {
+  width: 5px;
+  height: 5px;
+  animation: thinking-dot 1.2s ease-in-out infinite;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+.message--thinking i:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.message--thinking i:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+@keyframes thinking-dot {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.38;
+  }
+
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
 .chat-composer {
   display: flex;
   align-items: flex-end;
@@ -971,6 +1009,158 @@
 
 .memory-lines span:nth-child(3) {
   width: 46%;
+}
+
+.memory-collection {
+  min-width: 0;
+}
+
+.memory-collection__topline {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding: 0 4px;
+  color: #7d7082;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.memory-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.memory-card {
+  position: relative;
+  padding: clamp(22px, 3vw, 32px);
+  overflow: hidden;
+  border: 1px solid rgba(91, 70, 101, 0.11);
+  border-radius: 23px;
+  background:
+    linear-gradient(145deg, rgba(189, 151, 227, 0.12), transparent 48%),
+    rgba(255, 252, 249, 0.72);
+  box-shadow: 0 20px 58px rgba(78, 55, 90, 0.07);
+  backdrop-filter: blur(18px);
+}
+
+.memory-card::after {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(246, 177, 127, 0.15), transparent 70%);
+  content: '';
+  pointer-events: none;
+  right: -28px;
+  top: -38px;
+}
+
+.memory-card__meta,
+.memory-card__footer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.memory-card__meta {
+  color: #7d7082;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.memory-card h2 {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  margin: 24px 0 30px;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.6vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.18;
+}
+
+.memory-card__footer {
+  padding-top: 18px;
+  border-top: 1px solid rgba(91, 70, 101, 0.09);
+}
+
+.memory-card__footer > span {
+  color: #817582;
+  font-size: 10px;
+}
+
+.memory-actions,
+.memory-edit > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.memory-actions button,
+.memory-edit button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(91, 70, 101, 0.13);
+  border-radius: 999px;
+  color: #675b6c;
+  background: rgba(255, 255, 255, 0.56);
+  font-size: 10px;
+  font-weight: 620;
+}
+
+.memory-actions button:hover:not(:disabled),
+.memory-edit button:hover:not(:disabled) {
+  border-color: rgba(133, 89, 189, 0.3);
+  color: #4e3c59;
+  background: rgba(245, 237, 251, 0.85);
+}
+
+.memory-actions button:disabled,
+.memory-edit button:disabled {
+  cursor: default;
+  opacity: 0.52;
+}
+
+.memory-actions .memory-action--forget {
+  border-color: transparent;
+  color: #9a6d68;
+  background: transparent;
+}
+
+.memory-edit {
+  position: relative;
+  z-index: 1;
+  margin: 22px 0 24px;
+}
+
+.memory-edit textarea {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 14px 15px;
+  resize: vertical;
+  border: 1px solid rgba(133, 89, 189, 0.25);
+  border-radius: 14px;
+  outline: 0;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.72);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.memory-edit textarea:focus {
+  border-color: rgba(133, 89, 189, 0.52);
+  box-shadow: 0 0 0 4px rgba(133, 89, 189, 0.08);
 }
 
 .signal-rings {
@@ -1615,7 +1805,28 @@
 }
 
 @media (max-width: 720px) {
+  .memory-collection__topline,
+  .memory-card__footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .memory-actions {
+    width: 100%;
+  }
+
+  .memory-actions button {
+    flex: 1;
+  }
+
   .connection-path li {
     border-color: rgba(91, 70, 101, 0.13);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .message--thinking i {
+    animation: none;
+    opacity: 0.65;
   }
 }

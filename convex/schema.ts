@@ -11,6 +11,7 @@ export default defineSchema({
   conversations: defineTable({
     anonymousSessionId: v.id("anonymousSessions"),
     kind: v.literal("primary"),
+    agentThreadId: v.optional(v.string()),
     nextMessageSequence: v.number(),
     createdAt: v.number(),
     updatedAt: v.number(),
@@ -37,12 +38,108 @@ export default defineSchema({
       v.literal("private"),
       v.literal("shareable_with_consent"),
     ),
+    clientMessageId: v.optional(v.string()),
     sequence: v.number(),
     createdAt: v.number(),
-  }).index("by_conversationId_and_sequence", [
-    "conversationId",
-    "sequence",
-  ]),
+    model: v.optional(v.string()),
+    providerResponseId: v.optional(v.union(v.string(), v.null())),
+    sourceMessageId: v.optional(v.union(v.id("messages"), v.null())),
+  })
+    .index("by_conversationId_and_sequence", [
+      "conversationId",
+      "sequence",
+    ])
+    .index("by_anonymousSessionId_and_clientMessageId", [
+      "anonymousSessionId",
+      "clientMessageId",
+    ]),
+
+  talkTurns: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    conversationId: v.id("conversations"),
+    sourceMessageId: v.id("messages"),
+    clientMessageId: v.string(),
+    agentThreadId: v.string(),
+    promptMessageId: v.string(),
+    status: v.union(
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("failed"),
+    ),
+    memoryStatus: v.union(
+      v.literal("pending"),
+      v.literal("completed"),
+      v.literal("failed"),
+    ),
+    replyModel: v.string(),
+    extractionModel: v.string(),
+    replyResponseId: v.union(v.string(), v.null()),
+    extractionResponseId: v.union(v.string(), v.null()),
+    errorCode: v.union(
+      v.null(),
+      v.literal("OPENAI_CONFIGURATION_MISSING"),
+      v.literal("REPLY_GENERATION_FAILED"),
+      v.literal("MEMORY_EXTRACTION_FAILED"),
+      v.literal("TURN_COMMIT_FAILED"),
+    ),
+    startedAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_sourceMessageId", ["sourceMessageId"])
+    .index("by_anonymousSessionId_and_updatedAt", [
+      "anonymousSessionId",
+      "updatedAt",
+    ]),
+
+  memories: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    statement: v.string(),
+    normalizedStatement: v.string(),
+    semanticType: v.union(
+      v.literal("experience"),
+      v.literal("interest"),
+      v.literal("preference"),
+      v.literal("availability"),
+      v.literal("knowledge"),
+      v.literal("resource"),
+      v.literal("constraint"),
+      v.literal("habit"),
+      v.literal("context"),
+      v.literal("other"),
+    ),
+    sourceMessageId: v.id("messages"),
+    source: v.union(
+      v.literal("conversation"),
+      v.literal("user_edit"),
+      v.literal("system_inference"),
+    ),
+    explicitness: v.union(v.literal("explicit"), v.literal("inferred")),
+    confidence: v.number(),
+    privacy: v.union(
+      v.literal("private"),
+      v.literal("shareable_with_consent"),
+    ),
+    freshness: v.union(
+      v.literal("long_term"),
+      v.literal("temporary"),
+      v.literal("unknown"),
+    ),
+    status: v.union(v.literal("active"), v.literal("forgotten")),
+    extractionModel: v.string(),
+    extractionResponseId: v.union(v.string(), v.null()),
+    lastConfirmedAt: v.union(v.number(), v.null()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_anonymousSessionId_and_status_and_updatedAt", [
+      "anonymousSessionId",
+      "status",
+      "updatedAt",
+    ])
+    .index("by_anonymousSessionId_and_normalizedStatement", [
+      "anonymousSessionId",
+      "normalizedStatement",
+    ]),
 
   companionManifestations: defineTable({
     anonymousSessionId: v.id("anonymousSessions"),

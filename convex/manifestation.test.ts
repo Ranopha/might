@@ -1,6 +1,7 @@
 /// <reference types="vite/client" />
 // @vitest-environment edge-runtime
 
+import agentTest from "@convex-dev/agent/test";
 import { convexTest } from "convex-test";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { api, internal } from "./_generated/api";
@@ -34,6 +35,12 @@ const modules = import.meta.glob([
 const browserAKey = "manifest-a-0000000000000000000000000000001";
 const browserBKey = "manifest-b-0000000000000000000000000000002";
 
+function initTest() {
+  const t = convexTest(schema, modules);
+  agentTest.register(t);
+  return t;
+}
+
 beforeEach(() => {
   openAIMock.constructorError = null;
   openAIMock.createResponse.mockReset();
@@ -44,7 +51,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 test("settles the lifecycle when the provider runtime rejects unexpectedly", async () => {
-  const t = convexTest(schema, modules);
+  const t = initTest();
   openAIMock.constructorError = new Error(
     "provider runtime rejected before a mapped API response",
   );
@@ -74,7 +81,7 @@ test("settles the lifecycle when the provider runtime rejects unexpectedly", asy
 });
 
 test("turns a famous-IP reference into an original brief before storing the generated asset", async () => {
-  const t = convexTest(schema, modules);
+  const t = initTest();
   const safeArtBrief =
     "An original tiny nocturnal guardian with a crescent-shaped travel cloak, warm amber eyes, rounded proportions, and an invented constellation clasp; no logos, franchise symbols, or recognizable costume elements.";
   const adaptationNote =
@@ -144,7 +151,7 @@ test("turns a famous-IP reference into an original brief before storing the gene
 });
 
 test("persists one session-private generated companion and reuses a client request", async () => {
-  const t = convexTest(schema, modules);
+  const t = initTest();
 
   await t.mutation(api.talk.ensureSession, {
     clientSessionKey: browserAKey,
@@ -216,7 +223,7 @@ test("persists one session-private generated companion and reuses a client reque
 });
 
 test("keeps the orb fallback when generation fails", async () => {
-  const t = convexTest(schema, modules);
+  const t = initTest();
   openAIMock.createResponse.mockRejectedValueOnce({
     request_id: "req_text_failed",
   });

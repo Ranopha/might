@@ -11,7 +11,9 @@
 import type * as http from "../http.js";
 import type * as manifestation from "../manifestation.js";
 import type * as manifestationOpenai from "../manifestationOpenai.js";
+import type * as memories from "../memories.js";
 import type * as talk from "../talk.js";
+import type * as talkOpenai from "../talkOpenai.js";
 
 import type {
   ApiFromModules,
@@ -23,7 +25,9 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   manifestation: typeof manifestation;
   manifestationOpenai: typeof manifestationOpenai;
+  memories: typeof memories;
   talk: typeof talk;
+  talkOpenai: typeof talkOpenai;
 }>;
 
 /**
@@ -53,5 +57,6 @@ export declare const internal: FilterApi<
 >;
 
 export declare const components: {
+  agent: import("@convex-dev/agent/_generated/component.js").ComponentApi<"agent">;
   staticHosting: import("@convex-dev/static-hosting/_generated/component.js").ComponentApi<"staticHosting">;
 };

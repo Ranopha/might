@@ -1,3 +1,4 @@
+import agent from "@convex-dev/agent/convex.config";
 import staticHosting from "@convex-dev/static-hosting/convex.config";
 import { defineApp } from "convex/server";
 import { v } from "convex/values";
@@ -12,6 +13,7 @@ const app = defineApp({
     OPENAI_IMAGE_MODEL: v.optional(v.string()),
   },
 });
+app.use(agent);
 app.use(staticHosting, { httpPrefix: "/" });
 
 export default app;

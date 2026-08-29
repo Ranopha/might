@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useAction, useMutation, useQuery } from 'convex/react'
 import { AnimatePresence, motion } from 'motion/react'
 import { api } from '../../convex/_generated/api'
@@ -16,6 +16,7 @@ export function TalkScreen() {
   const [isManifesting, setIsManifesting] = useState(false)
   const [manifestationError, setManifestationError] = useState<string | null>(null)
   const [sessionError, setSessionError] = useState<string | null>(null)
+  const pendingMessage = useRef<{ content: string; id: string } | null>(null)
   const [sessionKey] = useState(getOrCreateSessionKey)
   const ensureSession = useMutation(api.talk.ensureSession)
   const appendUserMessage = useMutation(api.talk.appendUserMessage)
@@ -26,6 +27,9 @@ export function TalkScreen() {
   const messages = useQuery(api.talk.listMessages, {
     clientSessionKey: sessionKey,
     limit: 50,
+  })
+  const latestTurn = useQuery(api.talk.latestTurn, {
+    clientSessionKey: sessionKey,
   })
 
   useEffect(() => {
@@ -70,12 +74,18 @@ export function TalkScreen() {
   async function sendMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const content = message.trim()
-    if (!content || isSending) return
+    if (!content || isSending || latestTurn?.status === 'processing') return
 
     setIsSending(true)
     setSessionError(null)
     try {
-      await appendUserMessage({ clientSessionKey: sessionKey, content })
+      const clientMessageId =
+        pendingMessage.current?.content === content
+          ? pendingMessage.current.id
+          : crypto.randomUUID()
+      pendingMessage.current = { content, id: clientMessageId }
+      await appendUserMessage({ clientSessionKey: sessionKey, clientMessageId, content })
+      pendingMessage.current = null
       setMessage('')
     } catch {
       setSessionError('That didn’t reach Might. Your words are still here—please try once more.')
@@ -95,6 +105,11 @@ export function TalkScreen() {
       ? manifestationFailureCopy(manifestation.errorCode)
       : null
   const visibleManifestationError = manifestationError ?? persistedFailure
+  const isThinking = latestTurn?.status === 'processing'
+  const turnFailure =
+    latestTurn?.status === 'failed'
+      ? 'Might could not finish that thought. Your message is safely stored—try telling me one more thing.'
+      : null
 
   if (activePhase === 'chat') {
     return (
@@ -142,6 +157,21 @@ export function TalkScreen() {
                   </motion.article>
                 ))
               )}
+              {isThinking ? (
+                <motion.article
+                  className="message message--assistant message--thinking"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  aria-label="Might is thinking"
+                >
+                  <span>Might</span>
+                  <p>
+                    <i aria-hidden="true" />
+                    <i aria-hidden="true" />
+                    <i aria-hidden="true" />
+                  </p>
+                </motion.article>
+              ) : null}
             </div>
 
             <form className="chat-composer" onSubmit={sendMessage}>
@@ -151,18 +181,29 @@ export function TalkScreen() {
               <textarea
                 id="message"
                 value={message}
-                onChange={(event) => setMessage(event.target.value)}
+                onChange={(event) => {
+                  if (pendingMessage.current?.content !== event.target.value.trim()) {
+                    pendingMessage.current = null
+                  }
+                  setMessage(event.target.value)
+                }}
                 placeholder="Tell Might something about your day…"
                 rows={2}
                 maxLength={8000}
               />
-              <button type="submit" disabled={!message.trim() || isSending}>
-                {isSending ? 'Sending…' : 'Send'}
+              <button
+                type="submit"
+                disabled={!message.trim() || isSending || isThinking}
+              >
+                {isSending ? 'Sending…' : isThinking ? 'Thinking…' : 'Send'}
               </button>
             </form>
-            {sessionError ? <p className="inline-error">{sessionError}</p> : null}
+            {sessionError || turnFailure ? (
+              <p className="inline-error">{sessionError ?? turnFailure}</p>
+            ) : null}
             <p className="chat-disclosure">
-              This slice stores your words privately in Convex. OpenAI replies and living memory arrive in the next verified slice.
+              OpenAI replies through a private Convex Agent thread. Only useful,
+              source-linked memories may appear in Me—and you stay in control of each one.
             </p>
           </div>
         </div>
