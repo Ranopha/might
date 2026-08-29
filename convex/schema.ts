@@ -222,6 +222,80 @@ export default defineSchema({
       "createdAt",
     ]),
 
+  matchRuns: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    worldSignalId: v.id("worldSignals"),
+    clientRequestId: v.string(),
+    candidateMemoryIds: v.array(v.id("memories")),
+    status: v.union(
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("failed"),
+    ),
+    judgeModel: v.string(),
+    judgeResponseId: v.union(v.string(), v.null()),
+    matchId: v.union(v.id("matches"), v.null()),
+    errorCode: v.union(
+      v.null(),
+      v.literal("OPENAI_CONFIGURATION_MISSING"),
+      v.literal("NO_ACTIVE_MEMORIES"),
+      v.literal("MATCH_JUDGE_FAILED"),
+      v.literal("MATCH_COMMIT_FAILED"),
+    ),
+    startedAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_anonymousSessionId_and_worldSignalId_and_clientRequestId", [
+      "anonymousSessionId",
+      "worldSignalId",
+      "clientRequestId",
+    ])
+    .index("by_anonymousSessionId_and_worldSignalId_and_updatedAt", [
+      "anonymousSessionId",
+      "worldSignalId",
+      "updatedAt",
+    ])
+    .index("by_anonymousSessionId_and_updatedAt", [
+      "anonymousSessionId",
+      "updatedAt",
+    ]),
+
+  matches: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    runId: v.id("matchRuns"),
+    worldSignalId: v.id("worldSignals"),
+    relevantMemoryIds: v.array(v.id("memories")),
+    whyThisSituationMatters: v.string(),
+    whyThisPersonCameToMind: v.string(),
+    recommendation: v.union(
+      v.literal("ignore"),
+      v.literal("ask_user"),
+      v.literal("surface"),
+    ),
+    riskLevel: v.union(
+      v.literal("low"),
+      v.literal("medium"),
+      v.literal("high"),
+    ),
+    matchConfidence: v.number(),
+    clarificationQuestion: v.union(v.string(), v.null()),
+    status: v.union(
+      v.literal("ignored"),
+      v.literal("needs_clarification"),
+      v.literal("surfaced"),
+    ),
+    consentState: v.literal("not_requested"),
+    judgeModel: v.string(),
+    judgeResponseId: v.union(v.string(), v.null()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_runId", ["runId"])
+    .index("by_anonymousSessionId_and_createdAt", [
+      "anonymousSessionId",
+      "createdAt",
+    ]),
+
   companionManifestations: defineTable({
     anonymousSessionId: v.id("anonymousSessions"),
     clientRequestId: v.string(),

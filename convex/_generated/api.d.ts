@@ -11,6 +11,8 @@
 import type * as http from "../http.js";
 import type * as manifestation from "../manifestation.js";
 import type * as manifestationOpenai from "../manifestationOpenai.js";
+import type * as matchJudge from "../matchJudge.js";
+import type * as matches from "../matches.js";
 import type * as memories from "../memories.js";
 import type * as talk from "../talk.js";
 import type * as talkOpenai from "../talkOpenai.js";
@@ -27,6 +29,8 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   manifestation: typeof manifestation;
   manifestationOpenai: typeof manifestationOpenai;
+  matchJudge: typeof matchJudge;
+  matches: typeof matches;
   memories: typeof memories;
   talk: typeof talk;
   talkOpenai: typeof talkOpenai;

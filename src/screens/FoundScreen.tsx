@@ -8,10 +8,16 @@ import { getOrCreateSessionKey } from '../lib/session'
 export function FoundScreen() {
   const [sessionKey] = useState(getOrCreateSessionKey)
   const [requestError, setRequestError] = useState<string | null>(null)
+  const [matchError, setMatchError] = useState<string | null>(null)
   const pendingRequestId = useRef<string | null>(null)
+  const pendingMatchRequestId = useRef<string | null>(null)
   const ensureSession = useMutation(api.talk.ensureSession)
   const requestScan = useMutation(api.worldSignals.requestScan)
+  const requestMatch = useMutation(api.matches.requestMatch)
   const worldSignal = useQuery(api.worldSignals.latest, {
+    clientSessionKey: sessionKey,
+  })
+  const matchRun = useQuery(api.matches.latest, {
     clientSessionKey: sessionKey,
   })
 
@@ -36,9 +42,32 @@ export function FoundScreen() {
     }
   }
 
+  async function lookForOverlap() {
+    if (!completedSignal) return
+    const requestId = pendingMatchRequestId.current ?? crypto.randomUUID()
+    pendingMatchRequestId.current = requestId
+    setMatchError(null)
+    try {
+      await requestMatch({
+        clientSessionKey: sessionKey,
+        worldSignalId: completedSignal.id,
+        clientRequestId: requestId,
+      })
+      pendingMatchRequestId.current = null
+    } catch {
+      setMatchError('Might could not compare this signal yet. Share something useful in Talk, then try again.')
+    }
+  }
+
   const isProcessing = worldSignal?.status === 'processing'
   const isFailed = worldSignal?.status === 'failed'
   const completedSignal = worldSignal?.status === 'completed' ? worldSignal.signal : null
+  const matchForSignal =
+    completedSignal && matchRun?.worldSignalId === completedSignal.id ? matchRun : null
+  const isMatching = matchForSignal?.status === 'processing'
+  const matchFailed = matchForSignal?.status === 'failed'
+  const completedMatch = matchForSignal?.status === 'completed' ? matchForSignal.match : null
+  const surfacedMatch = completedMatch?.status !== 'ignored' ? completedMatch : null
   const firecrawlMode =
     worldSignal?.provenance.sourceMode === 'cached'
       ? 'cached'
@@ -56,9 +85,17 @@ export function FoundScreen() {
       <div className="editorial-heading">
         <p className="kicker">Might Found</p>
         <h1 id="found-title">
-          {completedSignal ? 'Something real came into view.' : 'Somewhere, something may need you.'}
+          {surfacedMatch
+            ? 'I found something you might be great for.'
+            : completedSignal
+              ? 'Something real came into view.'
+              : 'Somewhere, something may need you.'}
         </h1>
-        <p>Might looks for public situations, not job titles.</p>
+        <p>
+          {surfacedMatch
+            ? 'Not a label. A source-backed overlap between one real situation and what you chose to remember.'
+            : 'Might looks for public situations, not job titles.'}
+        </p>
       </div>
 
       {completedSignal ? (
@@ -100,10 +137,102 @@ export function FoundScreen() {
             </a>
           </blockquote>
 
+          {surfacedMatch ? (
+            <motion.section
+              className="match-overlap"
+              aria-label="Contextual overlap"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55 }}
+            >
+              <div className="match-overlap__topline">
+                <span>{surfacedMatch.matchConfidence >= 0.8 ? 'Strong possible fit' : 'Possible fit'}</span>
+                <i>OpenAI contextual match</i>
+              </div>
+              <h3>{surfacedMatch.whyThisPersonCameToMind}</h3>
+              <div className="match-overlap__columns">
+                <section>
+                  <span>Why this situation matters</span>
+                  <p>{surfacedMatch.whyThisSituationMatters}</p>
+                </section>
+                <section>
+                  <span>Why you came to mind</span>
+                  <p>{surfacedMatch.whyThisPersonCameToMind}</p>
+                </section>
+              </div>
+              <div className="match-memory-thread">
+                <span>Private memory used</span>
+                {surfacedMatch.relevantMemories.map((memory) => (
+                  <p key={memory.id}>“{memory.statement}”</p>
+                ))}
+              </div>
+            </motion.section>
+          ) : null}
+
+          {surfacedMatch ? (
+            <motion.section
+              className="match-question"
+              aria-label="Clarification before consent"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.08 }}
+            >
+              <div className="match-question__topline">
+                <span>{surfacedMatch.clarificationQuestion ? 'One thing I’m not sure about' : 'Worth exploring'}</span>
+                <i>No consent requested</i>
+              </div>
+              <h3>
+                {surfacedMatch.clarificationQuestion ?? 'This may be worth exploring with you.'}
+              </h3>
+              <p>
+                {surfacedMatch.clarificationQuestion
+                  ? 'This question stays inside Might. Answering it will not share a memory or contact anyone.'
+                  : 'No memory has been shared. Exploring this further will still require a separate choice from you.'}
+              </p>
+            </motion.section>
+          ) : null}
+
           <footer>
-            <span>Observed, not matched</span>
-            <p>Next, Might will compare this situation with only the relevant private memories—and ask before anything leaves Might.</p>
+            <span>
+              {isMatching
+                ? 'Looking for context'
+                : matchFailed
+                  ? 'Match paused safely'
+                  : completedMatch?.status === 'ignored'
+                    ? 'No convincing overlap'
+                    : surfacedMatch
+                      ? 'Reasoned, not shared'
+                      : 'Observed, not matched'}
+            </span>
+            {isMatching ? (
+              <div className="match-thinking" aria-label="OpenAI is comparing relevant private memories">
+                OpenAI is connecting the dots
+                <span />
+                <span />
+                <span />
+              </div>
+            ) : (
+              <p>
+                {completedMatch?.status === 'ignored'
+                  ? 'Might looked closely and did not find enough evidence to put this in front of you. Nothing was shared.'
+                  : surfacedMatch
+                    ? 'This is a private suggestion. Consent has not been requested, and Might cannot contact anyone.'
+                    : 'Might can compare this situation with only this session’s living memories—and stop before consent.'}
+              </p>
+            )}
+            {!isMatching && !surfacedMatch && completedMatch?.status !== 'ignored' ? (
+              <button
+                className="world-match-action"
+                type="button"
+                onClick={() => void lookForOverlap()}
+                disabled={matchRun === undefined}
+              >
+                {matchFailed ? 'Try the private comparison again' : 'See why Might thought of me'}
+                <span aria-hidden="true">→</span>
+              </button>
+            ) : null}
           </footer>
+          {matchError ? <p className="inline-error" role="alert">{matchError}</p> : null}
         </motion.article>
       ) : (
         <motion.div
@@ -146,8 +275,12 @@ export function FoundScreen() {
       )}
 
       <aside className="editorial-note">
-        <span>Evidence first</span>
-        <p>Every discovery keeps its public source. Observation never authorizes contact.</p>
+        <span>{surfacedMatch ? 'Still private' : 'Evidence first'}</span>
+        <p>
+          {surfacedMatch
+            ? 'A contextual match is only a thought. Consent and contact are separate steps—and neither has happened.'
+            : 'Every discovery keeps its public source. Observation never authorizes contact.'}
+        </p>
       </aside>
     </section>
   )
