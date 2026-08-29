@@ -283,6 +283,7 @@ export default defineSchema({
       v.literal("ignored"),
       v.literal("needs_clarification"),
       v.literal("surfaced"),
+      v.literal("dismissed"),
     ),
     consentState: v.literal("not_requested"),
     judgeModel: v.string(),
@@ -295,6 +296,75 @@ export default defineSchema({
       "anonymousSessionId",
       "createdAt",
     ]),
+
+  matchClarificationRuns: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    matchId: v.id("matches"),
+    clientRequestId: v.string(),
+    question: v.string(),
+    answer: v.string(),
+    privacy: v.literal("private"),
+    status: v.union(
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("failed"),
+    ),
+    judgeModel: v.string(),
+    judgeResponseId: v.union(v.string(), v.null()),
+    resultId: v.union(v.id("matchClarifications"), v.null()),
+    errorCode: v.union(
+      v.null(),
+      v.literal("OPENAI_CONFIGURATION_MISSING"),
+      v.literal("RELEVANT_MEMORY_UNAVAILABLE"),
+      v.literal("CLARIFICATION_CONTEXT_INVALID"),
+      v.literal("CLARIFICATION_JUDGE_FAILED"),
+      v.literal("CLARIFICATION_COMMIT_FAILED"),
+    ),
+    startedAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_anonymousSessionId_and_matchId_and_clientRequestId", [
+      "anonymousSessionId",
+      "matchId",
+      "clientRequestId",
+    ])
+    .index("by_anonymousSessionId_and_matchId_and_updatedAt", [
+      "anonymousSessionId",
+      "matchId",
+      "updatedAt",
+    ]),
+
+  matchClarifications: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    runId: v.id("matchClarificationRuns"),
+    matchId: v.id("matches"),
+    worldSignalId: v.id("worldSignals"),
+    relevantMemoryIds: v.array(v.id("memories")),
+    whyThisSituationMatters: v.string(),
+    whyThisPersonCameToMind: v.string(),
+    recommendation: v.union(v.literal("ignore"), v.literal("surface")),
+    riskLevel: v.union(
+      v.literal("low"),
+      v.literal("medium"),
+      v.literal("high"),
+    ),
+    matchConfidence: v.number(),
+    status: v.union(v.literal("ignored"), v.literal("surfaced")),
+    consentState: v.literal("not_requested"),
+    judgeModel: v.string(),
+    judgeResponseId: v.union(v.string(), v.null()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_runId", ["runId"])
+    .index("by_matchId_and_createdAt", ["matchId", "createdAt"]),
+
+  matchDismissals: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    matchId: v.id("matches"),
+    reason: v.literal("user_dismissed"),
+    createdAt: v.number(),
+  }).index("by_matchId", ["matchId"]),
 
   companionManifestations: defineTable({
     anonymousSessionId: v.id("anonymousSessions"),

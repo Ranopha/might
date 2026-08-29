@@ -48,6 +48,32 @@ const matchStatusValidator = v.union(
   v.literal("ignored"),
   v.literal("needs_clarification"),
   v.literal("surfaced"),
+  v.literal("dismissed"),
+);
+
+const clarificationRunStatusValidator = v.union(
+  v.literal("processing"),
+  v.literal("completed"),
+  v.literal("failed"),
+);
+
+const clarificationErrorValidator = v.union(
+  v.null(),
+  v.literal("OPENAI_CONFIGURATION_MISSING"),
+  v.literal("RELEVANT_MEMORY_UNAVAILABLE"),
+  v.literal("CLARIFICATION_CONTEXT_INVALID"),
+  v.literal("CLARIFICATION_JUDGE_FAILED"),
+  v.literal("CLARIFICATION_COMMIT_FAILED"),
+);
+
+const finalRecommendationValidator = v.union(
+  v.literal("ignore"),
+  v.literal("surface"),
+);
+
+const finalStatusValidator = v.union(
+  v.literal("ignored"),
+  v.literal("surfaced"),
 );
 
 const semanticTypeValidator = v.union(
@@ -94,6 +120,43 @@ const worldSignalViewValidator = v.object({
   evidence: v.array(evidenceValidator),
 });
 
+const clarificationFinalViewValidator = v.object({
+  id: v.id("matchClarifications"),
+  whyThisSituationMatters: v.string(),
+  whyThisPersonCameToMind: v.string(),
+  recommendation: finalRecommendationValidator,
+  status: finalStatusValidator,
+  riskLevel: riskLevelValidator,
+  matchConfidence: v.number(),
+  consentState: v.literal("not_requested"),
+  canContact: v.literal(false),
+  createdAt: v.number(),
+  updatedAt: v.number(),
+});
+
+const clarificationViewValidator = v.object({
+  runId: v.id("matchClarificationRuns"),
+  matchId: v.id("matches"),
+  status: clarificationRunStatusValidator,
+  errorCode: clarificationErrorValidator,
+  question: v.string(),
+  answer: v.string(),
+  privacy: v.literal("private"),
+  provenance: v.object({
+    judgeModel: v.string(),
+    judgeResponseId: v.union(v.string(), v.null()),
+  }),
+  finalResult: v.union(v.null(), clarificationFinalViewValidator),
+  startedAt: v.number(),
+  updatedAt: v.number(),
+});
+
+const dismissalViewValidator = v.object({
+  id: v.id("matchDismissals"),
+  reason: v.literal("user_dismissed"),
+  createdAt: v.number(),
+});
+
 const matchViewValidator = v.object({
   id: v.id("matches"),
   worldSignal: worldSignalViewValidator,
@@ -107,6 +170,12 @@ const matchViewValidator = v.object({
   status: matchStatusValidator,
   consentState: v.literal("not_requested"),
   canContact: v.literal(false),
+  canContinue: v.boolean(),
+  canAnswerClarification: v.boolean(),
+  canExpressInterest: v.boolean(),
+  supportingMemoryAvailable: v.boolean(),
+  clarification: v.union(v.null(), clarificationViewValidator),
+  dismissal: v.union(v.null(), dismissalViewValidator),
   createdAt: v.number(),
   updatedAt: v.number(),
 });
@@ -317,18 +386,49 @@ export const latest = query({
           ),
         )
       : [];
+    const clarificationRun = storedMatch
+      ? await ctx.db
+          .query("matchClarificationRuns")
+          .withIndex(
+            "by_anonymousSessionId_and_matchId_and_updatedAt",
+            (q) =>
+              q
+                .eq("anonymousSessionId", session._id)
+                .eq("matchId", storedMatch._id),
+          )
+          .order("desc")
+          .first()
+      : null;
+    const clarificationResult = clarificationRun?.resultId
+      ? await ctx.db.get("matchClarifications", clarificationRun.resultId)
+      : null;
+    const dismissal = storedMatch
+      ? await ctx.db
+          .query("matchDismissals")
+          .withIndex("by_matchId", (q) => q.eq("matchId", storedMatch._id))
+          .unique()
+      : null;
     const relevantMemories = memoryDocuments.filter(
       (memory): memory is Doc<"memories"> =>
         memory !== null &&
         memory.anonymousSessionId === session._id &&
         memory.status === "active",
     );
-    const canRevealMatch =
+    const supportingMemoryAvailable =
       storedMatch !== null &&
       storedMatch.anonymousSessionId === session._id &&
       worldSignal !== null &&
       worldSignal.anonymousSessionId === session._id &&
       relevantMemories.length === storedMatch.relevantMemoryIds.length;
+    const canRevealMatch =
+      supportingMemoryAvailable ||
+      (storedMatch !== null &&
+        storedMatch.anonymousSessionId === session._id &&
+        storedMatch.status === "dismissed" &&
+        worldSignal !== null &&
+        worldSignal.anonymousSessionId === session._id &&
+        dismissal !== null &&
+        dismissal.anonymousSessionId === session._id);
 
     return {
       runId: run._id,
@@ -358,13 +458,17 @@ export const latest = query({
               confidence: worldSignal.confidence,
               evidence: worldSignal.evidence,
             },
-            relevantMemories: relevantMemories.map((memory) => ({
-              id: memory._id,
-              statement: memory.statement,
-              sourceMessageId: memory.sourceMessageId,
-            })),
+            relevantMemories: supportingMemoryAvailable
+              ? relevantMemories.map((memory) => ({
+                  id: memory._id,
+                  statement: memory.statement,
+                  sourceMessageId: memory.sourceMessageId,
+                }))
+              : [],
             whyThisSituationMatters: storedMatch.whyThisSituationMatters,
-            whyThisPersonCameToMind: storedMatch.whyThisPersonCameToMind,
+            whyThisPersonCameToMind: supportingMemoryAvailable
+              ? storedMatch.whyThisPersonCameToMind
+              : "A supporting private memory was forgotten, so Might will not continue this match.",
             recommendation: storedMatch.recommendation,
             riskLevel: storedMatch.riskLevel,
             matchConfidence: storedMatch.matchConfidence,
@@ -372,11 +476,121 @@ export const latest = query({
             status: storedMatch.status,
             consentState: "not_requested" as const,
             canContact: false as const,
+            canContinue:
+              storedMatch.status === "needs_clarification" ||
+              storedMatch.status === "surfaced",
+            canAnswerClarification:
+              storedMatch.status === "needs_clarification" &&
+              clarificationRun === null,
+            canExpressInterest: storedMatch.status === "surfaced",
+            supportingMemoryAvailable,
+            clarification:
+              clarificationRun === null
+                ? null
+                : {
+                    runId: clarificationRun._id,
+                    matchId: clarificationRun.matchId,
+                    status: clarificationRun.status,
+                    errorCode: clarificationRun.errorCode,
+                    question: clarificationRun.question,
+                    answer: clarificationRun.answer,
+                    privacy: "private" as const,
+                    provenance: {
+                      judgeModel: clarificationRun.judgeModel,
+                      judgeResponseId: clarificationRun.judgeResponseId,
+                    },
+                    finalResult:
+                      clarificationResult !== null &&
+                      clarificationResult.anonymousSessionId === session._id &&
+                      clarificationResult.matchId === storedMatch._id &&
+                      clarificationResult.runId === clarificationRun._id
+                        ? {
+                            id: clarificationResult._id,
+                            whyThisSituationMatters:
+                              clarificationResult.whyThisSituationMatters,
+                            whyThisPersonCameToMind:
+                              clarificationResult.whyThisPersonCameToMind,
+                            recommendation:
+                              clarificationResult.recommendation,
+                            status: clarificationResult.status,
+                            riskLevel: clarificationResult.riskLevel,
+                            matchConfidence:
+                              clarificationResult.matchConfidence,
+                            consentState: "not_requested" as const,
+                            canContact: false as const,
+                            createdAt: clarificationResult.createdAt,
+                            updatedAt: clarificationResult.updatedAt,
+                          }
+                        : null,
+                    startedAt: clarificationRun.startedAt,
+                    updatedAt: clarificationRun.updatedAt,
+                  },
+            dismissal:
+              dismissal !== null &&
+              dismissal.anonymousSessionId === session._id
+                ? {
+                    id: dismissal._id,
+                    reason: "user_dismissed" as const,
+                    createdAt: dismissal.createdAt,
+                  }
+                : null,
             createdAt: storedMatch.createdAt,
             updatedAt: storedMatch.updatedAt,
           }
         : null,
     };
+  },
+});
+
+export const dismiss = mutation({
+  args: {
+    clientSessionKey: v.string(),
+    matchId: v.id("matches"),
+  },
+  returns: v.object({
+    dismissalId: v.id("matchDismissals"),
+    created: v.boolean(),
+  }),
+  handler: async (ctx, args) => {
+    assertClientSessionKey(args.clientSessionKey);
+    const session = await ctx.db
+      .query("anonymousSessions")
+      .withIndex("by_clientSessionKey", (q) =>
+        q.eq("clientSessionKey", args.clientSessionKey),
+      )
+      .unique();
+    const match = await ctx.db.get("matches", args.matchId);
+    if (
+      session === null ||
+      match === null ||
+      match.anonymousSessionId !== session._id
+    ) {
+      throw new ConvexError("Match is unavailable.");
+    }
+
+    const existing = await ctx.db
+      .query("matchDismissals")
+      .withIndex("by_matchId", (q) => q.eq("matchId", match._id))
+      .unique();
+    if (existing !== null) {
+      return { dismissalId: existing._id, created: false };
+    }
+    if (match.status === "dismissed") {
+      throw new ConvexError("Dismissed match audit is unavailable.");
+    }
+
+    const now = Date.now();
+    const dismissalId = await ctx.db.insert("matchDismissals", {
+      anonymousSessionId: session._id,
+      matchId: match._id,
+      reason: "user_dismissed",
+      createdAt: now,
+    });
+    await ctx.db.patch("matches", match._id, {
+      status: "dismissed",
+      updatedAt: now,
+    });
+    return { dismissalId, created: true };
   },
 });
 

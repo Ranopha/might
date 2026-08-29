@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useMutation, useQuery } from 'convex/react'
 import { motion } from 'motion/react'
 import { api } from '../../convex/_generated/api'
@@ -9,11 +9,18 @@ export function FoundScreen() {
   const [sessionKey] = useState(getOrCreateSessionKey)
   const [requestError, setRequestError] = useState<string | null>(null)
   const [matchError, setMatchError] = useState<string | null>(null)
+  const [clarificationDraft, setClarificationDraft] = useState('')
+  const [clarificationError, setClarificationError] = useState<string | null>(null)
+  const [dismissPending, setDismissPending] = useState(false)
+  const [dismissError, setDismissError] = useState<string | null>(null)
   const pendingRequestId = useRef<string | null>(null)
   const pendingMatchRequestId = useRef<string | null>(null)
+  const pendingClarificationRequestId = useRef<string | null>(null)
   const ensureSession = useMutation(api.talk.ensureSession)
   const requestScan = useMutation(api.worldSignals.requestScan)
   const requestMatch = useMutation(api.matches.requestMatch)
+  const dismissMatch = useMutation(api.matches.dismiss)
+  const submitClarification = useMutation(api.matchClarifications.submitAnswer)
   const worldSignal = useQuery(api.worldSignals.latest, {
     clientSessionKey: sessionKey,
   })
@@ -59,6 +66,41 @@ export function FoundScreen() {
     }
   }
 
+  async function answerClarification(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    if (!surfacedMatch || clarificationDraft.trim().length === 0) return
+    const requestId = pendingClarificationRequestId.current ?? crypto.randomUUID()
+    pendingClarificationRequestId.current = requestId
+    setClarificationError(null)
+    try {
+      await submitClarification({
+        clientSessionKey: sessionKey,
+        matchId: surfacedMatch.id,
+        clientRequestId: requestId,
+        answer: clarificationDraft.trim(),
+      })
+      pendingClarificationRequestId.current = null
+    } catch {
+      setClarificationError('Might could not save that answer yet. Nothing was shared—please try once more.')
+    }
+  }
+
+  async function dismissCurrentMatch() {
+    if (!surfacedMatch) return
+    setDismissPending(true)
+    setDismissError(null)
+    try {
+      await dismissMatch({
+        clientSessionKey: sessionKey,
+        matchId: surfacedMatch.id,
+      })
+    } catch {
+      setDismissError('Might could not close this match yet. Nothing was shared—please try again.')
+    } finally {
+      setDismissPending(false)
+    }
+  }
+
   const isProcessing = worldSignal?.status === 'processing'
   const isFailed = worldSignal?.status === 'failed'
   const completedSignal = worldSignal?.status === 'completed' ? worldSignal.signal : null
@@ -67,7 +109,15 @@ export function FoundScreen() {
   const isMatching = matchForSignal?.status === 'processing'
   const matchFailed = matchForSignal?.status === 'failed'
   const completedMatch = matchForSignal?.status === 'completed' ? matchForSignal.match : null
-  const surfacedMatch = completedMatch?.status !== 'ignored' ? completedMatch : null
+  const matchIsClosed = completedMatch?.status === 'ignored' || completedMatch?.status === 'dismissed'
+  const surfacedMatch = completedMatch && !matchIsClosed ? completedMatch : null
+  const clarification = surfacedMatch?.clarification ?? null
+  const clarificationPending = clarification?.status === 'processing'
+  const clarificationFailed = clarification?.status === 'failed'
+  const finalMatchResult = clarification?.finalResult ?? null
+  const matchWhySituation = finalMatchResult?.whyThisSituationMatters ?? surfacedMatch?.whyThisSituationMatters
+  const matchWhyPerson = finalMatchResult?.whyThisPersonCameToMind ?? surfacedMatch?.whyThisPersonCameToMind
+  const matchConfidence = finalMatchResult?.matchConfidence ?? surfacedMatch?.matchConfidence ?? 0
   const firecrawlMode =
     worldSignal?.provenance.sourceMode === 'cached'
       ? 'cached'
@@ -146,18 +196,18 @@ export function FoundScreen() {
               transition={{ duration: 0.55 }}
             >
               <div className="match-overlap__topline">
-                <span>{surfacedMatch.matchConfidence >= 0.8 ? 'Strong possible fit' : 'Possible fit'}</span>
+                <span>{matchConfidence >= 0.8 ? 'Strong possible fit' : 'Possible fit'}</span>
                 <i>OpenAI contextual match</i>
               </div>
-              <h3>{surfacedMatch.whyThisPersonCameToMind}</h3>
+              <h3>{matchWhyPerson}</h3>
               <div className="match-overlap__columns">
                 <section>
                   <span>Why this situation matters</span>
-                  <p>{surfacedMatch.whyThisSituationMatters}</p>
+                  <p>{matchWhySituation}</p>
                 </section>
                 <section>
                   <span>Why you came to mind</span>
-                  <p>{surfacedMatch.whyThisPersonCameToMind}</p>
+                  <p>{matchWhyPerson}</p>
                 </section>
               </div>
               <div className="match-memory-thread">
@@ -178,17 +228,80 @@ export function FoundScreen() {
               transition={{ duration: 0.55, delay: 0.08 }}
             >
               <div className="match-question__topline">
-                <span>{surfacedMatch.clarificationQuestion ? 'One thing I’m not sure about' : 'Worth exploring'}</span>
+                <span>
+                  {clarificationPending
+                    ? 'Reconsidering with your answer'
+                    : finalMatchResult
+                      ? 'Your answer strengthened the context'
+                      : surfacedMatch.clarificationQuestion
+                        ? 'One thing I’m not sure about'
+                        : 'Worth exploring'}
+                </span>
                 <i>No consent requested</i>
               </div>
               <h3>
-                {surfacedMatch.clarificationQuestion ?? 'This may be worth exploring with you.'}
+                {finalMatchResult
+                  ? 'This now looks worth exploring with you.'
+                  : surfacedMatch.clarificationQuestion ?? 'This may be worth exploring with you.'}
               </h3>
-              <p>
-                {surfacedMatch.clarificationQuestion
-                  ? 'This question stays inside Might. Answering it will not share a memory or contact anyone.'
-                  : 'No memory has been shared. Exploring this further will still require a separate choice from you.'}
-              </p>
+              {clarification ? (
+                <blockquote className="match-answer-receipt">
+                  <span>Your private answer</span>
+                  <p>“{clarification.answer}”</p>
+                </blockquote>
+              ) : null}
+              {surfacedMatch.status === 'needs_clarification' && clarification === null ? (
+                <form className="match-answer" onSubmit={(event) => void answerClarification(event)}>
+                  <label htmlFor={`clarification-${surfacedMatch.id}`}>Answer inside Might</label>
+                  <textarea
+                    id={`clarification-${surfacedMatch.id}`}
+                    value={clarificationDraft}
+                    onChange={(event) => setClarificationDraft(event.target.value)}
+                    maxLength={1000}
+                    rows={3}
+                    placeholder="Share only what would help Might understand this fit…"
+                  />
+                  <div>
+                    <button
+                      className="world-match-action"
+                      type="submit"
+                      disabled={clarificationDraft.trim().length === 0}
+                    >
+                      Reconsider with this answer <span aria-hidden="true">→</span>
+                    </button>
+                    <span>Still private · not Send consent</span>
+                  </div>
+                </form>
+              ) : clarificationPending ? (
+                <div className="match-thinking" aria-label="OpenAI is reconsidering the match">
+                  OpenAI is reconsidering
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              ) : (
+                <p>
+                  {clarificationFailed
+                    ? 'The re-check paused safely. Your answer stayed private and nothing was shared.'
+                    : finalMatchResult
+                      ? 'Your answer stayed inside Might. Exploring this further will still require a separate choice from you.'
+                      : 'No memory has been shared. Exploring this further will still require a separate choice from you.'}
+                </p>
+              )}
+              {clarificationError ? <p className="inline-error" role="alert">{clarificationError}</p> : null}
+              {surfacedMatch.canContinue ? (
+                <div className="match-choice-boundary">
+                  <span>Not your path?</span>
+                  <button
+                    type="button"
+                    onClick={() => void dismissCurrentMatch()}
+                    disabled={dismissPending || clarificationPending}
+                  >
+                    {dismissPending ? 'Closing…' : 'Not for me'}
+                  </button>
+                </div>
+              ) : null}
+              {dismissError ? <p className="inline-error" role="alert">{dismissError}</p> : null}
             </motion.section>
           ) : null}
 
@@ -200,6 +313,8 @@ export function FoundScreen() {
                   ? 'Match paused safely'
                   : completedMatch?.status === 'ignored'
                     ? 'No convincing overlap'
+                    : completedMatch?.status === 'dismissed'
+                      ? 'Passed for now'
                     : surfacedMatch
                       ? 'Reasoned, not shared'
                       : 'Observed, not matched'}
@@ -215,12 +330,14 @@ export function FoundScreen() {
               <p>
                 {completedMatch?.status === 'ignored'
                   ? 'Might looked closely and did not find enough evidence to put this in front of you. Nothing was shared.'
+                  : completedMatch?.status === 'dismissed'
+                    ? 'You closed this possibility. It cannot continue to clarification, consent, or contact.'
                   : surfacedMatch
                     ? 'This is a private suggestion. Consent has not been requested, and Might cannot contact anyone.'
                     : 'Might can compare this situation with only this session’s living memories—and stop before consent.'}
               </p>
             )}
-            {!isMatching && !surfacedMatch && completedMatch?.status !== 'ignored' ? (
+            {!isMatching && !surfacedMatch && !matchIsClosed ? (
               <button
                 className="world-match-action"
                 type="button"

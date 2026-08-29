@@ -2217,6 +2217,107 @@
   line-height: 1.6;
 }
 
+.match-question .match-answer-receipt {
+  margin: 18px 0 0;
+  padding: 15px 17px;
+  border-left-color: rgba(199, 116, 75, 0.3);
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.match-question .match-answer-receipt p {
+  margin: 7px 0 0;
+  color: #675660;
+  font-size: 12px;
+}
+
+.match-answer {
+  margin-top: 20px;
+}
+
+.match-answer label {
+  display: block;
+  margin-bottom: 8px;
+  color: #806f84;
+  font-size: 8px;
+  font-weight: 680;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.match-answer textarea {
+  width: 100%;
+  padding: 14px 15px;
+  resize: vertical;
+  border: 1px solid rgba(126, 82, 178, 0.16);
+  border-radius: 16px;
+  outline: 0;
+  color: #514356;
+  background: rgba(255, 255, 255, 0.65);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.55;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.match-answer textarea:focus {
+  border-color: rgba(126, 82, 178, 0.36);
+  box-shadow: 0 0 0 3px rgba(126, 82, 178, 0.07);
+}
+
+.match-answer textarea::placeholder {
+  color: #9a8d96;
+}
+
+.match-answer > div {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.match-answer > div > span {
+  color: #927d83;
+  font-size: 9px;
+}
+
+.match-choice-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(126, 82, 178, 0.1);
+}
+
+.match-choice-boundary > span {
+  color: #927d83;
+  font-size: 9px;
+}
+
+.match-choice-boundary button {
+  min-height: 34px;
+  padding: 0 13px;
+  border: 1px solid rgba(126, 82, 178, 0.13);
+  border-radius: 999px;
+  color: #765f78;
+  background: rgba(255, 255, 255, 0.48);
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.match-choice-boundary button:hover:not(:disabled) {
+  border-color: rgba(126, 82, 178, 0.28);
+  color: #59405e;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.match-choice-boundary button:disabled {
+  cursor: default;
+  opacity: 0.56;
+}
+
 @keyframes match-pulse {
   0%,
   65%,
@@ -2265,6 +2366,20 @@
 
   .match-overlap__columns {
     grid-template-columns: 1fr;
+  }
+
+  .match-answer > div {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .match-answer .world-match-action {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .match-choice-boundary {
+    align-items: flex-start;
   }
 }
 
