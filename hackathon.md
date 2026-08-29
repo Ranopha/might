@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-29T05:51:50Z
+- **Last updated:** 2026-08-29T14:07:30Z
 
 ## Log
 
@@ -199,3 +199,17 @@ checks, and the dependency audit passed. AgentMail remains unconfigured, so no
 email or webhook call occurred. Production was not changed; interest, pitch,
 payload-bound Send consent, AgentMail outbound/inbound, Replied, Connected, and
 the complete E2E remain open.
+
+### 2026-08-29 - 95f3705
+
+Investigated Zeabur's environment-variable incident and found no Zeabur,
+LiteLLM, or related deployment path in Might; cross-project credential reuse
+remains unprovable from repository evidence (`docs/research/zeabur-incident-2026-08-29.md`).
+
+A security scan found two public paid-work abuse paths. Added component-backed
+global, daily, and per-session budgets plus one-active-turn/generation guards
+before OpenAI, scheduler, image, or Storage work (`convex/abuseProtection.ts`,
+`convex/talk.ts`, `convex/manifestation.ts`). Seventeen tests, lint, typecheck,
+build, secret/dependency checks, and development sync passed. The guards are
+verified on `vibrant-wren-913`; production was not changed and remains open
+until a fresh deploy approval.
