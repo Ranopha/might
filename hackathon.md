@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-29T05:16:44Z
+- **Last updated:** 2026-08-29T05:33:57Z
 
 ## Log
 
@@ -147,3 +147,33 @@ and mobile browser inspection found no warning or error. This is a real
 Firecrawl → OpenAI → Convex integration verified on `vibrant-wren-913` only.
 Production, contextual matching, clarification, consent, AgentMail, reply,
 Connected, and the complete E2E remain open and are not claimed.
+
+### 2026-08-29 - 0d9505b
+
+Added the private WorldSignal-to-Match tracer bullet. One session-owned,
+completed public signal and at most twelve active private-memory candidates now
+enter a scheduled OpenAI Serendipity Judge. The deterministic commit accepts at
+most four relevant memory IDs, revalidates ownership and active state, stores
+both reasoning sides and provider trace metadata, and exposes the result only to
+the owning browser (`convex/matches.ts`, `convex/matchJudge.ts`).
+
+The public behavior test proves idempotency, browser isolation, exclusion of a
+forgotten memory, source evidence on both sides, at most one clarification, and
+the hard `consentState: not_requested` / `canContact: false` boundary. Eleven
+tests, lint, typecheck, build, development sync, secret/diff checks, and the
+dependency audit passed.
+
+Verified a real development flow using the earlier Firecrawl signal and one new
+synthetic Talk turn. Four private memories appeared, two were confirmed, and
+OpenAI selected only the confirmed woodworking/tools memory for the low-risk
+repair overlap. The Judge action finished in about 3.35 seconds; Might Found
+updated without refresh and survived reload. Desktop and mobile inspection
+found no browser warning or error.
+
+The real Judge returned `surface` without a clarification, so live clarification
+is not claimed. The Judge instructions were tightened afterward: skills and
+tools cannot imply willingness or relevant availability, and volunteer contexts
+missing either must ask one neutral question that is explicitly not consent.
+This correction is synced to development and covered by the deterministic seam,
+but still needs a fresh live run. Production, clarification answer, consent,
+AgentMail, reply, Connected, and the complete E2E remain open.
