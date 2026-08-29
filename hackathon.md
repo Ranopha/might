@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-29T05:33:57Z
+- **Last updated:** 2026-08-29T05:51:50Z
 
 ## Log
 
@@ -177,3 +177,25 @@ missing either must ask one neutral question that is explicitly not consent.
 This correction is synced to development and covered by the deterministic seam,
 but still needs a fresh live run. Production, clarification answer, consent,
 AgentMail, reply, Connected, and the complete E2E remain open.
+
+### 2026-08-29 - 1adfe2d
+
+Added the private clarification tracer. The owning browser may answer the one
+neutral Match question once; Convex preserves the exact private question and
+answer, schedules an OpenAI re-judge, revalidates every supporting memory, and
+saves a separate final audit without overwriting the original Match reasoning
+(`convex/matchClarifications.ts`, `convex/matchClarificationJudge.ts`). A
+session-owned, idempotent `Not for me` path closes the Match without external
+contact.
+
+Verified a fresh real development flow from Talk and private memories through a
+new Firecrawl signal, corrected OpenAI Match clarification, private answer, and
+final OpenAI re-judging. Might Found updated in realtime, showed strengthened
+context, retained `consentState: not_requested` and `canContact: false`, and
+survived reload. Desktop and mobile checks found no browser warning or error.
+
+Twelve behavior tests, lint, typecheck, build, development sync, diff/secret
+checks, and the dependency audit passed. AgentMail remains unconfigured, so no
+email or webhook call occurred. Production was not changed; interest, pitch,
+payload-bound Send consent, AgentMail outbound/inbound, Replied, Connected, and
+the complete E2E remain open.
