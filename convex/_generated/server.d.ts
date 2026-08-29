@@ -30,6 +30,7 @@ import type { DataModel } from "./dataModel.js";
 type Env = {
   readonly CONVEX_CLOUD_URL: string;
   readonly CONVEX_SITE_URL: string;
+  readonly FIRECRAWL_API_KEY: string;
   readonly OPENAI_API_KEY: string | undefined;
   readonly OPENAI_IMAGE_MODEL: string | undefined;
   readonly OPENAI_TEXT_MODEL: string | undefined;

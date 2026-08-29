@@ -14,6 +14,8 @@ import type * as manifestationOpenai from "../manifestationOpenai.js";
 import type * as memories from "../memories.js";
 import type * as talk from "../talk.js";
 import type * as talkOpenai from "../talkOpenai.js";
+import type * as worldSensor from "../worldSensor.js";
+import type * as worldSignals from "../worldSignals.js";
 
 import type {
   ApiFromModules,
@@ -28,6 +30,8 @@ declare const fullApi: ApiFromModules<{
   memories: typeof memories;
   talk: typeof talk;
   talkOpenai: typeof talkOpenai;
+  worldSensor: typeof worldSensor;
+  worldSignals: typeof worldSignals;
 }>;
 
 /**
@@ -58,5 +62,7 @@ export declare const internal: FilterApi<
 
 export declare const components: {
   agent: import("@convex-dev/agent/_generated/component.js").ComponentApi<"agent">;
+  rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
+  firecrawl: import("@firecrawl/firecrawl-convex/_generated/component.js").ComponentApi<"firecrawl">;
   staticHosting: import("@convex-dev/static-hosting/_generated/component.js").ComponentApi<"staticHosting">;
 };

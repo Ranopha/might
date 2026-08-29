@@ -1,4 +1,6 @@
 import agent from "@convex-dev/agent/convex.config";
+import rateLimiter from "@convex-dev/rate-limiter/convex.config";
+import firecrawl from "@firecrawl/firecrawl-convex/convex.config";
 import staticHosting from "@convex-dev/static-hosting/convex.config";
 import { defineApp } from "convex/server";
 import { v } from "convex/values";
@@ -11,9 +13,16 @@ const app = defineApp({
     OPENAI_API_KEY: v.optional(v.string()),
     OPENAI_TEXT_MODEL: v.optional(v.string()),
     OPENAI_IMAGE_MODEL: v.optional(v.string()),
+    FIRECRAWL_API_KEY: v.string(),
   },
 });
 app.use(agent);
+app.use(rateLimiter);
+app.use(firecrawl, {
+  env: {
+    FIRECRAWL_API_KEY: app.env.FIRECRAWL_API_KEY,
+  },
+});
 app.use(staticHosting, { httpPrefix: "/" });
 
 export default app;

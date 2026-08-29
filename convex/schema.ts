@@ -141,6 +141,87 @@ export default defineSchema({
       "normalizedStatement",
     ]),
 
+  worldSignalRuns: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    clientRequestId: v.string(),
+    sourceUrl: v.string(),
+    status: v.union(
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("failed"),
+    ),
+    provider: v.literal("firecrawl"),
+    sourceMode: v.union(
+      v.null(),
+      v.literal("live"),
+      v.literal("cached"),
+      v.literal("unknown"),
+    ),
+    providerRequestId: v.union(v.string(), v.null()),
+    interpreterModel: v.string(),
+    interpreterResponseId: v.union(v.string(), v.null()),
+    signalId: v.union(v.id("worldSignals"), v.null()),
+    errorCode: v.union(
+      v.null(),
+      v.literal("FIRECRAWL_SCRAPE_FAILED"),
+      v.literal("SOURCE_RESPONSE_INVALID"),
+      v.literal("OPENAI_CONFIGURATION_MISSING"),
+      v.literal("WORLD_INTERPRETATION_FAILED"),
+      v.literal("WORLD_SIGNAL_COMMIT_FAILED"),
+    ),
+    startedAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_anonymousSessionId_and_clientRequestId", [
+      "anonymousSessionId",
+      "clientRequestId",
+    ])
+    .index("by_anonymousSessionId_and_updatedAt", [
+      "anonymousSessionId",
+      "updatedAt",
+    ]),
+
+  worldSignals: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    runId: v.id("worldSignalRuns"),
+    sourceUrl: v.string(),
+    sourceTitle: v.string(),
+    sourceDomain: v.string(),
+    rawExcerpt: v.string(),
+    situation: v.string(),
+    painOrFriction: v.string(),
+    desiredOutcome: v.string(),
+    needHypothesis: v.string(),
+    location: v.string(),
+    timeContext: v.string(),
+    explicitness: v.union(
+      v.literal("explicit_need"),
+      v.literal("inferred_need"),
+    ),
+    confidence: v.number(),
+    evidence: v.array(
+      v.object({
+        url: v.string(),
+        excerpt: v.string(),
+      }),
+    ),
+    provider: v.literal("firecrawl"),
+    sourceMode: v.union(
+      v.literal("live"),
+      v.literal("cached"),
+      v.literal("unknown"),
+    ),
+    providerRequestId: v.union(v.string(), v.null()),
+    interpreterModel: v.string(),
+    interpreterResponseId: v.union(v.string(), v.null()),
+    createdAt: v.number(),
+  })
+    .index("by_runId", ["runId"])
+    .index("by_anonymousSessionId_and_createdAt", [
+      "anonymousSessionId",
+      "createdAt",
+    ]),
+
   companionManifestations: defineTable({
     anonymousSessionId: v.id("anonymousSessions"),
     clientRequestId: v.string(),
