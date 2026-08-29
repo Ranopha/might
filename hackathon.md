@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-29T02:25:21Z
+- **Last updated:** 2026-08-29T04:25:48Z
 
 ## Log
 
@@ -100,3 +100,23 @@ production build, Convex codegen, and `convex dev --once` passed. This proof is
 limited to development deployment `vibrant-wren-913`; the public production app
 still serves the prior Manifestation slice. Firecrawl, AgentMail, matching,
 consent outreach, inbound reply, Connected, and the complete E2E remain open.
+
+### 2026-08-29 - de1d546
+
+Deployed the Talk-to-Memory slice and `@convex-dev/agent` component to
+production, then published the matching frontend through Convex Static Hosting
+(deployment `58f020a6-78ef-45bb-b1b7-2189cb6a486c`). The production schema added
+five Talk/Memory indexes and deleted none.
+
+Verified a fresh signed-out public session with real OpenAI work. A natural
+message persisted immediately, Might replied contextually, and three private,
+source-linked memories appeared in Me through a realtime query. Confirming one,
+correcting one, and forgetting one updated the UI live from three memories to
+two; the remaining memories and conversation survived a full reload.
+
+Production logs recorded the scheduled `talkOpenai:generateTurn` action in
+about 6.16 seconds together with the Talk, memory-commit, confirm, edit, and
+forget functions. The public bundle targets the production Convex deployment,
+`/api/health` is live, and browser verification found no warning or error.
+Firecrawl, AgentMail, matching, consent outreach, inbound reply, Connected, and
+the complete E2E remain open and are not claimed.
