@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-29T02:22:21Z
+- **Last updated:** 2026-08-29T02:25:21Z
 
 ## Log
 
@@ -74,7 +74,7 @@ Firecrawl, AgentMail, living-memory extraction, matching, consent outreach,
 inbound reply, and the complete end-to-end chain remain unimplemented and are
 not claimed.
 
-### 2026-08-29 - working tree
+### 2026-08-29 - 126ac1c
 
 Added the first real Talk-to-Memory tracer bullet. Each browser-scoped primary
 conversation now owns a durable Convex Agent thread. A user message is saved
