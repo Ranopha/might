@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-29T14:07:30Z
+- **Last updated:** 2026-08-29T14:24:29Z
 
 ## Log
 
@@ -213,3 +213,19 @@ before OpenAI, scheduler, image, or Storage work (`convex/abuseProtection.ts`,
 build, secret/dependency checks, and development sync passed. The guards are
 verified on `vibrant-wren-913`; production was not changed and remains open
 until a fresh deploy approval.
+
+### 2026-08-29 - 48f54ed
+
+Production preflight for exact `main@4fc1a1d` passed 17 tests, lint, typecheck,
+build, and a non-destructive Convex dry-run. The approved push failed closed at
+finalization because production lacks the required `FIRECRAWL_API_KEY`; the new
+functions and paid-work guards were not activated. The existing public health
+route remained live, and no Sponsor call, email, or environment change occurred.
+
+Compared current OpenAI and Gemini pricing, data terms, image availability, and
+hackathon scoring using official sources
+(`docs/research/openai-vs-gemini-cost-2026-08-29.md`). GPT-5.6 Luna is already a
+low-cost Sponsor-visible path; free Gemini is not suitable for Might's private
+memory content and does not provide free image generation. The submission path
+therefore remains on OpenAI with Convex quotas, idempotency, and persistent asset
+reuse rather than adding a second provider before the complete E2E is reliable.
