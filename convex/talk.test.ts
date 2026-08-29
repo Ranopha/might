@@ -2,6 +2,7 @@
 // @vitest-environment edge-runtime
 
 import agentTest from "@convex-dev/agent/test";
+import rateLimiterTest from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
 import type { FunctionArgs } from "convex/server";
 import { expect, test } from "vitest";
@@ -21,6 +22,7 @@ const unknownBrowserKey = "unknown-000000000000000000000000000000003";
 function initTest() {
   const t = convexTest(schema, modules);
   agentTest.register(t);
+  rateLimiterTest.register(t);
   return t;
 }
 
@@ -53,6 +55,16 @@ test("keeps anonymous browser conversations isolated and ordered", async () => {
     clientSessionKey: browserAKey,
     clientMessageId: "message-a-1",
     content: "I manage a convenience store.",
+  });
+  const firstBrowserATurn = await t.query(api.talk.latestTurn, {
+    clientSessionKey: browserAKey,
+  });
+  if (firstBrowserATurn === null) {
+    throw new Error("Expected the first browser A turn to be processing.");
+  }
+  await t.mutation(internal.talk.failTurn, {
+    turnId: firstBrowserATurn.id,
+    errorCode: "TURN_COMMIT_FAILED",
   });
   await t.mutation(api.talk.appendUserMessage, {
     clientSessionKey: browserAKey,
@@ -224,6 +236,77 @@ test("a client turn is idempotent and enters one asynchronous processing state",
     sourceMessageId: first.id,
     status: "processing",
   });
+});
+
+test("rejects a second Talk turn while the first turn is still processing", async () => {
+  const t = initTest();
+
+  await t.mutation(api.talk.ensureSession, {
+    clientSessionKey: browserAKey,
+  });
+  await t.mutation(api.talk.appendUserMessage, {
+    clientSessionKey: browserAKey,
+    clientMessageId: "message-processing-1",
+    content: "I have a decade of woodworking experience.",
+  });
+
+  await expect(
+    t.mutation(api.talk.appendUserMessage, {
+      clientSessionKey: browserAKey,
+      clientMessageId: "message-processing-2",
+      content: "I also still own all of my tools.",
+    }),
+  ).rejects.toThrow(/still replying/i);
+
+  const messages = await t.query(api.talk.listMessages, {
+    clientSessionKey: browserAKey,
+    limit: 50,
+  });
+  expect(messages.map((message) => message.content)).toEqual([
+    "I have a decade of woodworking experience.",
+  ]);
+});
+
+test("all anonymous sessions share a strict Talk sponsor-call burst budget", async () => {
+  const t = initTest();
+
+  for (let index = 0; index < 20; index += 1) {
+    const clientSessionKey = `talk-budget-${index.toString().padStart(2, "0")}-${"0".repeat(32)}`;
+    await t.mutation(api.talk.ensureSession, { clientSessionKey });
+    await t.mutation(api.talk.appendUserMessage, {
+      clientSessionKey,
+      clientMessageId: `budget-message-${index.toString().padStart(2, "0")}`,
+      content: `Bounded test message ${index}.`,
+    });
+  }
+
+  const blockedSessionKey = `talk-budget-20-${"0".repeat(32)}`;
+  await t.mutation(api.talk.ensureSession, {
+    clientSessionKey: blockedSessionKey,
+  });
+  await expect(
+    t.mutation(api.talk.appendUserMessage, {
+      clientSessionKey: blockedSessionKey,
+      clientMessageId: "budget-message-20",
+      content: "This turn must not reach paid provider work.",
+    }),
+  ).rejects.toThrow(/resting for a moment/i);
+});
+
+test("anonymous session bootstrap has a deployment-wide allocation budget", async () => {
+  const t = initTest();
+
+  for (let index = 0; index < 30; index += 1) {
+    await t.mutation(api.talk.ensureSession, {
+      clientSessionKey: `session-budget-${index.toString().padStart(2, "0")}-${"0".repeat(32)}`,
+    });
+  }
+
+  await expect(
+    t.mutation(api.talk.ensureSession, {
+      clientSessionKey: `session-budget-30-${"0".repeat(32)}`,
+    }),
+  ).rejects.toThrow(/new private sessions are resting/i);
 });
 
 test("memory controls confirm, correct, and forget only inside the owning session", async () => {

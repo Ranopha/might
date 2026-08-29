@@ -8,6 +8,7 @@ import {
   mutation,
   query,
 } from "./_generated/server";
+import { abuseProtection } from "./abuseProtection";
 
 const MIN_SESSION_KEY_LENGTH = 32;
 const MAX_SESSION_KEY_LENGTH = 256;
@@ -146,6 +147,18 @@ export const ensureSession = mutation({
       )
       .unique();
 
+    if (existingSession === null) {
+      const sessionBudget = await abuseProtection.limit(
+        ctx,
+        "anonymousSessionCreation",
+      );
+      if (!sessionBudget.ok) {
+        throw new ConvexError(
+          "New private sessions are resting for a moment. Please try again shortly.",
+        );
+      }
+    }
+
     const createdSession = existingSession === null;
     const sessionId = createdSession
       ? await ctx.db.insert("anonymousSessions", {
@@ -251,6 +264,36 @@ export const appendUserMessage = mutation({
         createdAt: existingMessage.createdAt,
         created: false,
       };
+    }
+
+    const processingTurn = await ctx.db
+      .query("talkTurns")
+      .withIndex(
+        "by_anonymousSessionId_and_status_and_updatedAt",
+        (q) =>
+          q
+            .eq("anonymousSessionId", session._id)
+            .eq("status", "processing"),
+      )
+      .order("desc")
+      .first();
+    if (processingTurn !== null) {
+      throw new ConvexError(
+        "Might is still replying to your previous message.",
+      );
+    }
+
+    const burstBudget = await abuseProtection.limit(ctx, "talkBurst");
+    const dailyBudget = await abuseProtection.limit(ctx, "talkDaily");
+    const sessionBudget = await abuseProtection.limit(
+      ctx,
+      "talkSessionHourly",
+      { key: session._id },
+    );
+    if (!burstBudget.ok || !dailyBudget.ok || !sessionBudget.ok) {
+      throw new ConvexError(
+        "Might is resting for a moment. Please try again shortly.",
+      );
     }
 
     const conversation = await ctx.db

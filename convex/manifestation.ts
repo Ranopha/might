@@ -10,6 +10,7 @@ import {
   type ActionCtx,
   type QueryCtx,
 } from "./_generated/server";
+import { abuseProtection } from "./abuseProtection";
 
 const DEFAULT_TEXT_MODEL = "gpt-5.6-luna";
 const DEFAULT_IMAGE_MODEL = "gpt-image-2";
@@ -223,6 +224,17 @@ export const beginGeneration = internalMutation({
         q.eq("clientSessionKey", args.clientSessionKey),
       )
       .unique();
+    if (existingSession === null) {
+      const sessionBudget = await abuseProtection.limit(
+        ctx,
+        "anonymousSessionCreation",
+      );
+      if (!sessionBudget.ok) {
+        throw new ConvexError(
+          "New private sessions are resting for a moment. Please try again shortly.",
+        );
+      }
+    }
     const sessionId =
       existingSession?._id ??
       (await ctx.db.insert("anonymousSessions", {
@@ -249,6 +261,79 @@ export const beginGeneration = internalMutation({
         manifestationId: existing._id,
         shouldGenerate: false,
       };
+    }
+
+    const ready = await ctx.db
+      .query("companionManifestations")
+      .withIndex(
+        "by_anonymousSessionId_and_status_and_updatedAt",
+        (q) =>
+          q
+            .eq("anonymousSessionId", sessionId)
+            .eq("status", "ready"),
+      )
+      .order("desc")
+      .first();
+    if (ready !== null) {
+      return { manifestationId: ready._id, shouldGenerate: false };
+    }
+
+    const generatingImage = await ctx.db
+      .query("companionManifestations")
+      .withIndex(
+        "by_anonymousSessionId_and_status_and_updatedAt",
+        (q) =>
+          q
+            .eq("anonymousSessionId", sessionId)
+            .eq("status", "generating_image"),
+      )
+      .order("desc")
+      .first();
+    const generatingBrief = await ctx.db
+      .query("companionManifestations")
+      .withIndex(
+        "by_anonymousSessionId_and_status_and_updatedAt",
+        (q) =>
+          q
+            .eq("anonymousSessionId", sessionId)
+            .eq("status", "generating_brief"),
+      )
+      .order("desc")
+      .first();
+    const active = generatingImage ?? generatingBrief;
+    if (active !== null) {
+      return { manifestationId: active._id, shouldGenerate: false };
+    }
+
+    const failedAttempts = await ctx.db
+      .query("companionManifestations")
+      .withIndex(
+        "by_anonymousSessionId_and_status_and_updatedAt",
+        (q) =>
+          q
+            .eq("anonymousSessionId", sessionId)
+            .eq("status", "failed"),
+      )
+      .order("desc")
+      .take(3);
+    if (failedAttempts.length >= 3) {
+      throw new ConvexError(
+        "Companion generation is paused for this private session after repeated failures.",
+      );
+    }
+
+    const burstBudget = await abuseProtection.limit(
+      ctx,
+      "manifestationBurst",
+    );
+    const dailyBudget = await abuseProtection.limit(
+      ctx,
+      "manifestationDaily",
+    );
+    if (!burstBudget.ok || !dailyBudget.ok) {
+      throw new ConvexError(
+        "Companion generation is resting for a moment. Please try again shortly.",
+      );
     }
 
     if (existingSession !== null) {

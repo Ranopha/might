@@ -86,6 +86,11 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_sourceMessageId", ["sourceMessageId"])
+    .index("by_anonymousSessionId_and_status_and_updatedAt", [
+      "anonymousSessionId",
+      "status",
+      "updatedAt",
+    ])
     .index("by_anonymousSessionId_and_updatedAt", [
       "anonymousSessionId",
       "updatedAt",
@@ -398,6 +403,11 @@ export default defineSchema({
     .index("by_anonymousSessionId_and_clientRequestId", [
       "anonymousSessionId",
       "clientRequestId",
+    ])
+    .index("by_anonymousSessionId_and_status_and_updatedAt", [
+      "anonymousSessionId",
+      "status",
+      "updatedAt",
     ])
     .index("by_anonymousSessionId_and_updatedAt", [
       "anonymousSessionId",

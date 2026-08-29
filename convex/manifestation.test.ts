@@ -2,6 +2,7 @@
 // @vitest-environment edge-runtime
 
 import agentTest from "@convex-dev/agent/test";
+import rateLimiterTest from "@convex-dev/rate-limiter/test";
 import { convexTest } from "convex-test";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { api, internal } from "./_generated/api";
@@ -34,10 +35,12 @@ const modules = import.meta.glob([
 
 const browserAKey = "manifest-a-0000000000000000000000000000001";
 const browserBKey = "manifest-b-0000000000000000000000000000002";
+const browserCKey = "manifest-c-0000000000000000000000000000003";
 
 function initTest() {
   const t = convexTest(schema, modules);
   agentTest.register(t);
+  rateLimiterTest.register(t);
   return t;
 }
 
@@ -148,6 +151,101 @@ test("turns a famous-IP reference into an original brief before storing the gene
     imageRequestId: "req_image_public_seam",
     storageId: expect.any(String),
   });
+});
+
+test("one private session reuses an active companion generation", async () => {
+  const t = initTest();
+  let releaseBrief: ((value: unknown) => void) | undefined;
+  const pendingBrief = new Promise((resolve) => {
+    releaseBrief = resolve;
+  });
+  openAIMock.createResponse.mockReturnValueOnce(pendingBrief);
+  openAIMock.generateImage.mockResolvedValueOnce({
+    _request_id: "req_image_single_active",
+    data: [{ b64_json: "cG5nLXRlc3QtYnl0ZXM=" }],
+  });
+
+  const firstGeneration = t.action(api.manifestation.generate, {
+    clientSessionKey: browserCKey,
+    clientRequestId: "manifest-active-request-000000001",
+    description: "A bright little guide with a warm sunrise cloak.",
+  });
+  await vi.waitFor(() => {
+    expect(openAIMock.createResponse).toHaveBeenCalledTimes(1);
+  });
+
+  try {
+    const reused = await t.action(api.manifestation.generate, {
+      clientSessionKey: browserCKey,
+      clientRequestId: "manifest-active-request-000000002",
+      description: "A second request that must reuse the active companion.",
+    });
+    expect(reused).toMatchObject({
+      status: "generating_brief",
+      description: "A bright little guide with a warm sunrise cloak.",
+    });
+    expect(openAIMock.createResponse).toHaveBeenCalledTimes(1);
+    expect(openAIMock.generateImage).not.toHaveBeenCalled();
+
+    releaseBrief?.({
+      _request_id: "req_text_single_active",
+      output_text: JSON.stringify({
+        artBrief:
+          "An original sunrise guide with warm amber eyes and an invented soft coral cloak.",
+        adaptationNote:
+          "Kept the bright guiding mood in a wholly original companion design.",
+      }),
+    });
+    const ready = await firstGeneration;
+    expect(ready.id).toBe(reused.id);
+    expect(ready.status).toBe("ready");
+  } finally {
+    releaseBrief?.({
+      _request_id: "req_text_single_active_cleanup",
+      output_text: JSON.stringify({
+        artBrief:
+          "An original sunrise guide with warm amber eyes and an invented soft coral cloak.",
+        adaptationNote:
+          "Kept the bright guiding mood in a wholly original companion design.",
+      }),
+    });
+    await firstGeneration;
+  }
+});
+
+test("all anonymous sessions share a strict companion-generation burst budget", async () => {
+  const t = initTest();
+  openAIMock.createResponse.mockResolvedValue({
+    _request_id: "req_text_budget",
+    output_text: JSON.stringify({
+      artBrief:
+        "An original bright pocket guide with amber eyes and a coral travel cloak.",
+      adaptationNote:
+        "Kept the warm companion mood in a wholly original character design.",
+    }),
+  });
+  openAIMock.generateImage.mockResolvedValue({
+    _request_id: "req_image_budget",
+    data: [{ b64_json: "cG5nLXRlc3QtYnl0ZXM=" }],
+  });
+
+  for (let index = 0; index < 3; index += 1) {
+    await t.action(api.manifestation.generate, {
+      clientSessionKey: `manifest-budget-${index}-${"0".repeat(32)}`,
+      clientRequestId: `manifest-budget-request-00000000${index}`,
+      description: `Original bright companion number ${index}.`,
+    });
+  }
+
+  await expect(
+    t.action(api.manifestation.generate, {
+      clientSessionKey: `manifest-budget-3-${"0".repeat(32)}`,
+      clientRequestId: "manifest-budget-request-000000003",
+      description: "This request must not reach image generation.",
+    }),
+  ).rejects.toThrow(/generation is resting/i);
+  expect(openAIMock.createResponse).toHaveBeenCalledTimes(3);
+  expect(openAIMock.generateImage).toHaveBeenCalledTimes(3);
 });
 
 test("persists one session-private generated companion and reuses a client request", async () => {
