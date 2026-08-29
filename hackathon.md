@@ -7,12 +7,12 @@
 - **Repo:** https://github.com/Ranopha/might
 - **Frontend:** Convex static hosting
 - **Convex deployment:** https://hushed-stork-401.convex.cloud
-- **Components:** @convex-dev/agent, @convex-dev/static-hosting
+- **Components:** @convex-dev/agent, @convex-dev/rate-limiter, @convex-dev/static-hosting, @firecrawl/firecrawl-convex
 - **Convex features:** schema, tables, indexes, queries, mutations, actions, scheduled functions, realtime queries, HTTP actions, file storage
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-29T04:25:48Z
+- **Last updated:** 2026-08-29T05:16:44Z
 
 ## Log
 
@@ -120,3 +120,30 @@ forget functions. The public bundle targets the production Convex deployment,
 `/api/health` is live, and browser verification found no warning or error.
 Firecrawl, AgentMail, matching, consent outreach, inbound reply, Connected, and
 the complete E2E remain open and are not claimed.
+
+### 2026-08-29 - eaa0540
+
+Added the real Firecrawl World Sensor tracer bullet on development. One
+allowlisted public volunteer page is scraped through the official Firecrawl
+Convex component, then a Convex action asks OpenAI for one strict, cautious
+structured interpretation. The deterministic commit accepts only one to three
+verbatim source excerpts, rejects contact details, and preserves Firecrawl and
+OpenAI trace metadata, confidence, failure state, timestamps, and browser-session
+ownership (`convex/worldSensor.ts`, `convex/worldSignals.ts`).
+
+The first live attempt failed closed because an unavailable Firecrawl
+zero-data-retention entitlement returned `403`; no signal was committed and the
+UI exposed a retry state. Removing only that unsupported option let the same
+path succeed. Firecrawl read the Taoyuan public source in about 2.8 seconds,
+OpenAI interpreted the supported need, and the complete action finished in
+about 7.95 seconds. Might Found updated without refresh and a full reload
+restored the Convex-stored signal without a second provider call.
+
+Mounted the official Convex Rate Limiter so at most two genuinely new anonymous
+world scans can begin per minute globally; idempotent retries and existing
+results do not consume another slot. Ten behavior tests, lint, typecheck, build,
+development sync, diff/secret checks, and the dependency audit passed. Desktop
+and mobile browser inspection found no warning or error. This is a real
+Firecrawl → OpenAI → Convex integration verified on `vibrant-wren-913` only.
+Production, contextual matching, clarification, consent, AgentMail, reply,
+Connected, and the complete E2E remain open and are not claimed.
