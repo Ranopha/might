@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-30T07:16:42Z
+- **Last updated:** 2026-08-30T08:38:38Z
 
 ## Log
 
@@ -356,3 +356,17 @@ the same real reply and provider thread receipt. This is real development
 inbound and realtime `Replied` evidence with one disclosed reconciliation step;
 explicit `Connected`, an unassisted post-fix callback run, production promotion,
 and complete E2E acceptance remain open.
+
+### 2026-08-30 - working tree
+
+After the owner's separate explicit continuation decision, the existing
+`Replied` connection advanced once to `Connected`. The already-open Connections
+screen changed without refresh and a full reload retained the state; no second
+email or external commitment was created.
+
+Development now has one continuation, one inbound event, and one mail binding
+with real provider receipts, `status: connected`, and `sendCount: 1`. This closes
+the real development tracer through Connected while retaining the disclosed
+inbound reconciliation boundary. An unassisted post-fix callback run, clean
+repeatability rehearsal, production promotion, and final submission acceptance
+remain open.
