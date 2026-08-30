@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-29T14:24:29Z
+- **Last updated:** 2026-08-30T04:13:52Z
 
 ## Log
 
@@ -229,3 +229,21 @@ low-cost Sponsor-visible path; free Gemini is not suitable for Might's private
 memory content and does not provide free image generation. The submission path
 therefore remains on OpenAI with Convex quotas, idempotency, and persistent asset
 reuse rather than adding a second provider before the complete E2E is reliable.
+
+### 2026-08-30 - caf7e05
+
+Promoted the reviewed World Sensor, private Match, clarification, and anonymous
+paid-work guards to production `hushed-stork-401`. The production Firecrawl
+credential was confirmed present without exposing its value; preflight passed
+17 tests, lint, typecheck, build, schema validation, and a zero-index-deletion
+dry-run.
+
+The deploy activated the Firecrawl and rate-limiter components plus the World
+Signal, Match, and clarification functions. Production function inventory and
+the live `/api/health` response were verified afterward. No Sponsor API call,
+email, static frontend release, or application-data mutation occurred in this
+deployment session.
+
+This proves the backend slice is publicly deployed, not that a fresh production
+Firecrawl → OpenAI → Match browser tracer has completed. AgentMail, payload-bound
+consent, inbound reply, Replied, Connected, and the complete E2E remain open.
