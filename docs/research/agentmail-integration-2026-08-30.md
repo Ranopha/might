@@ -1,0 +1,71 @@
+# AgentMail integration decision — 2026-08-30
+
+## Decision
+
+Use the official `@agentmail/convex` component, currently `0.1.0`, for Might's real outbound and inbound tracer. Do not hand-roll AgentMail thread storage, retries, delivery state, webhook signature verification, or event deduplication.
+
+This directly serves the competition path:
+
+`approved payload → durable AgentMail send → outbound status → verified inbound event → Convex realtime connection state`
+
+## Why this component
+
+The component documentation states that it provides:
+
+- mutation-enqueued durable sending through a bounded-retry workpool;
+- reactive outbound lifecycle and inbound thread/message queries;
+- Svix-verified webhook handling;
+- `event_id` deduplication;
+- isolated Convex tables for inboxes, inbound/outbound messages, and events;
+- callbacks for verified `message.received` events.
+
+This is a better fit than rebuilding the same infrastructure around the generic Node SDK and is stronger Convex/component evidence for the hackathon.
+
+## Route topology
+
+Might's Convex app reserves `/api` for application HTTP routes while Static Hosting owns `/`. The stable callback will therefore be:
+
+`https://hushed-stork-401.convex.site/api/agentmail/webhook`
+
+Do not register a different callback and later move it without re-verifying the AgentMail webhook configuration.
+
+## Secret and external-resource gate
+
+Required Convex environment variables:
+
+- `AGENTMAIL_API_KEY`
+- `AGENTMAIL_WEBHOOK_SECRET`
+- optionally `AGENTMAIL_BASE_URL` only if EU residency is intentionally selected
+
+The secret values must never enter Git, client bundles, logs, screenshots, or `hackathon.md`. Creating the persistent AgentMail inbox and registering the production webhook are external mutations; resolve the exact account/inbox and obtain action-specific authorization before executing them.
+
+## Consent and send contract
+
+- `I'm interested` only creates a pitch intent; it is not permission to share or contact.
+- The preview must show the actual recipient, subject, complete body, selected memory statements, and private fields.
+- Approval binds the exact payload hash, pitch/connection, recipient, timestamp, and idempotency key.
+- Editing recipient, subject, body, or selected memory invalidates the prior approval.
+- A valid approval may enqueue exactly one `AgentMail.sendMessage`; retries reuse the same application intent and component `OutboundId`.
+- Without a current approval, AgentMail send count is zero.
+
+## Inbound contract
+
+- Mount `AgentMail.handleWebhook` at `/api/agentmail/webhook`; the component verifies `svix-id`, `svix-timestamp`, and `svix-signature` against the raw body.
+- AgentMail `message.received` events include `event_id`, `inbox_id`, `thread_id`, `message_id`, message metadata/content, and thread metadata.
+- The app callback must accept only the configured inbox and a thread already bound to an existing contacted connection.
+- Duplicate `event_id` or component callback retries are idempotent.
+- Unknown inboxes, threads, event types, or mismatched recipients fail closed and cannot advance state.
+- A verified new reply transitions `CONTACTED → REPLIED`; the Connections realtime query changes without refresh. `CONNECTED` requires a later explicit in-product continuation decision and does not imply agreement, price, payment, or schedule.
+
+## Current evidence boundary
+
+Research only. No AgentMail package is installed, no credential or inbox is configured, no webhook is registered, and no email has been sent or received yet.
+
+## Official sources
+
+- Component: https://www.npmjs.com/package/@agentmail/convex
+- Quickstart and SDK behavior: https://docs.agentmail.to/quickstart
+- Webhook overview and payloads: https://docs.agentmail.to/webhooks-overview
+- Webhook events: https://docs.agentmail.to/events
+- Signature verification: https://docs.agentmail.to/webhook-verification
+- Webhook creation API: https://docs.agentmail.to/api-reference/webhooks/create

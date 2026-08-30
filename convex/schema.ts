@@ -371,6 +371,136 @@ export default defineSchema({
     createdAt: v.number(),
   }).index("by_matchId", ["matchId"]),
 
+  connections: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    matchId: v.id("matches"),
+    interestRequestId: v.string(),
+    status: v.union(
+      v.literal("user_interested"),
+      v.literal("pitch_ready"),
+    ),
+    pitchRunId: v.union(v.id("connectionPitchRuns"), v.null()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_anonymousSessionId_and_matchId", [
+      "anonymousSessionId",
+      "matchId",
+    ])
+    .index("by_anonymousSessionId_and_updatedAt", [
+      "anonymousSessionId",
+      "updatedAt",
+    ]),
+
+  connectionPitchRuns: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    connectionId: v.id("connections"),
+    matchId: v.id("matches"),
+    clientRequestId: v.string(),
+    status: v.union(
+      v.literal("processing"),
+      v.literal("completed"),
+      v.literal("failed"),
+    ),
+    model: v.string(),
+    responseId: v.union(v.string(), v.null()),
+    pitchId: v.union(v.id("connectionPitches"), v.null()),
+    errorCode: v.union(
+      v.null(),
+      v.literal("OPENAI_CONFIGURATION_MISSING"),
+      v.literal("MATCH_CONTEXT_INVALID"),
+      v.literal("RELEVANT_MEMORY_UNAVAILABLE"),
+      v.literal("PITCH_GENERATION_FAILED"),
+      v.literal("PITCH_COMMIT_FAILED"),
+    ),
+    startedAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_connectionId", ["connectionId"])
+    .index("by_anonymousSessionId_and_updatedAt", [
+      "anonymousSessionId",
+      "updatedAt",
+    ]),
+
+  connectionPitches: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    connectionId: v.id("connections"),
+    pitchRunId: v.id("connectionPitchRuns"),
+    matchId: v.id("matches"),
+    targetDisplayName: v.string(),
+    recipientEmail: v.union(v.string(), v.null()),
+    recipientStatus: v.union(
+      v.literal("unavailable"),
+      v.literal("configured"),
+    ),
+    subject: v.string(),
+    body: v.string(),
+    selectedMemoryIds: v.array(v.id("memories")),
+    selectedMemorySnapshots: v.array(
+      v.object({
+        id: v.id("memories"),
+        statement: v.string(),
+        privacy: v.union(
+          v.literal("private"),
+          v.literal("shareable_with_consent"),
+        ),
+      }),
+    ),
+    privateFields: v.array(
+      v.object({
+        memoryId: v.id("memories"),
+        statement: v.string(),
+      }),
+    ),
+    payloadHash: v.string(),
+    revision: v.number(),
+    model: v.string(),
+    responseId: v.union(v.string(), v.null()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_connectionId", ["connectionId"])
+    .index("by_anonymousSessionId_and_updatedAt", [
+      "anonymousSessionId",
+      "updatedAt",
+    ]),
+
+  sendApprovals: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    connectionId: v.id("connections"),
+    pitchId: v.id("connectionPitches"),
+    payloadHash: v.string(),
+    targetDisplayName: v.string(),
+    recipientEmail: v.string(),
+    subject: v.string(),
+    body: v.string(),
+    selectedMemoryIds: v.array(v.id("memories")),
+    selectedMemorySnapshots: v.array(
+      v.object({
+        id: v.id("memories"),
+        statement: v.string(),
+        privacy: v.union(
+          v.literal("private"),
+          v.literal("shareable_with_consent"),
+        ),
+      }),
+    ),
+    privateFields: v.array(
+      v.object({
+        memoryId: v.id("memories"),
+        statement: v.string(),
+      }),
+    ),
+    clientRequestId: v.string(),
+    approvedAt: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_anonymousSessionId_and_clientRequestId", [
+      "anonymousSessionId",
+      "clientRequestId",
+    ])
+    .index("by_pitchId_and_createdAt", ["pitchId", "createdAt"]),
+
   companionManifestations: defineTable({
     anonymousSessionId: v.id("anonymousSessions"),
     clientRequestId: v.string(),

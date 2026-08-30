@@ -9,6 +9,8 @@
  */
 
 import type * as abuseProtection from "../abuseProtection.js";
+import type * as connectionPitchOpenai from "../connectionPitchOpenai.js";
+import type * as connections from "../connections.js";
 import type * as http from "../http.js";
 import type * as manifestation from "../manifestation.js";
 import type * as manifestationOpenai from "../manifestationOpenai.js";
@@ -30,6 +32,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   abuseProtection: typeof abuseProtection;
+  connectionPitchOpenai: typeof connectionPitchOpenai;
+  connections: typeof connections;
   http: typeof http;
   manifestation: typeof manifestation;
   manifestationOpenai: typeof manifestationOpenai;

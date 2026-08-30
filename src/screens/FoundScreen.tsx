@@ -1,11 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useMutation, useQuery } from 'convex/react'
 import { motion } from 'motion/react'
+import { useNavigate } from 'react-router-dom'
 import { api } from '../../convex/_generated/api'
 import { CompanionPresence } from '../components/companion/CompanionPresence'
 import { getOrCreateSessionKey } from '../lib/session'
 
 export function FoundScreen() {
+  const navigate = useNavigate()
   const [sessionKey] = useState(getOrCreateSessionKey)
   const [requestError, setRequestError] = useState<string | null>(null)
   const [matchError, setMatchError] = useState<string | null>(null)
@@ -13,18 +15,25 @@ export function FoundScreen() {
   const [clarificationError, setClarificationError] = useState<string | null>(null)
   const [dismissPending, setDismissPending] = useState(false)
   const [dismissError, setDismissError] = useState<string | null>(null)
+  const [interestPending, setInterestPending] = useState(false)
+  const [interestError, setInterestError] = useState<string | null>(null)
   const pendingRequestId = useRef<string | null>(null)
   const pendingMatchRequestId = useRef<string | null>(null)
   const pendingClarificationRequestId = useRef<string | null>(null)
+  const pendingInterestRequestId = useRef<string | null>(null)
   const ensureSession = useMutation(api.talk.ensureSession)
   const requestScan = useMutation(api.worldSignals.requestScan)
   const requestMatch = useMutation(api.matches.requestMatch)
   const dismissMatch = useMutation(api.matches.dismiss)
   const submitClarification = useMutation(api.matchClarifications.submitAnswer)
+  const expressInterest = useMutation(api.connections.expressInterest)
   const worldSignal = useQuery(api.worldSignals.latest, {
     clientSessionKey: sessionKey,
   })
   const matchRun = useQuery(api.matches.latest, {
+    clientSessionKey: sessionKey,
+  })
+  const connection = useQuery(api.connections.latest, {
     clientSessionKey: sessionKey,
   })
 
@@ -101,6 +110,27 @@ export function FoundScreen() {
     }
   }
 
+  async function continuePrivately() {
+    if (!surfacedMatch) return
+    const requestId = pendingInterestRequestId.current ?? crypto.randomUUID()
+    pendingInterestRequestId.current = requestId
+    setInterestPending(true)
+    setInterestError(null)
+    try {
+      await expressInterest({
+        clientSessionKey: sessionKey,
+        matchId: surfacedMatch.id,
+        clientRequestId: requestId,
+      })
+      pendingInterestRequestId.current = null
+      navigate('/connections')
+    } catch {
+      setInterestError('Might could not begin the private draft. Nothing was shared—please try again.')
+    } finally {
+      setInterestPending(false)
+    }
+  }
+
   const isProcessing = worldSignal?.status === 'processing'
   const isFailed = worldSignal?.status === 'failed'
   const completedSignal = worldSignal?.status === 'completed' ? worldSignal.signal : null
@@ -115,6 +145,8 @@ export function FoundScreen() {
   const clarificationPending = clarification?.status === 'processing'
   const clarificationFailed = clarification?.status === 'failed'
   const finalMatchResult = clarification?.finalResult ?? null
+  const existingConnection =
+    surfacedMatch && connection?.matchId === surfacedMatch.id ? connection : null
   const matchWhySituation = finalMatchResult?.whyThisSituationMatters ?? surfacedMatch?.whyThisSituationMatters
   const matchWhyPerson = finalMatchResult?.whyThisPersonCameToMind ?? surfacedMatch?.whyThisPersonCameToMind
   const matchConfidence = finalMatchResult?.matchConfidence ?? surfacedMatch?.matchConfidence ?? 0
@@ -291,16 +323,41 @@ export function FoundScreen() {
               {clarificationError ? <p className="inline-error" role="alert">{clarificationError}</p> : null}
               {surfacedMatch.canContinue ? (
                 <div className="match-choice-boundary">
-                  <span>Not your path?</span>
-                  <button
-                    type="button"
-                    onClick={() => void dismissCurrentMatch()}
-                    disabled={dismissPending || clarificationPending}
-                  >
-                    {dismissPending ? 'Closing…' : 'Not for me'}
-                  </button>
+                  <div className="match-choice-boundary__primary">
+                    <button
+                      className="world-match-action"
+                      type="button"
+                      onClick={() => {
+                        if (existingConnection) {
+                          navigate('/connections')
+                          return
+                        }
+                        void continuePrivately()
+                      }}
+                      disabled={interestPending || clarificationPending || connection === undefined}
+                    >
+                      {interestPending
+                        ? 'Beginning a private draft…'
+                        : existingConnection
+                          ? 'View my private draft'
+                          : 'I’m interested'}
+                      {!interestPending ? <span aria-hidden="true">→</span> : null}
+                    </button>
+                    <span>Creates a private draft · does not send</span>
+                  </div>
+                  <div className="match-choice-boundary__secondary">
+                    <span>Not your path?</span>
+                    <button
+                      type="button"
+                      onClick={() => void dismissCurrentMatch()}
+                      disabled={dismissPending || clarificationPending || interestPending}
+                    >
+                      {dismissPending ? 'Closing…' : 'Not for me'}
+                    </button>
+                  </div>
                 </div>
               ) : null}
+              {interestError ? <p className="inline-error" role="alert">{interestError}</p> : null}
               {dismissError ? <p className="inline-error" role="alert">{dismissError}</p> : null}
             </motion.section>
           ) : null}

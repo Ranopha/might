@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-30T04:13:52Z
+- **Last updated:** 2026-08-30T04:49:20Z
 
 ## Log
 
@@ -247,3 +247,26 @@ deployment session.
 This proves the backend slice is publicly deployed, not that a fresh production
 Firecrawl → OpenAI → Match browser tracer has completed. AgentMail, payload-bound
 consent, inbound reply, Replied, Connected, and the complete E2E remain open.
+
+### 2026-08-30 - working tree
+
+Published static deployment `9c72865c-c2a9-43a9-9c0a-5bd9906516c9` and ran one
+public Sponsor tracer. A synthetic Talk turn produced four confirmed private
+memories; Firecrawl read the allowlisted Taoyuan volunteer source; OpenAI saved
+the source-grounded Match; and reload preserved the full private state. The UI
+remained at `No consent requested`, `canContact: false`, with zero email sends.
+
+Added the next consent seam in development. “I’m interested” now starts one
+private OpenAI pitch intent, while Convex stores the exact recipient, subject,
+body, selected private-memory snapshots, SHA-256 payload fingerprint, immutable
+approval snapshot, and idempotency key (`convex/connections.ts`,
+`convex/connectionPitchOpenai.ts`, `src/screens/ConnectionsScreen.tsx`). Editing
+the recipient or words, forgetting a disclosed memory, or crossing browser
+sessions invalidates or blocks approval; approval still leaves
+`canContact: false` and `sendCount: 0`.
+
+Twenty-two behavior tests, lint, typecheck, production build, diff and secret
+checks passed, and the functions synced to development `vibrant-wren-913`.
+The real OpenAI pitch action and populated consent UI have not yet been run in a
+live browser; this slice is not deployed to production. AgentMail outbound,
+signed inbound reply, Replied, Connected, and the complete E2E remain open.
