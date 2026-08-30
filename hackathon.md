@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-30T05:45:29Z
+- **Last updated:** 2026-08-30T06:35:02Z
 
 ## Log
 
@@ -292,3 +292,22 @@ but its recipient allowlist remains unset and the account has no webhook, so no
 live email can be sent and no real reply was processed. This slice is not
 deployed to production; live AgentMail outbound/inbound, populated-browser
 realtime proof, production promotion, and the complete E2E remain open.
+
+### 2026-08-30 - working tree
+
+Configured the first real AgentMail development callback after explicit owner
+authorization. Exactly one inbox-scoped, enabled webhook now subscribes only to
+`message.received` at the development `/api/agentmail/webhook` route. Its signing
+secret and a one-mailbox demo allowlist exist only in Convex development; no
+secret, mailbox address, or production environment was committed.
+
+Reused the existing synthetic Firecrawl/OpenAI Match session and ran one real
+OpenAI contextual-pitch action with `store: false`. Connections updated live to
+show the complete recipient, Chinese subject/body, one disclosed synthetic
+private-memory statement, and the revised payload fingerprint. The browser is
+stopped at exact-message approval with `Nothing sent` and send count zero.
+
+This proves the live contextual-pitch and development webhook-configuration
+gates, not AgentMail E2E. Exact payload approval, the separate outbound Send,
+provider message/thread receipts, a human reply, Convex realtime `Replied`,
+explicit `Connected`, reload proof, and production promotion remain open.
