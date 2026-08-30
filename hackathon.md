@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-30T06:47:55Z
+- **Last updated:** 2026-08-30T07:16:42Z
 
 ## Log
 
@@ -337,3 +337,22 @@ This is real development Consent → AgentMail Contact evidence. The controlled
 mailbox still needs a human reply before signed inbound, realtime `Replied`,
 reload persistence, explicit `Connected`, full E2E, or production evidence can
 be claimed.
+
+### 2026-08-30 - working tree
+
+The first human reply reached the signed development webhook and was persisted
+once by the official AgentMail component. Might initially failed closed because
+the real event used display-name email addresses while its recipient guard
+compared complete display strings to a bare inbox address.
+
+Added a red-to-green provider-shape test and canonical mailbox comparison while
+preserving exact inbox/thread binding, external-sender checks, and event
+idempotency (`convex/agentMailInbound.ts`, `convex/connections.test.ts`). After
+the development sync, the already verified component event was reconciled once;
+no new email or webhook was created and the send count remained one.
+
+Connections changed without refresh to `They replied`, and a full reload kept
+the same real reply and provider thread receipt. This is real development
+inbound and realtime `Replied` evidence with one disclosed reconciliation step;
+explicit `Connected`, an unassisted post-fix callback run, production promotion,
+and complete E2E acceptance remain open.

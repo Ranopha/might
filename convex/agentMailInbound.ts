@@ -54,6 +54,12 @@ function addresses(value: unknown): string[] | null {
     : null;
 }
 
+function mailboxAddress(value: string): string | null {
+  const bracketed = /<([^<>]+)>$/.exec(value);
+  const candidate = (bracketed?.[1] ?? value).trim().toLowerCase();
+  return /^[^\s@<>]+@[^\s@<>]+$/.test(candidate) ? candidate : null;
+}
+
 function previewFromMessage(message: Record<string, unknown>): string {
   const candidates = [
     message.extracted_text,
@@ -103,6 +109,9 @@ export const onMessageReceived = internalMutation({
     );
     const from = boundedString(args.message.from, MAX_ADDRESS_LENGTH);
     const to = addresses(args.message.to);
+    const normalizedInboxId =
+      inboxId === null ? null : mailboxAddress(inboxId);
+    const normalizedFrom = from === null ? null : mailboxAddress(from);
     const threadMetadataId = isRecord(args.thread)
       ? boundedString(args.thread.thread_id, MAX_MESSAGE_ID_LENGTH)
       : null;
@@ -112,11 +121,13 @@ export const onMessageReceived = internalMutation({
       messageId === null ||
       from === null ||
       to === null ||
+      normalizedInboxId === null ||
+      normalizedFrom === null ||
       (threadMetadataId !== null && threadMetadataId !== threadId) ||
       !to.some(
-        (recipient) => recipient.toLowerCase() === inboxId.toLowerCase(),
+        (recipient) => mailboxAddress(recipient) === normalizedInboxId,
       ) ||
-      from.toLowerCase() === inboxId.toLowerCase()
+      normalizedFrom === normalizedInboxId
     ) {
       return { processed: false as const, reason: "invalid_message" as const };
     }
