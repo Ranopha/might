@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-30T13:10:43Z
+- **Last updated:** 2026-08-30T13:15:44Z
 
 ## Log
 
@@ -399,4 +399,12 @@ reconciliation. Reopening and fully navigating each isolated session restored
 The original three Contacted tabs had been reclaimed before the replies, so this
 run did not directly observe their instant no-refresh transition; the earlier
 tracer remains that UI proof. All three are honestly retained at `replied`.
-Fresh, separate continuation decisions and production promotion remain open.
+The owner then authorized continuation for exactly two of the three runs. Those
+two open screens changed without refresh to Connected and removed their action;
+the unselected run remained Replied with its decision still available.
+
+Convex now has three continuations for three unique connections and a final
+development split of three `connected` plus one `replied`, including the earlier
+tracer. Total `sendCount` remains four, all provider receipts remain present,
+and no new email was sent. Full navigation restored the same selective state.
+Production promotion remains open.
