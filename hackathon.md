@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-30T08:38:38Z
+- **Last updated:** 2026-08-30T08:56:51Z
 
 ## Log
 
@@ -370,3 +370,17 @@ the real development tracer through Connected while retaining the disclosed
 inbound reconciliation boundary. An unassisted post-fix callback run, clean
 repeatability rehearsal, production promotion, and final submission acceptance
 remain open.
+
+### 2026-08-30 - working tree
+
+Started a three-run repeatability rehearsal on development using three isolated
+browser sessions. Each run generated a new original OpenAI companion, completed
+Talk and confirmed living memory, interpreted the same public source, ran Match
+plus one clarification, and produced a new contextual pitch. Runs one and three
+used Firecrawl live; run two replayed a clearly labeled prior real cache.
+
+All three stopped at their exact payload approval gates. They created three new
+`pitch_ready` connections but zero new approvals, mail threads, or sends; the
+deployment total remained one earlier approved outreach. Each run still needs
+payload-specific owner approval, one real AgentMail reply, realtime `Replied`,
+and explicit `Connected` before the three-run rehearsal is complete.
