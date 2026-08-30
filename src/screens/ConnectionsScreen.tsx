@@ -11,6 +11,10 @@ export function ConnectionsScreen() {
   const [sessionKey] = useState(getOrCreateSessionKey)
   const [approvalPending, setApprovalPending] = useState(false)
   const [approvalError, setApprovalError] = useState<string | null>(null)
+  const [sendPending, setSendPending] = useState(false)
+  const [sendError, setSendError] = useState<string | null>(null)
+  const [connectPending, setConnectPending] = useState(false)
+  const [connectError, setConnectError] = useState<string | null>(null)
   const [editingDraft, setEditingDraft] = useState(false)
   const [recipientDraft, setRecipientDraft] = useState('')
   const [subjectDraft, setSubjectDraft] = useState('')
@@ -18,7 +22,11 @@ export function ConnectionsScreen() {
   const [revisionPending, setRevisionPending] = useState(false)
   const [revisionError, setRevisionError] = useState<string | null>(null)
   const approvalRequestId = useRef<string | null>(null)
+  const sendRequestId = useRef<string | null>(null)
+  const connectRequestId = useRef<string | null>(null)
   const approveCurrentPitch = useMutation(api.connections.approveCurrentPitch)
+  const sendApprovedPitch = useMutation(api.connections.sendApprovedPitch)
+  const confirmConnected = useMutation(api.connections.confirmConnected)
   const reviseCurrentPitch = useMutation(api.connections.reviseCurrentPitch)
   const connection = useQuery(api.connections.latest, {
     clientSessionKey: sessionKey,
@@ -29,11 +37,16 @@ export function ConnectionsScreen() {
   const hasValidApproval = Boolean(
     connection?.hasValidSendApproval && connection.approval?.isValid,
   )
-  const approvedSteps =
-    connection === null || connection === undefined ? 0 : hasValidApproval ? 3 : 2
+  const approvedSteps = (() => {
+    if (connection === null || connection === undefined) return 0
+    if (connection.status === 'connected') return 6
+    if (connection.status === 'replied') return 5
+    if (connection.status === 'contacted' || connection.status === 'contacting' || connection.status === 'send_failed') return 4
+    return hasValidApproval ? 3 : 2
+  })()
 
   function beginEditingDraft() {
-    if (!pitch) return
+    if (!pitch || connection?.mail) return
     setRecipientDraft(pitch.target.email ?? '')
     setSubjectDraft(pitch.subject)
     setBodyDraft(pitch.body)
@@ -86,6 +99,47 @@ export function ConnectionsScreen() {
     }
   }
 
+  async function sendExactMessage() {
+    if (!connection || !connection.approval?.isValid || connection.mail) return
+    const requestId = sendRequestId.current ?? crypto.randomUUID()
+    sendRequestId.current = requestId
+    setSendPending(true)
+    setSendError(null)
+    try {
+      await sendApprovedPitch({
+        clientSessionKey: sessionKey,
+        connectionId: connection.id,
+        approvalId: connection.approval.id,
+        clientRequestId: requestId,
+      })
+      sendRequestId.current = null
+    } catch {
+      setSendError('Might could not hand this approved email to AgentMail. No second message was created—please try again.')
+    } finally {
+      setSendPending(false)
+    }
+  }
+
+  async function continueConnection() {
+    if (!connection || connection.status !== 'replied') return
+    const requestId = connectRequestId.current ?? crypto.randomUUID()
+    connectRequestId.current = requestId
+    setConnectPending(true)
+    setConnectError(null)
+    try {
+      await confirmConnected({
+        clientSessionKey: sessionKey,
+        connectionId: connection.id,
+        clientRequestId: requestId,
+      })
+      connectRequestId.current = null
+    } catch {
+      setConnectError('Might could not record that choice yet. The reply is safe—try once more.')
+    } finally {
+      setConnectPending(false)
+    }
+  }
+
   return (
     <section className="screen editorial-screen" aria-labelledby="connections-title">
       <header className="screen-topline">
@@ -96,15 +150,25 @@ export function ConnectionsScreen() {
       <div className="editorial-heading">
         <p className="kicker">Connections</p>
         <h1 id="connections-title">
-          {pitch
-            ? 'Before hello, you see everything.'
+          {connection?.status === 'connected'
+            ? 'A possibility became a real hello.'
+            : connection?.status === 'replied'
+              ? 'They replied.'
+              : connection?.status === 'contacted' || connection?.status === 'contacting'
+                ? 'Your hello is on its way.'
+                : pitch
+                  ? 'Before hello, you see everything.'
             : isPreparing
               ? 'Might is finding the right words.'
               : 'From possibility to hello.'}
         </h1>
         <p>
-          {pitch
-            ? 'A private draft is not permission. You choose what leaves Might—and only after a real recipient is known.'
+          {connection?.status === 'connected'
+            ? 'Connected means a two-way conversation has begun—not that any promise or agreement was made.'
+            : connection?.status === 'replied'
+              ? 'Their words arrived through Might’s inbox and changed this connection live.'
+              : pitch
+                ? 'A private draft is not permission. You choose what leaves Might—and only after a real recipient is known.'
             : 'Nothing leaves Might until you say so.'}
         </p>
       </div>
@@ -162,9 +226,19 @@ export function ConnectionsScreen() {
                   ? 'Private draft in progress'
                   : pitchFailed
                     ? 'Draft paused safely'
-                    : 'Private disclosure preview'}
+                    : connection.status === 'connected'
+                      ? 'Connection opened'
+                      : connection.status === 'replied'
+                        ? 'A real reply arrived'
+                        : connection.status === 'contacted'
+                          ? 'Reached out through Might'
+                          : connection.status === 'contacting'
+                            ? 'AgentMail is delivering'
+                            : connection.status === 'send_failed'
+                              ? 'Delivery paused safely'
+                              : 'Private disclosure preview'}
               </span>
-              <i>{connection.sendCount} emails sent</i>
+              <i>{connection.sendCount === 0 ? 'Nothing sent' : '1 approved outreach'}</i>
             </header>
 
             {isPreparing ? (
@@ -197,9 +271,11 @@ export function ConnectionsScreen() {
                         {pitch.target.status === 'configured' ? 'Recipient verified' : 'Send locked'}
                       </i>
                     </p>
-                    <button type="button" onClick={beginEditingDraft}>
-                      {pitch.target.email ? 'Change recipient or words' : 'Add recipient and review'}
-                    </button>
+                    {!connection.mail ? (
+                      <button type="button" onClick={beginEditingDraft}>
+                        {pitch.target.email ? 'Change recipient or words' : 'Add recipient and review'}
+                      </button>
+                    ) : null}
                   </div>
                 </div>
 
@@ -282,10 +358,40 @@ export function ConnectionsScreen() {
                     <span>Draft fingerprint</span>
                     <code>{pitch.payloadHash}</code>
                   </div>
-                  {hasValidApproval ? (
-                    <div className="connection-approval-receipt">
-                      <strong>This exact message is approved.</strong>
-                      <p>Approval is recorded. No email has been sent in this build step.</p>
+                  {connection.mail ? (
+                    <div className={`connection-mail-receipt connection-mail-receipt--${connection.mail.status}`}>
+                      <strong>
+                        {connection.mail.status === 'queued'
+                          ? 'AgentMail is sending this exact message.'
+                          : connection.mail.status === 'failed'
+                            ? 'Delivery stopped safely.'
+                            : connection.mail.status === 'replied' || connection.mail.status === 'connected'
+                              ? 'This became a two-way thread.'
+                              : 'Might reached out.'}
+                      </strong>
+                      <p>
+                        {connection.mail.status === 'queued'
+                          ? 'The approved payload is locked. Retries cannot create a second email.'
+                          : connection.mail.status === 'failed'
+                            ? 'AgentMail did not confirm delivery, and Might will not duplicate the outreach.'
+                            : 'AgentMail returned a real thread receipt for this approved outreach.'}
+                      </p>
+                    </div>
+                  ) : hasValidApproval ? (
+                    <div className="connection-send-ready">
+                      <div className="connection-approval-receipt">
+                        <strong>This exact message is approved.</strong>
+                        <p>One final action will send only this fingerprint through Might’s inbox.</p>
+                      </div>
+                      <button
+                        className="connection-send-consent"
+                        type="button"
+                        onClick={() => void sendExactMessage()}
+                        disabled={sendPending}
+                      >
+                        {sendPending ? 'Handing it to AgentMail…' : 'Send this exact email'}
+                        {!sendPending ? <span aria-hidden="true">→</span> : null}
+                      </button>
                     </div>
                   ) : pitch.canApprove ? (
                     <button
@@ -310,6 +416,37 @@ export function ConnectionsScreen() {
                   </p>
                 ) : null}
                 {approvalError ? <p className="inline-error connection-approval-error" role="alert">{approvalError}</p> : null}
+                {sendError ? <p className="inline-error connection-approval-error" role="alert">{sendError}</p> : null}
+
+                {connection.reply ? (
+                  <motion.section
+                    className={`connection-reply ${connection.status === 'connected' ? 'is-connected' : ''}`}
+                    initial={{ opacity: 0, y: 18 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.65 }}
+                    aria-label="Incoming reply"
+                  >
+                    <span>{connection.status === 'connected' ? 'Connected' : 'They replied'}</span>
+                    <h3>{connection.reply.subject}</h3>
+                    <p>“{connection.reply.preview || 'A reply arrived in Might’s inbox.'}”</p>
+                    <footer>
+                      <small>From {connection.reply.from}</small>
+                      {connection.status === 'replied' ? (
+                        <button
+                          type="button"
+                          onClick={() => void continueConnection()}
+                          disabled={connectPending}
+                        >
+                          {connectPending ? 'Opening the connection…' : 'Yes, help me continue'}
+                          {!connectPending ? <span aria-hidden="true">→</span> : null}
+                        </button>
+                      ) : (
+                        <strong>Two-way contact is open.</strong>
+                      )}
+                    </footer>
+                    {connectError ? <p className="inline-error" role="alert">{connectError}</p> : null}
+                  </motion.section>
+                ) : null}
               </>
             ) : null}
           </article>

@@ -1,5 +1,6 @@
+import { AgentMail } from "@agentmail/convex";
 import { ConvexError, v } from "convex/values";
-import { internal } from "./_generated/api";
+import { components, internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import {
   env,
@@ -16,10 +17,25 @@ const MAX_SESSION_KEY_LENGTH = 256;
 const MIN_CLIENT_REQUEST_ID_LENGTH = 8;
 const MAX_CLIENT_REQUEST_ID_LENGTH = 128;
 const MAX_SELECTED_MEMORIES = 4;
+const MAX_ALLOWED_RECIPIENTS = 20;
+const agentmail = new AgentMail(components.agentmail);
 
 const connectionStatusValidator = v.union(
   v.literal("user_interested"),
   v.literal("pitch_ready"),
+  v.literal("contacting"),
+  v.literal("contacted"),
+  v.literal("replied"),
+  v.literal("connected"),
+  v.literal("send_failed"),
+);
+const mailStatusValidator = v.union(
+  v.literal("queued"),
+  v.literal("sent"),
+  v.literal("delivered"),
+  v.literal("failed"),
+  v.literal("replied"),
+  v.literal("connected"),
 );
 const pitchRunStatusValidator = v.union(
   v.literal("processing"),
@@ -85,8 +101,8 @@ const latestViewValidator = v.object({
     v.literal("send_approved"),
   ),
   hasValidSendApproval: v.boolean(),
-  canContact: v.literal(false),
-  sendCount: v.literal(0),
+  canContact: v.boolean(),
+  sendCount: v.number(),
   pitchRun: v.object({
     id: v.id("connectionPitchRuns"),
     status: pitchRunStatusValidator,
@@ -100,6 +116,36 @@ const latestViewValidator = v.object({
   }),
   pitch: v.union(v.null(), pitchViewValidator),
   approval: v.union(v.null(), approvalViewValidator),
+  mail: v.union(
+    v.null(),
+    v.object({
+      id: v.id("mailThreads"),
+      status: mailStatusValidator,
+      inboxId: v.string(),
+      recipientEmail: v.string(),
+      outboundId: v.string(),
+      providerMessageId: v.union(v.string(), v.null()),
+      threadId: v.union(v.string(), v.null()),
+      errorCode: v.union(
+        v.null(),
+        v.literal("AGENTMAIL_SEND_FAILED"),
+        v.literal("AGENTMAIL_STATUS_UNAVAILABLE"),
+      ),
+      createdAt: v.number(),
+      updatedAt: v.number(),
+    }),
+  ),
+  reply: v.union(
+    v.null(),
+    v.object({
+      eventId: v.string(),
+      messageId: v.string(),
+      from: v.string(),
+      subject: v.string(),
+      preview: v.string(),
+      receivedAt: v.number(),
+    }),
+  ),
   createdAt: v.number(),
   updatedAt: v.number(),
 });
@@ -163,6 +209,34 @@ function normalizeRecipientEmail(recipientEmail: string): string {
     throw new ConvexError("Invalid recipient email.");
   }
   return normalized;
+}
+
+function assertRecipientIsAuthorized(recipientEmail: string): void {
+  const configuredRecipients = env.AGENTMAIL_ALLOWED_RECIPIENTS;
+  if (configuredRecipients === undefined) {
+    throw new ConvexError("The recipient is not authorized for this demo.");
+  }
+  const recipients = configuredRecipients
+    .split(",")
+    .map((recipient) => recipient.trim())
+    .filter((recipient) => recipient.length > 0);
+  if (
+    recipients.length === 0 ||
+    recipients.length > MAX_ALLOWED_RECIPIENTS ||
+    recipients.some((recipient) =>
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient),
+    )
+  ) {
+    throw new ConvexError("The recipient allowlist is not configured safely.");
+  }
+  const normalizedRecipient = recipientEmail.toLowerCase();
+  if (
+    !recipients.some(
+      (recipient) => recipient.toLowerCase() === normalizedRecipient,
+    )
+  ) {
+    throw new ConvexError("The recipient is not authorized for this demo.");
+  }
 }
 
 function assertBoundedText(
@@ -441,6 +515,22 @@ export const latest = query({
       approval.payloadHash === pitch.payloadHash &&
       approval.recipientEmail === pitch.recipientEmail &&
       pitch.recipientStatus === "configured";
+    const mail = await ctx.db
+      .query("mailThreads")
+      .withIndex("by_connectionId", (q) =>
+        q.eq("connectionId", connection._id),
+      )
+      .first();
+    const reply =
+      mail === null
+        ? null
+        : await ctx.db
+            .query("mailInboundEvents")
+            .withIndex("by_mailThreadId_and_receivedAt", (q) =>
+              q.eq("mailThreadId", mail._id),
+            )
+            .order("desc")
+            .first();
 
     return {
       id: connection._id,
@@ -452,8 +542,8 @@ export const latest = query({
           ? ("awaiting_send_approval" as const)
           : ("not_requested" as const),
       hasValidSendApproval,
-      canContact: false as const,
-      sendCount: 0 as const,
+      canContact: mail !== null,
+      sendCount: mail?.sendCount ?? 0,
       pitchRun: {
         id: pitchRun._id,
         status: pitchRun.status,
@@ -501,6 +591,32 @@ export const latest = query({
               isValid: hasValidSendApproval,
             }
           : null,
+      mail:
+        mail === null
+          ? null
+          : {
+              id: mail._id,
+              status: mail.status,
+              inboxId: mail.inboxId,
+              recipientEmail: mail.recipientEmail,
+              outboundId: mail.outboundId,
+              providerMessageId: mail.providerMessageId,
+              threadId: mail.threadId,
+              errorCode: mail.errorCode,
+              createdAt: mail.createdAt,
+              updatedAt: mail.updatedAt,
+            },
+      reply:
+        reply === null
+          ? null
+          : {
+              eventId: reply.eventId,
+              messageId: reply.messageId,
+              from: reply.from,
+              subject: reply.subject,
+              preview: reply.preview,
+              receivedAt: reply.receivedAt,
+            },
       createdAt: connection.createdAt,
       updatedAt: connection.updatedAt,
     };
@@ -715,6 +831,219 @@ export const approveCurrentPitch = mutation({
       createdAt: now,
     });
     return { approvalId, created: true, sendCount: 0 as const };
+  },
+});
+
+export const sendApprovedPitch = mutation({
+  args: {
+    clientSessionKey: v.string(),
+    connectionId: v.id("connections"),
+    approvalId: v.id("sendApprovals"),
+    clientRequestId: v.string(),
+  },
+  returns: v.object({
+    mailThreadId: v.id("mailThreads"),
+    created: v.boolean(),
+    sendCount: v.literal(1),
+  }),
+  handler: async (ctx, args) => {
+    assertClientSessionKey(args.clientSessionKey);
+    const clientRequestId = normalizeClientRequestId(args.clientRequestId);
+    const session = await ctx.db
+      .query("anonymousSessions")
+      .withIndex("by_clientSessionKey", (q) =>
+        q.eq("clientSessionKey", args.clientSessionKey),
+      )
+      .unique();
+    const connection = await ctx.db.get("connections", args.connectionId);
+    const approval = await ctx.db.get("sendApprovals", args.approvalId);
+    if (
+      session === null ||
+      connection === null ||
+      approval === null ||
+      connection.anonymousSessionId !== session._id ||
+      approval.anonymousSessionId !== session._id ||
+      approval.connectionId !== connection._id
+    ) {
+      throw new ConvexError("Send approval is unavailable.");
+    }
+
+    const existing = await ctx.db
+      .query("mailThreads")
+      .withIndex("by_approvalId", (q) => q.eq("approvalId", approval._id))
+      .unique();
+    if (existing !== null) {
+      if (
+        existing.anonymousSessionId !== session._id ||
+        existing.connectionId !== connection._id
+      ) {
+        throw new ConvexError("Send approval is unavailable.");
+      }
+      return {
+        mailThreadId: existing._id,
+        created: false,
+        sendCount: 1 as const,
+      };
+    }
+
+    const pitch = await ctx.db.get("connectionPitches", approval.pitchId);
+    const latestApproval = await ctx.db
+      .query("sendApprovals")
+      .withIndex("by_pitchId_and_createdAt", (q) =>
+        q.eq("pitchId", approval.pitchId),
+      )
+      .order("desc")
+      .first();
+    if (
+      pitch === null ||
+      latestApproval?._id !== approval._id ||
+      pitch.anonymousSessionId !== session._id ||
+      pitch.connectionId !== connection._id ||
+      connection.pitchRunId !== pitch.pitchRunId ||
+      connection.status !== "pitch_ready" ||
+      pitch.recipientStatus !== "configured" ||
+      pitch.recipientEmail === null ||
+      pitch.payloadHash !== approval.payloadHash ||
+      pitch.recipientEmail !== approval.recipientEmail ||
+      pitch.subject !== approval.subject ||
+      pitch.body !== approval.body ||
+      !(await pitchEvidenceIsCurrent(ctx, session._id, pitch))
+    ) {
+      throw new ConvexError("This exact email is not approved or current.");
+    }
+
+    const inboxId = env.AGENTMAIL_INBOX_ID?.trim() ?? "";
+    if (inboxId.length === 0) {
+      throw new ConvexError("The Might AgentMail inbox is not configured.");
+    }
+    assertRecipientIsAuthorized(approval.recipientEmail);
+    const outboundId = await agentmail.sendMessage(ctx, inboxId, {
+      to: approval.recipientEmail,
+      subject: approval.subject,
+      text: approval.body,
+      labels: ["might", `connection-${connection._id}`],
+    });
+    const now = Date.now();
+    const mailThreadId = await ctx.db.insert("mailThreads", {
+      anonymousSessionId: session._id,
+      connectionId: connection._id,
+      approvalId: approval._id,
+      pitchId: pitch._id,
+      payloadHash: approval.payloadHash,
+      sendRequestId: clientRequestId,
+      idempotencyKey: `connection:${connection._id}:approval:${approval._id}`,
+      inboxId,
+      recipientEmail: approval.recipientEmail,
+      outboundId,
+      status: "queued",
+      providerMessageId: null,
+      threadId: null,
+      errorCode: null,
+      sendCount: 1,
+      statusSyncAttempts: 0,
+      lastStatusSyncAt: null,
+      createdAt: now,
+      updatedAt: now,
+    });
+    await ctx.db.patch("connections", connection._id, {
+      status: "contacting",
+      updatedAt: now,
+    });
+    await ctx.scheduler.runAfter(
+      1_000,
+      internal.agentMailOutbound.syncOutboundStatus,
+      { mailThreadId },
+    );
+    return { mailThreadId, created: true, sendCount: 1 as const };
+  },
+});
+
+export const confirmConnected = mutation({
+  args: {
+    clientSessionKey: v.string(),
+    connectionId: v.id("connections"),
+    clientRequestId: v.string(),
+  },
+  returns: v.object({
+    continuationId: v.id("connectionContinuations"),
+    created: v.boolean(),
+  }),
+  handler: async (ctx, args) => {
+    assertClientSessionKey(args.clientSessionKey);
+    const clientRequestId = normalizeClientRequestId(args.clientRequestId);
+    const session = await ctx.db
+      .query("anonymousSessions")
+      .withIndex("by_clientSessionKey", (q) =>
+        q.eq("clientSessionKey", args.clientSessionKey),
+      )
+      .unique();
+    const connection = await ctx.db.get("connections", args.connectionId);
+    if (
+      session === null ||
+      connection === null ||
+      connection.anonymousSessionId !== session._id
+    ) {
+      throw new ConvexError("Connection is unavailable.");
+    }
+    const existingRequest = await ctx.db
+      .query("connectionContinuations")
+      .withIndex("by_anonymousSessionId_and_clientRequestId", (q) =>
+        q
+          .eq("anonymousSessionId", session._id)
+          .eq("clientRequestId", clientRequestId),
+      )
+      .unique();
+    if (existingRequest !== null) {
+      if (existingRequest.connectionId !== connection._id) {
+        throw new ConvexError(
+          "Continuation request id is bound to another connection.",
+        );
+      }
+      return { continuationId: existingRequest._id, created: false };
+    }
+    const existingConnectionConfirmation = await ctx.db
+      .query("connectionContinuations")
+      .withIndex("by_connectionId", (q) =>
+        q.eq("connectionId", connection._id),
+      )
+      .unique();
+    if (existingConnectionConfirmation !== null) {
+      return {
+        continuationId: existingConnectionConfirmation._id,
+        created: false,
+      };
+    }
+    const mail = await ctx.db
+      .query("mailThreads")
+      .withIndex("by_connectionId", (q) =>
+        q.eq("connectionId", connection._id),
+      )
+      .unique();
+    if (
+      connection.status !== "replied" ||
+      mail === null ||
+      mail.anonymousSessionId !== session._id ||
+      mail.status !== "replied"
+    ) {
+      throw new ConvexError("The connection has not received a reply.");
+    }
+    const now = Date.now();
+    const continuationId = await ctx.db.insert("connectionContinuations", {
+      anonymousSessionId: session._id,
+      connectionId: connection._id,
+      mailThreadId: mail._id,
+      clientRequestId,
+      confirmedAt: now,
+    });
+    await ctx.db.patch("mailThreads", mail._id, {
+      status: "connected",
+      updatedAt: now,
+    });
+    await ctx.db.patch("connections", connection._id, {
+      status: "connected",
+      updatedAt: now,
+    });
+    return { continuationId, created: true };
   },
 });
 

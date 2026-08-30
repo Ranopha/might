@@ -35,6 +35,8 @@ Required Convex environment variables:
 
 - `AGENTMAIL_API_KEY`
 - `AGENTMAIL_WEBHOOK_SECRET`
+- `AGENTMAIL_INBOX_ID`
+- `AGENTMAIL_ALLOWED_RECIPIENTS`, a short comma-separated allowlist of controlled demo mailboxes
 - optionally `AGENTMAIL_BASE_URL` only if EU residency is intentionally selected
 
 The secret values must never enter Git, client bundles, logs, screenshots, or `hackathon.md`. Creating the persistent AgentMail inbox and registering the production webhook are external mutations; resolve the exact account/inbox and obtain action-specific authorization before executing them.
@@ -59,7 +61,9 @@ The secret values must never enter Git, client bundles, logs, screenshots, or `h
 
 ## Current evidence boundary
 
-Research only. No AgentMail package is installed, no credential or inbox is configured, no webhook is registered, and no email has been sent or received yet.
+The official `@agentmail/convex` component is installed in development `vibrant-wren-913`. The app now has a payload-bound, idempotent outbound mutation; durable local mail/thread bindings; an official component webhook route; fail-closed inbound thread handling; `CONTACTED → REPLIED`; and an explicit `REPLIED → CONNECTED` continuation mutation. Deterministic tests prove that stale approval and an unallowlisted recipient produce zero sends, one valid approval cannot create a duplicate send, unknown/duplicate inbound events do not advance state, and a bound reply updates the connection once.
+
+The development AgentMail credential and inbox identifier are configured without being recorded here. The controlled-recipient allowlist is intentionally unset, so a real send remains blocked. The AgentMail account currently has no registered webhook for this inbox. No webhook has been created, no live email has been sent or received, and no real `REPLIED` or `CONNECTED` transition is claimed. The code and component are not deployed to production.
 
 ## Official sources
 

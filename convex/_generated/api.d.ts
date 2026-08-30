@@ -9,6 +9,8 @@
  */
 
 import type * as abuseProtection from "../abuseProtection.js";
+import type * as agentMailInbound from "../agentMailInbound.js";
+import type * as agentMailOutbound from "../agentMailOutbound.js";
 import type * as connectionPitchOpenai from "../connectionPitchOpenai.js";
 import type * as connections from "../connections.js";
 import type * as http from "../http.js";
@@ -32,6 +34,8 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   abuseProtection: typeof abuseProtection;
+  agentMailInbound: typeof agentMailInbound;
+  agentMailOutbound: typeof agentMailOutbound;
   connectionPitchOpenai: typeof connectionPitchOpenai;
   connections: typeof connections;
   http: typeof http;
@@ -76,6 +80,7 @@ export declare const internal: FilterApi<
 
 export declare const components: {
   agent: import("@convex-dev/agent/_generated/component.js").ComponentApi<"agent">;
+  agentmail: import("@agentmail/convex/_generated/component.js").ComponentApi<"agentmail">;
   rateLimiter: import("@convex-dev/rate-limiter/_generated/component.js").ComponentApi<"rateLimiter">;
   firecrawl: import("@firecrawl/firecrawl-convex/_generated/component.js").ComponentApi<"firecrawl">;
   staticHosting: import("@convex-dev/static-hosting/_generated/component.js").ComponentApi<"staticHosting">;

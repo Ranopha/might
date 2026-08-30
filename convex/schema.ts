@@ -378,6 +378,11 @@ export default defineSchema({
     status: v.union(
       v.literal("user_interested"),
       v.literal("pitch_ready"),
+      v.literal("contacting"),
+      v.literal("contacted"),
+      v.literal("replied"),
+      v.literal("connected"),
+      v.literal("send_failed"),
     ),
     pitchRunId: v.union(v.id("connectionPitchRuns"), v.null()),
     createdAt: v.number(),
@@ -500,6 +505,78 @@ export default defineSchema({
       "clientRequestId",
     ])
     .index("by_pitchId_and_createdAt", ["pitchId", "createdAt"]),
+
+  mailThreads: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    connectionId: v.id("connections"),
+    approvalId: v.id("sendApprovals"),
+    pitchId: v.id("connectionPitches"),
+    payloadHash: v.string(),
+    sendRequestId: v.string(),
+    idempotencyKey: v.string(),
+    inboxId: v.string(),
+    recipientEmail: v.string(),
+    outboundId: v.string(),
+    status: v.union(
+      v.literal("queued"),
+      v.literal("sent"),
+      v.literal("delivered"),
+      v.literal("failed"),
+      v.literal("replied"),
+      v.literal("connected"),
+    ),
+    providerMessageId: v.union(v.string(), v.null()),
+    threadId: v.union(v.string(), v.null()),
+    errorCode: v.union(
+      v.null(),
+      v.literal("AGENTMAIL_SEND_FAILED"),
+      v.literal("AGENTMAIL_STATUS_UNAVAILABLE"),
+    ),
+    sendCount: v.literal(1),
+    statusSyncAttempts: v.number(),
+    lastStatusSyncAt: v.union(v.number(), v.null()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  })
+    .index("by_connectionId", ["connectionId"])
+    .index("by_approvalId", ["approvalId"])
+    .index("by_anonymousSessionId_and_sendRequestId", [
+      "anonymousSessionId",
+      "sendRequestId",
+    ])
+    .index("by_inboxId_and_threadId", ["inboxId", "threadId"]),
+
+  mailInboundEvents: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    connectionId: v.id("connections"),
+    mailThreadId: v.id("mailThreads"),
+    eventId: v.string(),
+    inboxId: v.string(),
+    threadId: v.string(),
+    messageId: v.string(),
+    from: v.string(),
+    to: v.array(v.string()),
+    subject: v.string(),
+    preview: v.string(),
+    receivedAt: v.number(),
+    processedAt: v.number(),
+  })
+    .index("by_eventId", ["eventId"])
+    .index("by_mailThreadId_and_receivedAt", ["mailThreadId", "receivedAt"])
+    .index("by_connectionId_and_receivedAt", ["connectionId", "receivedAt"]),
+
+  connectionContinuations: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    connectionId: v.id("connections"),
+    mailThreadId: v.id("mailThreads"),
+    clientRequestId: v.string(),
+    confirmedAt: v.number(),
+  })
+    .index("by_connectionId", ["connectionId"])
+    .index("by_anonymousSessionId_and_clientRequestId", [
+      "anonymousSessionId",
+      "clientRequestId",
+    ]),
 
   companionManifestations: defineTable({
     anonymousSessionId: v.id("anonymousSessions"),

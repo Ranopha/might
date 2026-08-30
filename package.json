@@ -15,6 +15,7 @@
     "typecheck": "tsc -b --pretty false"
   },
   "dependencies": {
+    "@agentmail/convex": "^0.1.0",
     "@ai-sdk/openai": "^4.0.51",
     "@convex-dev/agent": "^0.7.1",
     "@convex-dev/rate-limiter": "^0.3.2",

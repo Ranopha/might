@@ -2,7 +2,9 @@
 // @vitest-environment edge-runtime
 
 import agentTest from "@convex-dev/agent/test";
+import agentmailTest from "@agentmail/convex/test";
 import rateLimiterTest from "@convex-dev/rate-limiter/test";
+import workpoolTest from "@convex-dev/workpool/test";
 import { convexTest } from "convex-test";
 import { expect, test, vi } from "vitest";
 import { api, internal } from "./_generated/api";
@@ -13,6 +15,10 @@ const modules = import.meta.glob([
   "!./**/*.test.ts",
   "!./vitest.config.ts",
 ]);
+const agentmailModules = import.meta.glob([
+  "../node_modules/@agentmail/convex/src/component/**/*.ts",
+  "../node_modules/@agentmail/convex/src/component/**/*.js",
+]);
 
 const ownerKey = "connection-owner-000000000000000000000000001";
 const strangerKey = "connection-stranger-00000000000000000000001";
@@ -20,8 +26,40 @@ const strangerKey = "connection-stranger-00000000000000000000001";
 function initTest() {
   const t = convexTest(schema, modules);
   agentTest.register(t);
+  t.registerComponent("agentmail", agentmailTest.schema, agentmailModules);
+  workpoolTest.register(t, "agentmail/sendPool");
+  workpoolTest.register(t, "agentmail/callbackPool");
   rateLimiterTest.register(t);
   return t;
+}
+
+async function markAgentMailOutboundSent(
+  t: ReturnType<typeof initTest>,
+  outboundId: string,
+  messageId: string,
+  threadId: string,
+) {
+  const componentRunner = t as unknown as {
+    runInComponent: (
+      componentPath: string,
+      handler: (ctx: {
+        db: {
+          patch: (
+            id: string,
+            value: Record<string, unknown>,
+          ) => Promise<void>;
+        };
+      }) => Promise<void>,
+    ) => Promise<void>;
+  };
+  await componentRunner.runInComponent("agentmail", async (ctx) => {
+    await ctx.db.patch(outboundId, {
+      status: "sent",
+      agentmailMessageId: messageId,
+      threadId,
+      finalizedAt: Date.now(),
+    });
+  });
 }
 
 async function seedSurfacedMatch(
@@ -542,6 +580,347 @@ test("send approval binds the current recipient and payload idempotently without
     },
     approval: { id: approval.approvalId, isValid: false },
   });
+});
+
+test("only the current approval can enqueue one AgentMail outbound", async () => {
+  vi.stubEnv("AGENTMAIL_API_KEY", "agentmail-test-key");
+  vi.stubEnv("AGENTMAIL_INBOX_ID", "might-test@agentmail.to");
+  vi.stubEnv("AGENTMAIL_ALLOWED_RECIPIENTS", "approved@example.org");
+  try {
+    const t = initTest();
+    const fixture = await seedSurfacedMatch(t, ownerKey);
+    const interest = await t.mutation(api.connections.expressInterest, {
+      clientSessionKey: ownerKey,
+      matchId: fixture.matchId,
+      clientRequestId: "connection-send-interest-0001",
+    });
+    const pitchId = await t.mutation(
+      internal.connections.commitGeneratedPitch,
+      {
+        pitchRunId: interest.pitchRunId,
+        model: "test-pitch-model",
+        responseId: "openai-pitch-send-001",
+        selectedMemoryIds: [fixture.memoryId],
+        subject: "Woodworking help for your repair project",
+        body:
+          "Hello, I have ten years of woodworking experience and can volunteer on weekends. I would be glad to discuss whether that could help this project.",
+      },
+    );
+    const initial = await t.query(api.connections.latest, {
+      clientSessionKey: ownerKey,
+    });
+    if (!initial?.pitch) {
+      throw new Error("Expected a generated pitch.");
+    }
+    const revised = await t.mutation(api.connections.reviseCurrentPitch, {
+      clientSessionKey: ownerKey,
+      connectionId: interest.connectionId,
+      pitchId,
+      recipientEmail: "repair@example.org",
+      subject: initial.pitch.subject,
+      body: initial.pitch.body,
+    });
+
+    const staleApproval = await t.mutation(
+      api.connections.approveCurrentPitch,
+      {
+        clientSessionKey: ownerKey,
+        connectionId: interest.connectionId,
+        pitchId,
+        payloadHash: revised.payloadHash,
+        recipientEmail: "repair@example.org",
+        clientRequestId: "connection-stale-send-approval-0001",
+      },
+    );
+    const current = await t.mutation(api.connections.reviseCurrentPitch, {
+      clientSessionKey: ownerKey,
+      connectionId: interest.connectionId,
+      pitchId,
+      recipientEmail: "repair@example.org",
+      subject: initial.pitch.subject,
+      body: `${initial.pitch.body}\n\nThank you for considering it.`,
+    });
+    await expect(
+      t.mutation(api.connections.sendApprovedPitch, {
+        clientSessionKey: ownerKey,
+        connectionId: interest.connectionId,
+        approvalId: staleApproval.approvalId,
+        clientRequestId: "connection-send-attempt-0001",
+      }),
+    ).rejects.toThrow(/not approved or current/i);
+    await expect(
+      t.query(api.connections.latest, { clientSessionKey: ownerKey }),
+    ).resolves.toMatchObject({ sendCount: 0, canContact: false });
+
+    const approval = await t.mutation(api.connections.approveCurrentPitch, {
+      clientSessionKey: ownerKey,
+      connectionId: interest.connectionId,
+      pitchId,
+      payloadHash: current.payloadHash,
+      recipientEmail: "repair@example.org",
+      clientRequestId: "connection-send-approval-0002",
+    });
+    await expect(
+      t.mutation(api.connections.sendApprovedPitch, {
+        clientSessionKey: ownerKey,
+        connectionId: interest.connectionId,
+        approvalId: approval.approvalId,
+        clientRequestId: "connection-send-attempt-not-allowed-0001",
+      }),
+    ).rejects.toThrow(/recipient.*not authorized/i);
+    await expect(
+      t.query(api.connections.latest, { clientSessionKey: ownerKey }),
+    ).resolves.toMatchObject({ sendCount: 0, canContact: false, mail: null });
+
+    vi.stubEnv("AGENTMAIL_ALLOWED_RECIPIENTS", "repair@example.org");
+    const first = await t.mutation(api.connections.sendApprovedPitch, {
+      clientSessionKey: ownerKey,
+      connectionId: interest.connectionId,
+      approvalId: approval.approvalId,
+      clientRequestId: "connection-send-attempt-0002",
+    });
+    const sameRequestRetry = await t.mutation(
+      api.connections.sendApprovedPitch,
+      {
+        clientSessionKey: ownerKey,
+        connectionId: interest.connectionId,
+        approvalId: approval.approvalId,
+        clientRequestId: "connection-send-attempt-0002",
+      },
+    );
+    const newRequestRetry = await t.mutation(api.connections.sendApprovedPitch, {
+      clientSessionKey: ownerKey,
+      connectionId: interest.connectionId,
+      approvalId: approval.approvalId,
+      clientRequestId: "connection-send-attempt-0003",
+    });
+
+    expect(first.created).toBe(true);
+    expect(first.sendCount).toBe(1);
+    expect(sameRequestRetry).toEqual({
+      mailThreadId: first.mailThreadId,
+      created: false,
+      sendCount: 1,
+    });
+    expect(newRequestRetry).toEqual(sameRequestRetry);
+    await expect(
+      t.query(api.connections.latest, { clientSessionKey: ownerKey }),
+    ).resolves.toMatchObject({
+      id: interest.connectionId,
+      status: "contacting",
+      consentState: "send_approved",
+      hasValidSendApproval: true,
+      canContact: true,
+      sendCount: 1,
+      mail: {
+        id: first.mailThreadId,
+        status: "queued",
+        inboxId: "might-test@agentmail.to",
+        recipientEmail: "repair@example.org",
+        threadId: null,
+        providerMessageId: null,
+      },
+    });
+
+    const queued = await t.query(api.connections.latest, {
+      clientSessionKey: ownerKey,
+    });
+    if (!queued?.mail) {
+      throw new Error("Expected one queued AgentMail outbound.");
+    }
+    await markAgentMailOutboundSent(
+      t,
+      queued.mail.outboundId,
+      "agentmail-outbound-message-sync-001",
+      "agentmail-thread-sync-001",
+    );
+    const synced = await t.mutation(
+      internal.agentMailOutbound.syncOutboundStatus,
+      { mailThreadId: first.mailThreadId },
+    );
+    expect(synced).toEqual({ status: "contacted" });
+    await expect(
+      t.query(api.connections.latest, { clientSessionKey: ownerKey }),
+    ).resolves.toMatchObject({
+      status: "contacted",
+      sendCount: 1,
+      mail: {
+        id: first.mailThreadId,
+        status: "sent",
+        providerMessageId: "agentmail-outbound-message-sync-001",
+        threadId: "agentmail-thread-sync-001",
+      },
+    });
+  } finally {
+    vi.unstubAllEnvs();
+  }
+});
+
+test("only a new inbound event on the bound AgentMail thread moves Contacted to Replied", async () => {
+  vi.stubEnv("AGENTMAIL_API_KEY", "agentmail-test-key");
+  vi.stubEnv("AGENTMAIL_INBOX_ID", "might-test@agentmail.to");
+  vi.stubEnv("AGENTMAIL_ALLOWED_RECIPIENTS", "repair@example.org");
+  try {
+    const t = initTest();
+    const fixture = await seedSurfacedMatch(t, ownerKey);
+    const interest = await t.mutation(api.connections.expressInterest, {
+      clientSessionKey: ownerKey,
+      matchId: fixture.matchId,
+      clientRequestId: "connection-reply-interest-0001",
+    });
+    const pitchId = await t.mutation(
+      internal.connections.commitGeneratedPitch,
+      {
+        pitchRunId: interest.pitchRunId,
+        model: "test-pitch-model",
+        responseId: "openai-pitch-reply-001",
+        selectedMemoryIds: [fixture.memoryId],
+        subject: "Woodworking help for your repair project",
+        body:
+          "Hello, I have ten years of woodworking experience and can volunteer on weekends. I would be glad to discuss whether that could help this project.",
+      },
+    );
+    const initial = await t.query(api.connections.latest, {
+      clientSessionKey: ownerKey,
+    });
+    if (!initial?.pitch) {
+      throw new Error("Expected a generated pitch.");
+    }
+    const revised = await t.mutation(api.connections.reviseCurrentPitch, {
+      clientSessionKey: ownerKey,
+      connectionId: interest.connectionId,
+      pitchId,
+      recipientEmail: "repair@example.org",
+      subject: initial.pitch.subject,
+      body: initial.pitch.body,
+    });
+    const approval = await t.mutation(api.connections.approveCurrentPitch, {
+      clientSessionKey: ownerKey,
+      connectionId: interest.connectionId,
+      pitchId,
+      payloadHash: revised.payloadHash,
+      recipientEmail: "repair@example.org",
+      clientRequestId: "connection-reply-approval-0001",
+    });
+    const sent = await t.mutation(api.connections.sendApprovedPitch, {
+      clientSessionKey: ownerKey,
+      connectionId: interest.connectionId,
+      approvalId: approval.approvalId,
+      clientRequestId: "connection-reply-send-0001",
+    });
+    await t.run(async (ctx) => {
+      await ctx.db.patch("mailThreads", sent.mailThreadId, {
+        status: "sent",
+        providerMessageId: "agentmail-outbound-message-001",
+        threadId: "agentmail-thread-001",
+        updatedAt: Date.now(),
+      });
+      await ctx.db.patch("connections", interest.connectionId, {
+        status: "contacted",
+        updatedAt: Date.now(),
+      });
+    });
+
+    const unknown = await t.mutation(
+      internal.agentMailInbound.onMessageReceived,
+      {
+        eventId: "agentmail-inbound-event-unknown-001",
+        message: {
+          inbox_id: "might-test@agentmail.to",
+          thread_id: "unknown-thread",
+          message_id: "agentmail-inbound-message-unknown-001",
+          from: "coordinator@example.org",
+          to: ["might-test@agentmail.to"],
+          subject: "Re: Woodworking help",
+          text: "Could we talk next Saturday?",
+          timestamp: "2026-08-30T05:30:00.000Z",
+        },
+        thread: { thread_id: "unknown-thread" },
+      },
+    );
+    expect(unknown).toEqual({ processed: false, reason: "unknown_thread" });
+    await expect(
+      t.query(api.connections.latest, { clientSessionKey: ownerKey }),
+    ).resolves.toMatchObject({ status: "contacted", reply: null });
+
+    const receivedArgs = {
+      eventId: "agentmail-inbound-event-001",
+      message: {
+        inbox_id: "might-test@agentmail.to",
+        thread_id: "agentmail-thread-001",
+        message_id: "agentmail-inbound-message-001",
+        from: "coordinator@example.org",
+        to: ["might-test@agentmail.to"],
+        subject: "Re: Woodworking help",
+        text: "This sounds useful. Could Alex visit next Saturday?",
+        timestamp: "2026-08-30T05:31:00.000Z",
+      },
+      thread: { thread_id: "agentmail-thread-001" },
+    } as const;
+    const first = await t.mutation(
+      internal.agentMailInbound.onMessageReceived,
+      receivedArgs,
+    );
+    const duplicate = await t.mutation(
+      internal.agentMailInbound.onMessageReceived,
+      receivedArgs,
+    );
+    expect(first).toMatchObject({ processed: true, reason: "replied" });
+    expect(duplicate).toEqual({ processed: false, reason: "duplicate" });
+    await expect(
+      t.query(api.connections.latest, { clientSessionKey: ownerKey }),
+    ).resolves.toMatchObject({
+      id: interest.connectionId,
+      status: "replied",
+      sendCount: 1,
+      mail: {
+        id: sent.mailThreadId,
+        status: "replied",
+        threadId: "agentmail-thread-001",
+        providerMessageId: "agentmail-outbound-message-001",
+      },
+      reply: {
+        eventId: "agentmail-inbound-event-001",
+        messageId: "agentmail-inbound-message-001",
+        from: "coordinator@example.org",
+        subject: "Re: Woodworking help",
+        preview: "This sounds useful. Could Alex visit next Saturday?",
+        receivedAt: Date.parse("2026-08-30T05:31:00.000Z"),
+      },
+    });
+
+    const connected = await t.mutation(api.connections.confirmConnected, {
+      clientSessionKey: ownerKey,
+      connectionId: interest.connectionId,
+      clientRequestId: "connection-confirm-connected-0001",
+    });
+    const connectedRetry = await t.mutation(
+      api.connections.confirmConnected,
+      {
+        clientSessionKey: ownerKey,
+        connectionId: interest.connectionId,
+        clientRequestId: "connection-confirm-connected-0001",
+      },
+    );
+    expect(connected.created).toBe(true);
+    expect(connectedRetry).toEqual({
+      continuationId: connected.continuationId,
+      created: false,
+    });
+    await expect(
+      t.query(api.connections.latest, { clientSessionKey: ownerKey }),
+    ).resolves.toMatchObject({
+      id: interest.connectionId,
+      status: "connected",
+      mail: { id: sent.mailThreadId, status: "connected" },
+      reply: {
+        eventId: "agentmail-inbound-event-001",
+        preview: "This sounds useful. Could Alex visit next Saturday?",
+      },
+    });
+  } finally {
+    vi.unstubAllEnvs();
+  }
 });
 
 test("forgetting a disclosed memory invalidates approval and blocks every retry", async () => {

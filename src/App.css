@@ -2278,6 +2278,136 @@
   line-height: 1.5;
 }
 
+.connection-send-ready {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.connection-mail-receipt {
+  max-width: 420px;
+  padding: 14px 16px;
+  border: 1px solid rgba(79, 126, 99, 0.18);
+  border-radius: 15px;
+  background: linear-gradient(135deg, rgba(225, 243, 231, 0.68), rgba(255, 255, 255, 0.54));
+}
+
+.connection-mail-receipt strong {
+  color: #3f6551;
+  font-size: 11px;
+}
+
+.connection-mail-receipt p {
+  margin: 5px 0 0;
+  color: #647c6d;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.connection-mail-receipt--queued {
+  border-color: rgba(126, 82, 178, 0.16);
+  background: linear-gradient(135deg, rgba(234, 218, 247, 0.62), rgba(255, 255, 255, 0.5));
+}
+
+.connection-mail-receipt--queued strong,
+.connection-mail-receipt--queued p {
+  color: #725d7d;
+}
+
+.connection-mail-receipt--failed {
+  border-color: rgba(205, 128, 87, 0.18);
+  background: rgba(252, 238, 226, 0.56);
+}
+
+.connection-mail-receipt--failed strong,
+.connection-mail-receipt--failed p {
+  color: #80645b;
+}
+
+.connection-reply {
+  margin: 0 clamp(22px, 4vw, 42px) clamp(24px, 4vw, 42px);
+  padding: clamp(24px, 4vw, 40px);
+  border: 1px solid rgba(94, 133, 107, 0.17);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(239, 174, 126, 0.22), transparent 35%),
+    linear-gradient(145deg, rgba(239, 249, 241, 0.8), rgba(255, 252, 246, 0.78));
+  box-shadow: 0 18px 48px rgba(66, 103, 79, 0.08);
+}
+
+.connection-reply > span {
+  color: #4f7b61;
+  font-size: 9px;
+  font-weight: 720;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.connection-reply h3 {
+  max-width: 760px;
+  margin: 12px 0 16px;
+  color: #3f5447;
+  font-family: var(--font-display);
+  font-size: clamp(25px, 3vw, 38px);
+  font-weight: 540;
+  letter-spacing: -0.035em;
+}
+
+.connection-reply > p {
+  max-width: 760px;
+  margin: 0;
+  color: #566b5d;
+  font-family: var(--font-display);
+  font-size: clamp(15px, 1.65vw, 19px);
+  line-height: 1.65;
+}
+
+.connection-reply footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.connection-reply small {
+  color: #718076;
+  font-size: 9px;
+}
+
+.connection-reply footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid rgba(76, 124, 94, 0.2);
+  border-radius: 999px;
+  color: #fffdf9;
+  background: linear-gradient(135deg, #679676, #4f7b61);
+  box-shadow: 0 12px 28px rgba(68, 112, 83, 0.17);
+  font-size: 10px;
+  font-weight: 680;
+}
+
+.connection-reply footer button:disabled {
+  cursor: default;
+  opacity: 0.62;
+}
+
+.connection-reply footer strong {
+  color: #477559;
+  font-size: 11px;
+}
+
+.connection-reply.is-connected {
+  border-color: rgba(126, 82, 178, 0.17);
+  background:
+    radial-gradient(circle at 85% 10%, rgba(239, 174, 126, 0.23), transparent 34%),
+    linear-gradient(145deg, rgba(238, 223, 249, 0.68), rgba(255, 252, 246, 0.82));
+}
+
 .connection-approval-error {
   margin: 0;
   padding: 0 42px 22px;
@@ -2361,7 +2491,9 @@
   }
 
   .connection-draft-editor header,
-  .connection-draft-editor > div {
+  .connection-draft-editor > div,
+  .connection-send-ready,
+  .connection-reply footer {
     align-items: stretch;
     flex-direction: column;
   }

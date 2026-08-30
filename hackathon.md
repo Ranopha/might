@@ -7,12 +7,12 @@
 - **Repo:** https://github.com/Ranopha/might
 - **Frontend:** Convex static hosting
 - **Convex deployment:** https://hushed-stork-401.convex.cloud
-- **Components:** @convex-dev/agent, @convex-dev/rate-limiter, @convex-dev/static-hosting, @firecrawl/firecrawl-convex
+- **Components:** @convex-dev/agent, @agentmail/convex, @convex-dev/rate-limiter, @convex-dev/static-hosting, @firecrawl/firecrawl-convex
 - **Convex features:** schema, tables, indexes, queries, mutations, actions, scheduled functions, realtime queries, HTTP actions, file storage
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-30T04:49:20Z
+- **Last updated:** 2026-08-30T05:45:29Z
 
 ## Log
 
@@ -270,3 +270,25 @@ checks passed, and the functions synced to development `vibrant-wren-913`.
 The real OpenAI pitch action and populated consent UI have not yet been run in a
 live browser; this slice is not deployed to production. AgentMail outbound,
 signed inbound reply, Replied, Connected, and the complete E2E remain open.
+
+### 2026-08-30 - working tree
+
+Installed the official `@agentmail/convex` component in development and added
+the remaining deterministic path from exact approval to one durable outbound,
+provider receipt, verified bound inbound reply, realtime `Replied`, and an
+explicit in-product `Connected` decision (`convex/connections.ts`,
+`convex/agentMailOutbound.ts`, `convex/agentMailInbound.ts`, `convex/http.ts`).
+
+The send mutation revalidates the exact payload and active memory evidence,
+requires a short server-side allowlist of controlled demo recipients, and binds
+one approval to one component outbound ID. Unknown threads, mismatched inboxes,
+duplicate events, and replies without a confirmed outbound receipt fail closed.
+Connections presents delivery, reply, and connected states as a bright
+editorial story rather than a dashboard.
+
+Twenty-four behavior tests, lint, typecheck, production build, Convex codegen,
+development sync, diff, and secret checks passed. The development inbox exists,
+but its recipient allowlist remains unset and the account has no webhook, so no
+live email can be sent and no real reply was processed. This slice is not
+deployed to production; live AgentMail outbound/inbound, populated-browser
+realtime proof, production promotion, and the complete E2E remain open.
