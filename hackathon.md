@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-30T09:02:41Z
+- **Last updated:** 2026-08-30T13:10:43Z
 
 ## Log
 
@@ -387,6 +387,16 @@ no Send was retried and no fourth email was created.
 Redacted Convex reads now show four approvals, four mail bindings, and total
 `sendCount: 4` across the earlier completed tracer and these three runs. Every
 binding has provider message/thread receipts and no error; connection state is
-one `connected` plus three `contacted`. The three new threads still need separate
-human replies, unassisted signed callback proof, realtime `Replied`, and later
-payload-independent `Connected` consent before the rehearsal is complete.
+one `connected` plus three `replied` after the owner replied separately in all
+three new threads.
+
+All three new signed inbound events completed automatically through the fixed
+callback, each with a unique event, message, and thread identifier. They were
+processed about 15–17 seconds after receipt without the earlier tracer's manual
+reconciliation. Reopening and fully navigating each isolated session restored
+`They replied`; no additional outbound or continuation was created.
+
+The original three Contacted tabs had been reclaimed before the replies, so this
+run did not directly observe their instant no-refresh transition; the earlier
+tracer remains that UI proof. All three are honestly retained at `replied`.
+Fresh, separate continuation decisions and production promotion remain open.
