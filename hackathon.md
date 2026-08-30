@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-30T08:56:51Z
+- **Last updated:** 2026-08-30T09:02:41Z
 
 ## Log
 
@@ -379,8 +379,14 @@ Talk and confirmed living memory, interpreted the same public source, ran Match
 plus one clarification, and produced a new contextual pitch. Runs one and three
 used Firecrawl live; run two replayed a clearly labeled prior real cache.
 
-All three stopped at their exact payload approval gates. They created three new
-`pitch_ready` connections but zero new approvals, mail threads, or sends; the
-deployment total remained one earlier approved outreach. Each run still needs
-payload-specific owner approval, one real AgentMail reply, realtime `Replied`,
-and explicit `Connected` before the three-run rehearsal is complete.
+After reviewing all three full disclosure previews, the owner explicitly
+approved and sent each unchanged exact payload. The three isolated screens each
+used approval once and Send once, then received real AgentMail thread receipts;
+no Send was retried and no fourth email was created.
+
+Redacted Convex reads now show four approvals, four mail bindings, and total
+`sendCount: 4` across the earlier completed tracer and these three runs. Every
+binding has provider message/thread receipts and no error; connection state is
+one `connected` plus three `contacted`. The three new threads still need separate
+human replies, unassisted signed callback proof, realtime `Replied`, and later
+payload-independent `Connected` consent before the rehearsal is complete.
