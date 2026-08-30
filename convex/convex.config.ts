@@ -15,12 +15,19 @@ const app = defineApp({
     OPENAI_TEXT_MODEL: v.optional(v.string()),
     OPENAI_IMAGE_MODEL: v.optional(v.string()),
     FIRECRAWL_API_KEY: v.string(),
+    AGENTMAIL_API_KEY: v.string(),
+    AGENTMAIL_BASE_URL: v.optional(v.string()),
     AGENTMAIL_INBOX_ID: v.optional(v.string()),
     AGENTMAIL_ALLOWED_RECIPIENTS: v.optional(v.string()),
   },
 });
 app.use(agent);
-app.use(agentmail);
+app.use(agentmail, {
+  env: {
+    AGENTMAIL_API_KEY: app.env.AGENTMAIL_API_KEY,
+    AGENTMAIL_BASE_URL: app.env.AGENTMAIL_BASE_URL,
+  },
+});
 app.use(rateLimiter);
 app.use(firecrawl, {
   env: {

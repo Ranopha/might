@@ -63,7 +63,11 @@ The secret values must never enter Git, client bundles, logs, screenshots, or `h
 
 The official `@agentmail/convex` component is installed in development `vibrant-wren-913`. The app now has a payload-bound, idempotent outbound mutation; durable local mail/thread bindings; an official component webhook route; fail-closed inbound thread handling; `CONTACTED → REPLIED`; and an explicit `REPLIED → CONNECTED` continuation mutation. Deterministic tests prove that stale approval and an unallowlisted recipient produce zero sends, one valid approval cannot create a duplicate send, unknown/duplicate inbound events do not advance state, and a bound reply updates the connection once.
 
-The development AgentMail credential and inbox identifier are configured without being recorded here. The controlled-recipient allowlist is intentionally unset, so a real send remains blocked. The AgentMail account currently has no registered webhook for this inbox. No webhook has been created, no live email has been sent or received, and no real `REPLIED` or `CONNECTED` transition is claimed. The code and component are not deployed to production.
+The development AgentMail credential and inbox identifier are configured without being recorded here. After exact owner authorization, one controlled recipient was allowlisted and exactly one inbox-scoped `message.received` webhook was registered to the development callback; its signing secret is stored only in Convex development.
+
+The first approved live outbound exposed an upstream `@agentmail/convex@0.1.0` compatibility gap: the package read `AGENTMAIL_API_KEY` from its isolated component runtime without declaring that environment variable. The AgentMail API remained at zero messages while the official workpool retried the same pending outbound. Might now carries a reproducible `patch-package` patch that declares the component API-key/base-URL inputs and maps them from the parent app, following Convex component environment isolation rules.
+
+After the development sync, the existing outbound's final durable retry succeeded. AgentMail API, the component table, and Might's application binding now agree on one sent message, one real thread, one provider message ID, the approved payload fingerprint, `sendCount: 1`, and no error. The Connections UI updated without refresh to `Reached out through Might`. A live human reply, signed webhook receipt, `REPLIED`, `CONNECTED`, reload proof, and production promotion are not yet claimed.
 
 ## Official sources
 

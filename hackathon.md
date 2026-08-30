@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-30T06:35:02Z
+- **Last updated:** 2026-08-30T06:47:55Z
 
 ## Log
 
@@ -311,3 +311,29 @@ This proves the live contextual-pitch and development webhook-configuration
 gates, not AgentMail E2E. Exact payload approval, the separate outbound Send,
 provider message/thread receipts, a human reply, Convex realtime `Replied`,
 explicit `Connected`, reload proof, and production promotion remain open.
+
+### 2026-08-30 - working tree
+
+After reviewing the complete recipient, subject, body, one disclosed synthetic
+memory, and SHA-256 fingerprint, the owner explicitly approved and sent that
+exact payload. The browser invoked approval and the separate Send action once;
+Convex created one application mail binding and one official component outbound.
+
+The first durable attempt failed before external delivery because published
+`@agentmail/convex@0.1.0` did not declare the API-key environment input required
+inside an isolated Convex component. AgentMail still showed zero messages, so
+the failure did not create duplicate outreach. Added a reproducible npm patch
+that declares and maps the component environment according to Convex's official
+isolation model, then synced development only.
+
+The existing pending outbound retried successfully without another Send. The
+AgentMail API, official component state, and Might binding now agree on exactly
+one sent message, one real provider message/thread pair, the approved payload,
+`sendCount: 1`, and no error. Connections updated without refresh to `Reached
+out through Might`. A clean dependency install reapplied the patch; 24 tests,
+lint, typecheck, build, and the dependency audit passed.
+
+This is real development Consent → AgentMail Contact evidence. The controlled
+mailbox still needs a human reply before signed inbound, realtime `Replied`,
+reload persistence, explicit `Connected`, full E2E, or production evidence can
+be claimed.
