@@ -72,6 +72,22 @@ Result: passed
 - P2 — Found and Connections titles crossed mixed-tone wall regions: fixed with a diffuse, unboxed paper-light wash behind the copy.
 - Focused QA did not reveal a remaining crop, overlap, missing asset, or first-paint visibility defect.
 
+## Owner screenshot correction round
+
+- Owner references: `/var/folders/75/d_z3yqjs27xbcrxzm3vqpnwh0000gn/T/TemporaryItems/NSIRD_screencaptureui_c72tGy/截圖 2026-08-31 中午12.32.46.png`, `/Users/liuenyan/Desktop/截圖 2026-08-31 中午12.32.26.png`, and `/Users/liuenyan/Desktop/截圖 2026-08-31 中午12.32.33.png` (2940 × 1912 source pixels each).
+- Revised medium captures: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-surface-feedback-round2/{me,found,connections}-960.png` at 960 × 1000.
+- Revised mobile captures: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-surface-feedback-round2/{me,found,connections}-390.png` at 390 × 844.
+- Source-to-revision comparison: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-surface-feedback-round2/user-feedback-vs-revised.png`.
+- Verified states were empty living memory, no active overlap, and no connection. The ChatGPT floating composer visible in the owner's browser screenshots is external browser/app chrome and was excluded from the Might target.
+
+### Comparison history
+
+- P1 — Found's companion and incoming messenger both read from the left-to-right composition without an obvious action toward the door: fixed by moving Might to the right doorway, raising the messenger near the door, and moving the headline into the now-empty left alcove.
+- P2 — Me's memory folio was oversized and extended below its intended support: fixed by reducing its width and raising it until the wooden base rests on the alcove platform at medium and mobile widths.
+- P2 — Connections' idle lantern-pods were more transparent than the intended paper-lantern presence: fixed by raising normal idle opacity from `0.50` to `0.64` and reduced-motion idle opacity from `0.58` to `0.66`.
+- Medium and mobile browser checks showed no horizontal overflow, clipped control, text collision, or displaced illustration. The room, paper texture, door, platform, live HTML copy, persistent navigation, and reduced-motion behavior were all retained.
+- Focused comparison found no remaining actionable P0, P1, or P2 defect in these three owner-requested corrections.
+
 ## Final result
 
 passed

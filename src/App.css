@@ -3163,15 +3163,15 @@
 }
 
 .surface-room-hero--me .surface-room-hero__asset {
-  bottom: 5%;
-  left: 3.4%;
-  width: 39%;
+  bottom: 28%;
+  left: 4.4%;
+  width: 31%;
 }
 
 .surface-room-hero--found .surface-room-hero__asset {
-  top: 32%;
-  right: 4.5%;
-  width: 31%;
+  top: 23%;
+  right: 1.5%;
+  width: 24%;
 }
 
 .surface-room-hero--connections .surface-room-hero__asset {
@@ -3183,11 +3183,11 @@
 .surface-room-hero__companion {
   position: absolute;
   z-index: 2;
-  bottom: 13%;
-  left: 4.5%;
+  right: 5%;
+  bottom: 9%;
   display: grid;
-  width: 31%;
-  height: 58%;
+  width: 27%;
+  height: 54%;
   place-items: center;
 }
 
@@ -3221,8 +3221,8 @@
 
 .surface-room-hero--found .surface-room-hero__copy {
   top: 13%;
-  left: 36%;
-  width: 43%;
+  left: 10%;
+  width: 48%;
 }
 
 .surface-room-hero--connections .surface-room-hero__copy {
@@ -3366,15 +3366,15 @@
   }
 
   .surface-room-hero--me .surface-room-hero__asset {
-    bottom: 5%;
-    left: 2.5%;
-    width: 46%;
+    bottom: 31%;
+    left: 4%;
+    width: 36%;
   }
 
   .surface-room-hero--found .surface-room-hero__asset {
-    top: 30%;
-    right: 1.5%;
-    width: 38%;
+    top: 19%;
+    right: -2%;
+    width: 30%;
   }
 
   .surface-room-hero--connections .surface-room-hero__asset {
@@ -3384,10 +3384,10 @@
   }
 
   .surface-room-hero__companion {
-    bottom: 15%;
-    left: 2.5%;
-    width: 39%;
-    height: 56%;
+    right: 3%;
+    bottom: 8%;
+    width: 34%;
+    height: 52%;
   }
 }
 

@@ -88,7 +88,7 @@ function surfaceAssetMotion(
 ) {
   if (reduceMotion) {
     return {
-      animate: { opacity: state === 'idle' && variant !== 'me' ? 0.58 : 1, x: 0, y: 0, scale: 1 },
+      animate: { opacity: state === 'idle' && variant !== 'me' ? 0.66 : 1, x: 0, y: 0, scale: 1 },
       transition: { duration: 0.2 },
     }
   }
@@ -138,7 +138,7 @@ function surfaceAssetMotion(
     }
   }
   return {
-    animate: { opacity: 0.5, x: 0, y: 0, scale: 0.985 },
+    animate: { opacity: 0.64, x: 0, y: 0, scale: 0.985 },
     transition: { duration: 0.7, ease: 'easeOut' as const },
   }
 }

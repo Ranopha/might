@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-31T03:55:05Z
+- **Last updated:** 2026-08-31T04:48:27Z
 
 ## Log
 
@@ -433,6 +433,12 @@ state, become static for reduced motion, and preserve the existing live memory,
 world-signal, consent, reply, and Connected behavior
 (`src/components/room/SurfaceRoomHero.tsx`, `src/screens/`,
 `public/assets/surfaces/`).
+
+After owner screenshot review, moved Might to the right-hand Found doorway so
+the room reads as opening the door, reduced and seated Me's memory folio on the
+alcove platform, and made the idle Connections lanterns slightly more present.
+Live comparison at 960 × 1000 and 390 × 844 found no horizontal overflow
+(`src/App.css`, `src/components/room/SurfaceRoomHero.tsx`, `design-qa.md`).
 
 The Shape flow now accepts and persists a private companion name alongside the
 original OpenAI-generated manifestation; existing records and the house orb
