@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-30T13:15:44Z
+- **Last updated:** 2026-08-31T02:24:21Z
 
 ## Log
 
@@ -408,3 +408,18 @@ development split of three `connected` plus one `replied`, including the earlier
 tracer. Total `sendCount` remains four, all provider receipts remain present,
 and no new email was sent. Full navigation restored the same selective state.
 Production promotion remains open.
+
+### 2026-08-31 - working tree
+
+Rebuilt the Talk opening as a fixed, sunlit Webtoon-style room using original
+room, foreground, companion, and interaction-state image assets. The default
+Might is now the approved paper-and-leaf orb with a restrained breathing loop;
+the existing OpenAI manifestation and private Convex chat paths remain intact
+(`public/assets/`, `src/components/companion/Orb.tsx`,
+`src/screens/TalkScreen.tsx`, `src/App.css`).
+
+Desktop and 390 px mobile checks covered the opening, shape form, and transition
+into chat. The approved button plate changes on hover, reduced-motion fallbacks
+remain in place, and the browser console returned no warning or error. Typecheck,
+lint, 24 behavior tests, and the production build passed. This slice is locally
+verified only; production and Sponsor runtime state were not changed.

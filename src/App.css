@@ -3073,3 +3073,475 @@
     opacity: 0.64;
   }
 }
+
+/* Talk opening room: the home stays still while Might and the light breathe. */
+.orb__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 20px rgba(77, 61, 36, 0.22));
+  user-select: none;
+}
+
+.orb-stage--compact .orb__image {
+  filter: drop-shadow(0 3px 4px rgba(77, 61, 36, 0.2));
+}
+
+.talk-screen--room {
+  width: min(1500px, 100%);
+  padding: 24px clamp(20px, 3vw, 48px) 20px;
+}
+
+.talk-room-shell {
+  display: flex;
+  min-height: calc(100vh - 44px);
+  flex-direction: column;
+  justify-content: center;
+}
+
+.talk-room-scene {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1487 / 1058;
+  overflow: hidden;
+  border: 1px solid rgba(94, 78, 49, 0.18);
+  border-radius: 30px;
+  background: #d7ca9f;
+  box-shadow:
+    0 28px 80px rgba(79, 63, 37, 0.18),
+    0 2px 0 rgba(255, 255, 255, 0.65) inset;
+  isolation: isolate;
+}
+
+.talk-room-scene__visuals {
+  position: absolute;
+  inset: 0;
+}
+
+.talk-room-scene__background,
+.talk-room-scene__foreground {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+}
+
+.talk-room-scene__background {
+  z-index: 0;
+  animation: room-light-breathe 12s ease-in-out infinite;
+}
+
+.talk-room-scene__foreground {
+  z-index: 3;
+  opacity: 0.34;
+  animation: room-foreground-breathe 10s ease-in-out infinite;
+}
+
+.talk-room-scene__topline {
+  position: absolute;
+  z-index: 6;
+  top: clamp(16px, 2vw, 28px);
+  right: clamp(18px, 2.5vw, 34px);
+  left: clamp(18px, 2.5vw, 34px);
+  min-height: auto;
+}
+
+.talk-room-scene__topline .eyebrow,
+.talk-room-scene__topline .presence-indicator {
+  color: rgba(57, 54, 38, 0.78);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.52);
+}
+
+.talk-room-scene__topline .presence-indicator i {
+  background: #647755;
+  box-shadow: 0 0 0 4px rgba(100, 119, 85, 0.12);
+}
+
+.talk-room-scene__companion {
+  position: absolute;
+  z-index: 2;
+  top: 17%;
+  left: 3.4%;
+  width: 37%;
+  height: 51%;
+  justify-content: center;
+}
+
+.talk-room-scene__companion .orb-stage,
+.talk-room-scene__companion .companion-stage {
+  width: min(100%, 410px);
+}
+
+.talk-room-scene__companion .companion-stage__aura,
+.talk-room-scene__companion .companion-stage__sheen {
+  display: none;
+}
+
+.talk-room-scene__companion .companion-stage__image {
+  width: 86%;
+  border-color: rgba(88, 75, 49, 0.14);
+  border-radius: 42% 46% 40% 44%;
+  box-shadow: 0 20px 46px rgba(68, 55, 34, 0.2);
+}
+
+.talk-room-scene__companion .companion-stage__shadow {
+  bottom: 2%;
+  background: rgba(73, 57, 30, 0.18);
+}
+
+.talk-room-scene__companion .orb-caption {
+  margin: -5% 0 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  color: rgba(60, 57, 40, 0.72);
+  background: rgba(249, 244, 218, 0.64);
+  box-shadow: 0 5px 18px rgba(74, 59, 34, 0.07);
+  font-size: clamp(8px, 0.8vw, 11px);
+  text-align: center;
+}
+
+.talk-room-scene__conversation {
+  position: absolute;
+  z-index: 5;
+  top: 14%;
+  right: 4.6%;
+  width: min(47%, 590px);
+  padding: clamp(25px, 3vw, 42px);
+  border: 1px solid rgba(105, 89, 55, 0.16);
+  border-radius: 7px 24px 24px 7px;
+  color: #4b4937;
+  background: rgba(250, 247, 226, 0.82);
+  box-shadow:
+    0 22px 54px rgba(82, 65, 34, 0.16),
+    0 1px 0 rgba(255, 255, 255, 0.64) inset;
+  backdrop-filter: blur(11px) saturate(0.8);
+}
+
+.talk-room-scene__conversation::before {
+  top: 24px;
+  left: -1px;
+  width: 3px;
+  height: 62px;
+  border-radius: 0 4px 4px 0;
+  background: #899174;
+}
+
+.talk-room-scene__conversation .speaker,
+.talk-room-scene__conversation .manifestation-result__status,
+.talk-room-scene__conversation .shape-form label,
+.talk-room-scene__conversation .integration-note,
+.talk-room-scene__conversation .text-action {
+  color: #6b6d57;
+}
+
+.talk-room-scene__conversation h1 {
+  margin: 13px 0 12px;
+  color: #393a2f;
+  font-size: clamp(38px, 4vw, 64px);
+}
+
+.talk-room-scene__conversation .opening-copy {
+  max-width: 470px;
+  color: #5f5d48;
+  font-size: clamp(16px, 1.45vw, 21px);
+  line-height: 1.43;
+}
+
+.talk-room-scene__conversation .opening-actions {
+  gap: 4px;
+  margin-top: clamp(20px, 2.5vw, 31px);
+}
+
+.talk-room-scene__conversation .room-button {
+  display: inline-grid;
+  width: clamp(176px, 16vw, 220px);
+  min-height: clamp(51px, 4.6vw, 63px);
+  padding: 0 29px 3px 20px;
+  border: 0;
+  border-radius: 0;
+  color: #404637;
+  background-color: transparent;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-shadow: none;
+  font-size: clamp(11px, 1vw, 13px);
+  letter-spacing: 0.01em;
+  place-items: center;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.62);
+  transition: filter 160ms ease, transform 160ms ease;
+}
+
+.talk-room-scene__conversation .room-button--primary {
+  background-image: url('/assets/controls/might-primary-button-plate-v1.png');
+}
+
+.talk-room-scene__conversation .room-button--primary:hover {
+  background-image: url('/assets/controls/might-primary-button-plate-hover-v1.png');
+  transform: translateY(-2px);
+}
+
+.talk-room-scene__conversation .room-button--primary:active {
+  background-image: url('/assets/controls/might-primary-button-plate-pressed-v1.png');
+  transform: translateY(1px);
+}
+
+.talk-room-scene__conversation .room-button--secondary {
+  color: #595a4c;
+  background-image: url('/assets/controls/might-secondary-button-plate-v1.png');
+}
+
+.talk-room-scene__conversation .room-button--secondary:hover {
+  filter: brightness(1.025) saturate(1.05);
+  transform: translateY(-2px);
+}
+
+.talk-room-scene__conversation .room-button:focus-visible {
+  outline-color: #5e7351;
+  outline-offset: -6px;
+}
+
+.talk-room-scene__conversation .trust-copy {
+  max-width: 480px;
+  margin-top: clamp(20px, 2.3vw, 29px);
+  padding-top: 15px;
+  border-color: rgba(87, 80, 51, 0.13);
+  color: #77745f;
+}
+
+.talk-room-scene__conversation .shape-form,
+.talk-room-scene__conversation .manifestation-result,
+.talk-room-scene__conversation .manifestation-progress {
+  margin-top: 22px;
+}
+
+.talk-room-scene__conversation .manifestation-result h2,
+.talk-room-scene__conversation .manifestation-progress h2 {
+  color: #3f4034;
+}
+
+.talk-room-scene__conversation .manifestation-result > p,
+.talk-room-scene__conversation .manifestation-progress p {
+  color: #686752;
+}
+
+.talk-room-scene__conversation .manifestation-result .room-button {
+  margin-top: 16px;
+}
+
+.talk-room-scene__conversation .manifestation-progress__pulse {
+  background: #75805f;
+  box-shadow: 0 0 0 5px rgba(117, 128, 95, 0.12);
+}
+
+.talk-room-scene__conversation .composer {
+  border-color: rgba(92, 86, 55, 0.2);
+  background: rgba(255, 253, 240, 0.86);
+  box-shadow: 0 6px 22px rgba(81, 65, 34, 0.06) inset;
+}
+
+.talk-room-scene__conversation .composer:focus-within {
+  border-color: rgba(94, 115, 81, 0.58);
+  box-shadow: 0 0 0 4px rgba(94, 115, 81, 0.1);
+}
+
+.talk-room-scene__conversation .composer input {
+  color: #444536;
+}
+
+.talk-room-scene__conversation .composer input::placeholder {
+  color: #9a9783;
+}
+
+.talk-room-scene__conversation .composer button {
+  border-color: #67775a;
+  color: #fffdf2;
+  background: #67775a;
+  box-shadow: 0 7px 18px rgba(77, 91, 66, 0.16);
+}
+
+.talk-room-scene__conversation .composer button:not(:disabled):hover {
+  background: #738365;
+}
+
+.talk-room-scene__conversation .composer button:disabled {
+  color: #999987;
+  background: #e5e2cf;
+}
+
+.talk-room-shell .talk-footer {
+  margin-top: 15px;
+  border-color: rgba(91, 82, 55, 0.13);
+  color: #817c68;
+}
+
+@keyframes room-light-breathe {
+  0%,
+  100% {
+    filter: brightness(1) saturate(0.96);
+    transform: scale(1);
+  }
+  50% {
+    filter: brightness(1.035) saturate(1);
+    transform: scale(1.004);
+  }
+}
+
+@keyframes room-foreground-breathe {
+  0%,
+  100% {
+    opacity: 0.28;
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: 0.38;
+    transform: translate3d(3px, -2px, 0);
+  }
+}
+
+@media (max-width: 1120px) {
+  .talk-room-scene__conversation {
+    top: 12%;
+    right: 3.8%;
+    width: 48%;
+    padding: clamp(22px, 2.6vw, 32px);
+  }
+
+  .talk-room-scene__conversation .trust-copy {
+    margin-top: 18px;
+  }
+}
+
+@media (max-width: 760px) {
+  .talk-screen--room {
+    min-height: auto;
+    padding: 16px 16px 104px;
+  }
+
+  .talk-room-shell {
+    min-height: auto;
+    justify-content: flex-start;
+  }
+
+  .talk-room-scene {
+    display: grid;
+    aspect-ratio: auto;
+    overflow: visible;
+    border: 0;
+    border-radius: 23px;
+    background: #f6f1da;
+    box-shadow: 0 20px 54px rgba(79, 63, 37, 0.14);
+  }
+
+  .talk-room-scene__visuals {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1487 / 1058;
+    border: 1px solid rgba(94, 78, 49, 0.16);
+    border-radius: 23px 23px 0 0;
+  }
+
+  .talk-room-scene__topline {
+    top: 13px;
+    right: 15px;
+    left: 15px;
+  }
+
+  .talk-room-scene__topline .eyebrow,
+  .talk-room-scene__topline .presence-indicator {
+    font-size: 8px;
+  }
+
+  .talk-room-scene__companion {
+    top: 16%;
+    left: 2.5%;
+    width: 39%;
+    height: 52%;
+  }
+
+  .talk-room-scene__companion .orb-caption {
+    display: none;
+  }
+
+  .talk-room-scene__foreground {
+    opacity: 0.22;
+  }
+
+  .talk-room-scene__conversation {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 100%;
+    padding: 30px 23px 27px;
+    border: 0;
+    border-radius: 0 0 23px 23px;
+    background: #f9f5df;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  .talk-room-scene__conversation::before {
+    top: 0;
+    left: 23px;
+    width: 56px;
+    height: 3px;
+    border-radius: 0 0 4px 4px;
+  }
+
+  .talk-room-scene__conversation h1 {
+    font-size: clamp(40px, 13vw, 54px);
+  }
+
+  .talk-room-scene__conversation .opening-copy {
+    font-size: 18px;
+  }
+
+  .talk-room-scene__conversation .opening-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .talk-room-scene__conversation .room-button {
+    width: 100%;
+    min-height: 58px;
+    padding-right: 24px;
+  }
+
+  .talk-room-scene__conversation .composer {
+    flex-direction: column;
+  }
+
+  .talk-room-scene__conversation .composer button {
+    width: 100%;
+  }
+
+  .talk-room-shell .talk-footer {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .talk-room-scene__topline .eyebrow {
+    display: none;
+  }
+
+  .talk-room-scene__topline {
+    justify-content: flex-end;
+  }
+
+  .talk-room-scene__conversation .opening-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .talk-room-scene__background,
+  .talk-room-scene__foreground {
+    animation: none;
+  }
+}
