@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-31T06:02:30Z
+- **Last updated:** 2026-08-31T06:48:05Z
 
 ## Log
 
@@ -465,7 +465,7 @@ The released bundle targets the production Convex deployment; browser checks at
 new UI and backend are publicly deployed, not a production AgentMail reply E2E:
 no OpenAI, Firecrawl, or AgentMail call ran and no email was sent in this release.
 
-### 2026-08-31 - working tree
+### 2026-08-31 - 1d3e23b
 
 Added one room-native settings drawer without changing the four primary
 surfaces. Companion name and house-orb/generated-form choice now persist in the
@@ -478,3 +478,22 @@ Background music remains explicitly unavailable, and the anonymous app exposes
 no API-key input. Six test files / 26 tests, lint, typecheck, build, Convex dev
 sync, and 1280/390 px browser QA passed. This work is not deployed to production
 and triggered no OpenAI, Firecrawl, AgentMail, email, or webhook call.
+
+### 2026-08-31 - working tree
+
+Kept the Talk conversation inside the same approved sunlit room after
+`Keep this form`, instead of replacing the room with the prior blank AI-chat
+canvas. The companion remains on the alcove platform while messages and the
+composer live on the warm paper surface (`src/screens/TalkScreen.tsx`,
+`src/App.css`).
+
+Added a regression test for the exact transition. At 390 px the phase change
+returns to the room's top and the composer remains above the persistent bottom
+navigation. Seven test files / 27 tests, lint, typecheck, build, equal-density
+desktop comparison, 390 × 844 browser QA, and console review passed
+(`src/screens/TalkScreen.test.tsx`, `design-qa.md`).
+
+This correction is locally verified only. Ordinary browser QA may have created
+one empty, browser-scoped development session through the existing Talk
+`ensureSession` path. It changed no Convex schema, function, environment,
+production row, Sponsor provider call, email, webhook, or production deployment.

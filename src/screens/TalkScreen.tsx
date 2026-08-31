@@ -99,6 +99,11 @@ export function TalkScreen() {
     }
   }
 
+  function enterChat() {
+    setPhase('chat')
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' })
+  }
+
   const activePhase: TalkPhase = messages?.length ? 'chat' : phase
   const isGenerating =
     isManifesting ||
@@ -119,98 +124,118 @@ export function TalkScreen() {
 
   if (activePhase === 'chat') {
     return (
-      <section className="screen talk-screen talk-screen--chat" aria-labelledby="talk-title">
-        <header className="screen-topline">
-          <span className="eyebrow">Just talk naturally</span>
-          <span className="presence-indicator">
-            <i /> Conversation saved in Convex
-          </span>
-        </header>
-
-        <div className="chat-layout">
-          <aside className="chat-companion">
-            <CompanionPresence />
-            <span>{companionName}</span>
-            <p>
-              {isReady
-                ? 'In the form you imagined.'
-                : isGenerating
-                  ? 'Taking shape while you talk.'
-                  : 'Still in its original form.'}
-            </p>
-          </aside>
-
-          <div className="chat-column">
-            <div className="chat-intro">
-              <span className="speaker">{companionName}</span>
-              <h1 id="talk-title">Now I’d like to know you.</h1>
-              <p>What should I call you?</p>
-            </div>
-
-            <div className="message-list" aria-live="polite">
-              {messages === undefined ? (
-                <p className="message-loading">Opening your private conversation…</p>
-              ) : (
-                messages.map((item) => (
-                  <motion.article
-                    className={`message message--${item.role}`}
-                    key={item.id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                  >
-                    <span>{item.role === 'user' ? 'You' : companionName}</span>
-                    <p>{item.content}</p>
-                  </motion.article>
-                ))
-              )}
-              {isThinking ? (
-                <motion.article
-                  className="message message--assistant message--thinking"
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  aria-label={`${companionName} is thinking`}
-                >
-                  <span>{companionName}</span>
-                  <p>
-                    <i aria-hidden="true" />
-                    <i aria-hidden="true" />
-                    <i aria-hidden="true" />
-                  </p>
-                </motion.article>
-              ) : null}
-            </div>
-
-            <form className="chat-composer" onSubmit={sendMessage}>
-              <label className="sr-only" htmlFor="message">
-                Message {companionName}
-              </label>
-              <textarea
-                id="message"
-                value={message}
-                onChange={(event) => {
-                  if (pendingMessage.current?.content !== event.target.value.trim()) {
-                    pendingMessage.current = null
-                  }
-                  setMessage(event.target.value)
-                }}
-                placeholder={`Tell ${companionName} something about your day…`}
-                rows={2}
-                maxLength={8000}
+      <section
+        className="screen talk-screen talk-screen--chat talk-screen--chat-room"
+        aria-labelledby="talk-title"
+      >
+        <div className="talk-room-shell talk-room-shell--chat">
+          <div className="talk-room-scene talk-room-scene--chat">
+            <div className="talk-room-scene__visuals" aria-hidden="true">
+              <img
+                className="talk-room-scene__background"
+                src="/assets/room/might-room-background-v1.png"
+                alt=""
               />
-              <button
-                type="submit"
-                disabled={!message.trim() || isSending || isThinking}
-              >
-                {isSending ? 'Sending…' : isThinking ? 'Thinking…' : 'Send'}
-              </button>
-            </form>
-            {sessionError || turnFailure ? (
-              <p className="inline-error">{sessionError ?? turnFailure}</p>
-            ) : null}
-            <p className="chat-disclosure">
-              OpenAI replies through a private Convex Agent thread. Only useful,
-              source-linked memories may appear in Me—and you stay in control of each one.
-            </p>
+              <img
+                className="talk-room-scene__foreground"
+                src="/assets/room/might-room-foreground-frame-v3.png"
+                alt=""
+              />
+            </div>
+
+            <header className="screen-topline talk-room-scene__topline talk-room-scene__topline--chat">
+              <span className="eyebrow">Just talk naturally</span>
+              <span className="presence-indicator">
+                <i /> Conversation saved in Convex
+              </span>
+            </header>
+
+            <div className="chat-layout chat-layout--room">
+              <aside className="chat-companion chat-companion--room">
+                <CompanionPresence />
+                <span>{companionName}</span>
+                <p>
+                  {isReady
+                    ? 'In the form you imagined.'
+                    : isGenerating
+                      ? 'Taking shape while you talk.'
+                      : 'Still in its original form.'}
+                </p>
+              </aside>
+
+              <div className="chat-column chat-column--room">
+                <div className="chat-intro">
+                  <span className="speaker">{companionName}</span>
+                  <h1 id="talk-title">Now I’d like to know you.</h1>
+                  <p>What should I call you?</p>
+                </div>
+
+                <div className="message-list" aria-live="polite">
+                  {messages === undefined ? (
+                    <p className="message-loading">Opening your private conversation…</p>
+                  ) : (
+                    messages.map((item) => (
+                      <motion.article
+                        className={`message message--${item.role}`}
+                        key={item.id}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                      >
+                        <span>{item.role === 'user' ? 'You' : companionName}</span>
+                        <p>{item.content}</p>
+                      </motion.article>
+                    ))
+                  )}
+                  {isThinking ? (
+                    <motion.article
+                      className="message message--assistant message--thinking"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      aria-label={`${companionName} is thinking`}
+                    >
+                      <span>{companionName}</span>
+                      <p>
+                        <i aria-hidden="true" />
+                        <i aria-hidden="true" />
+                        <i aria-hidden="true" />
+                      </p>
+                    </motion.article>
+                  ) : null}
+                </div>
+
+                <form className="chat-composer" onSubmit={sendMessage}>
+                  <label className="sr-only" htmlFor="message">
+                    Message {companionName}
+                  </label>
+                  <textarea
+                    id="message"
+                    value={message}
+                    onChange={(event) => {
+                      if (pendingMessage.current?.content !== event.target.value.trim()) {
+                        pendingMessage.current = null
+                      }
+                      setMessage(event.target.value)
+                    }}
+                    placeholder={`Tell ${companionName} something about your day…`}
+                    rows={2}
+                    maxLength={8000}
+                  />
+                  <button
+                    type="submit"
+                    disabled={!message.trim() || isSending || isThinking}
+                  >
+                    {isSending ? 'Sending…' : isThinking ? 'Thinking…' : 'Send'}
+                  </button>
+                </form>
+                {sessionError || turnFailure ? (
+                  <p className="inline-error">{sessionError ?? turnFailure}</p>
+                ) : null}
+                <p className="chat-disclosure">
+                  OpenAI replies through a private Convex Agent thread. Only useful,
+                  source-linked memories may appear in Me—and you stay in control of each one.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -286,7 +311,7 @@ export function TalkScreen() {
                   <button
                     className="primary-action room-button room-button--primary"
                     type="button"
-                    onClick={() => setPhase('chat')}
+                    onClick={enterChat}
                   >
                     Talk with {companionName}
                   </button>
@@ -310,7 +335,7 @@ export function TalkScreen() {
                     </h2>
                     <p>This can take a little while. Might will keep its light until the image is safely stored.</p>
                   </div>
-                  <button className="text-action" type="button" onClick={() => setPhase('chat')}>
+                  <button className="text-action" type="button" onClick={enterChat}>
                     Talk while I wait
                   </button>
                 </motion.div>
@@ -355,7 +380,7 @@ export function TalkScreen() {
                       {visibleManifestationError}
                     </p>
                   ) : null}
-                  <button className="text-action" type="button" onClick={() => setPhase('chat')}>
+                  <button className="text-action" type="button" onClick={enterChat}>
                     Keep the orb instead
                   </button>
                 </motion.form>
@@ -377,7 +402,7 @@ export function TalkScreen() {
                   <button
                     className="secondary-action room-button room-button--secondary"
                     type="button"
-                    onClick={() => setPhase('chat')}
+                    onClick={enterChat}
                   >
                     Keep this form
                   </button>
