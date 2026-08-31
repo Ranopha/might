@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-31T06:48:05Z
+- **Last updated:** 2026-08-31T06:49:35Z
 
 ## Log
 
@@ -479,7 +479,7 @@ no API-key input. Six test files / 26 tests, lint, typecheck, build, Convex dev
 sync, and 1280/390 px browser QA passed. This work is not deployed to production
 and triggered no OpenAI, Firecrawl, AgentMail, email, or webhook call.
 
-### 2026-08-31 - working tree
+### 2026-08-31 - fc06563
 
 Kept the Talk conversation inside the same approved sunlit room after
 `Keep this form`, instead of replacing the room with the prior blank AI-chat
