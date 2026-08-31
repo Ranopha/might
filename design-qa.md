@@ -1,7 +1,7 @@
-# Design QA — Talk Room Hero
+# Design QA — Fixed Room Story Surfaces
 
 Date: 2026-08-31  
-Scope: Opening state of the Talk surface only
+Scope: Talk opening plus Me, Might Found, Connections, and the custom-Mighty shaping entry
 
 ## Visual target
 
@@ -43,6 +43,34 @@ Result: passed
 - `prefers-reduced-motion` disables room and foreground animation, while the companion components use Motion's reduced-motion preference.
 - Browser console verification returned no errors or warnings.
 - Typecheck, lint, all 24 tests, and production build passed.
+
+## Surface-family comparison
+
+- Approved source truth: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-surface-assets/surface-asset-room-family-v1.jpg`
+- Desktop captures: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-surface-integration/{me,found,connections}-desktop.png`
+- Mobile captures: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-surface-integration/{me,found,connections}-mobile.png`
+- Custom-name shaping capture: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-surface-integration/talk-shape-mobile.png`
+- Source-to-implementation comparison: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-surface-integration/reference-vs-implementation.png`
+- Desktop viewport: 1440 × 1000. Mobile viewport: 390 × 844. Both used a live local Convex-connected build at device pixel ratio 2.
+- Verified states: empty living memory, no world overlap, no connection, and the pre-generation shape form. Provider calls were not triggered during visual QA.
+
+### Required fidelity surfaces
+
+Result: passed
+
+- All three secondary surfaces inhabit the same approved sunlit room, paper texture, botanical line language, and warm neutral palette as Talk.
+- Me uses the luminous memory folio in the left alcove; Found keeps the current/default companion in the alcove while a paper messenger arrives at the door; Connections places the two botanical lantern-pods and living thread across the room.
+- Each illustration is a real transparent image asset. Labels and runtime state remain live HTML so the composition stays accessible and responsive.
+- Mobile preserves the complete room as an establishing panel, then moves the story copy onto a warm paper page. No horizontal overflow was observed at 390 px.
+- The shaping entry visibly supports both a companion name and a visual description without introducing a fifth primary surface.
+
+### Findings and fixes
+
+- P2 — thin generated chroma fringe: fixed by decontaminating only saturated green edge pixels while retaining the original alpha silhouette.
+- P2 — surface illustrations initially took the full breathing-loop duration to appear: fixed by starting motion assets at their intended visible state.
+- P2 — the idle Found messenger disappeared at downsampled/mobile sizes: fixed by increasing its resting opacity and reducing the off-door translation.
+- P2 — Found and Connections titles crossed mixed-tone wall regions: fixed with a diffuse, unboxed paper-light wash behind the copy.
+- Focused QA did not reveal a remaining crop, overlap, missing asset, or first-paint visibility defect.
 
 ## Final result
 

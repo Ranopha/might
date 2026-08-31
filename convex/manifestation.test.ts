@@ -105,11 +105,13 @@ test("turns a famous-IP reference into an original brief before storing the gene
   const generated = await t.action(api.manifestation.generate, {
     clientSessionKey: browserAKey,
     clientRequestId: "manifest-public-request-0000000001",
+    name: "Lumi",
     description: "A baby Batman who feels brave but gentle.",
   });
 
   expect(generated).toMatchObject({
     status: "ready",
+    name: "Lumi",
     description: "A baby Batman who feels brave but gentle.",
     artBrief: safeArtBrief,
     adaptationNote,
@@ -147,6 +149,7 @@ test("turns a famous-IP reference into an original brief before storing the gene
   });
   expect(persisted).toMatchObject({
     status: "ready",
+    name: "Lumi",
     textRequestId: "req_text_public_seam",
     imageRequestId: "req_image_public_seam",
     storageId: expect.any(String),

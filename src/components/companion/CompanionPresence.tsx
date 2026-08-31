@@ -22,15 +22,22 @@ export function CompanionPresence({
   const isGenerating =
     manifestation?.status === 'generating_brief' ||
     manifestation?.status === 'generating_image'
+  const companionName = manifestation?.name ?? 'Might'
 
   if (manifestation?.status !== 'ready' || manifestation.imageUrl === null) {
-    return <Orb compact={compact} state={isGenerating ? 'thinking' : state} />
+    return (
+      <Orb
+        compact={compact}
+        state={isGenerating ? 'thinking' : state}
+        name={companionName}
+      />
+    )
   }
 
   return (
     <motion.figure
       className={`companion-stage${compact ? ' companion-stage--compact' : ''}`}
-      aria-label="Might in its original generated companion form"
+      aria-label={`${companionName} in its original generated companion form`}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{
         opacity: 1,
@@ -47,7 +54,7 @@ export function CompanionPresence({
       <img
         className="companion-stage__image"
         src={manifestation.imageUrl}
-        alt="Might's original Webtoon-style companion"
+        alt={`${companionName}, your original Webtoon-style companion`}
       />
       <span className="companion-stage__sheen" aria-hidden="true" />
       <span className="companion-stage__shadow" aria-hidden="true" />

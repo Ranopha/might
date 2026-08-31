@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react'
 import { api } from '../../convex/_generated/api'
 import type { Id } from '../../convex/_generated/dataModel'
 import { CompanionPresence } from '../components/companion/CompanionPresence'
+import { SurfaceRoomHero } from '../components/room/SurfaceRoomHero'
 import { getOrCreateSessionKey } from '../lib/session'
 
 export function MeScreen() {
@@ -65,17 +66,20 @@ export function MeScreen() {
   }
 
   return (
-    <section className="screen editorial-screen" aria-labelledby="me-title">
+    <section className="screen editorial-screen surface-story-screen" aria-labelledby="me-title">
       <header className="screen-topline">
         <span className="eyebrow">Living memory</span>
         <CompanionPresence compact />
       </header>
 
-      <div className="editorial-heading">
-        <p className="kicker">Me</p>
-        <h1 id="me-title">What I remember</h1>
-        <p>Not a résumé. Just the small truths that may matter someday.</p>
-      </div>
+      <SurfaceRoomHero
+        variant="me"
+        kicker="Me · Living memory"
+        title="What I remember"
+        titleId="me-title"
+        description="Not a résumé. Just the small truths that may matter someday."
+        state="active"
+      />
 
       {memories === undefined ? (
         <motion.div

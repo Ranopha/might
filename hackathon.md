@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-31T03:16:29Z
+- **Last updated:** 2026-08-31T03:55:05Z
 
 ## Log
 
@@ -426,13 +426,22 @@ verified only; production and Sponsor runtime state were not changed.
 
 ### 2026-08-31 - working tree
 
-Completed the matching visual asset family for Me, Might Found, and
-Connections. Living memory is represented by a botanical folio in the alcove,
-the world knocks as a paper-leaf messenger from the doorway, and a real reply
-becomes two lantern-pods joined by a living thread
-(`public/assets/surfaces/`, `docs/design/fixed-room-surface-assets-v1.md`).
+Integrated the matching Webtoon-style asset family into Me, Might Found, and
+Connections so all four primary surfaces now tell different moments in one
+fixed sunlit room. The real transparent illustrations breathe with runtime
+state, become static for reduced motion, and preserve the existing live memory,
+world-signal, consent, reply, and Connected behavior
+(`src/components/room/SurfaceRoomHero.tsx`, `src/screens/`,
+`public/assets/surfaces/`).
 
-The three original Webtoon-style PNGs have real alpha channels, no baked UI
-text, and were composited over the approved room for local scale and edge
-review. This is an asset-only working-tree checkpoint: the three screens,
-runtime integrations, and public production deployment were not changed.
+The Shape flow now accepts and persists a private companion name alongside the
+original OpenAI-generated manifestation; existing records and the house orb
+continue to read as `Might` (`convex/manifestation.ts`, `convex/schema.ts`,
+`src/screens/TalkScreen.tsx`). Desktop and 390 px mobile comparison QA, all 24
+behavior tests, lint, typecheck, production build, alpha/edge checks, and a
+development Convex sync passed.
+
+Documented—but did not implement—a future authenticated user-owned OpenAI-key
+option. The anonymous app does not collect secrets, no Sponsor call or email was
+triggered, and production was not deployed in this working-tree checkpoint
+(`docs/design/companion-identity-and-byok-boundary-v1.md`, `design-qa.md`).

@@ -3,6 +3,7 @@ import { useMutation, useQuery } from 'convex/react'
 import { motion } from 'motion/react'
 import { api } from '../../convex/_generated/api'
 import { CompanionPresence } from '../components/companion/CompanionPresence'
+import { SurfaceRoomHero } from '../components/room/SurfaceRoomHero'
 import { getOrCreateSessionKey } from '../lib/session'
 
 const steps = ['Noticed', 'Interested', 'You approve', 'Reached out', 'They replied', 'Connected']
@@ -141,16 +142,17 @@ export function ConnectionsScreen() {
   }
 
   return (
-    <section className="screen editorial-screen" aria-labelledby="connections-title">
+    <section className="screen editorial-screen surface-story-screen" aria-labelledby="connections-title">
       <header className="screen-topline">
         <span className="eyebrow">Human, eventually</span>
         <CompanionPresence compact state={isPreparing ? 'thinking' : 'idle'} />
       </header>
 
-      <div className="editorial-heading">
-        <p className="kicker">Connections</p>
-        <h1 id="connections-title">
-          {connection?.status === 'connected'
+      <SurfaceRoomHero
+        variant="connections"
+        kicker="Connections · A real hello"
+        title={
+          connection?.status === 'connected'
             ? 'A possibility became a real hello.'
             : connection?.status === 'replied'
               ? 'They replied.'
@@ -158,20 +160,30 @@ export function ConnectionsScreen() {
                 ? 'Your hello is on its way.'
                 : pitch
                   ? 'Before hello, you see everything.'
-            : isPreparing
-              ? 'Might is finding the right words.'
-              : 'From possibility to hello.'}
-        </h1>
-        <p>
-          {connection?.status === 'connected'
+                  : isPreparing
+                    ? 'Might is finding the right words.'
+                    : 'From possibility to hello.'
+        }
+        titleId="connections-title"
+        description={
+          connection?.status === 'connected'
             ? 'Connected means a two-way conversation has begun—not that any promise or agreement was made.'
             : connection?.status === 'replied'
               ? 'Their words arrived through Might’s inbox and changed this connection live.'
               : pitch
                 ? 'A private draft is not permission. You choose what leaves Might—and only after a real recipient is known.'
-            : 'Nothing leaves Might until you say so.'}
-        </p>
-      </div>
+                : 'Nothing leaves Might until you say so.'
+        }
+        state={
+          connection?.status === 'connected'
+            ? 'connected'
+            : connection?.status === 'replied'
+              ? 'replied'
+              : connection
+                ? 'active'
+                : 'idle'
+        }
+      />
 
       {connection === undefined ? (
         <motion.div

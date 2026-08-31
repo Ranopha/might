@@ -536,6 +536,28 @@
   margin-top: 29px;
 }
 
+.shape-form__identity {
+  margin-bottom: 16px;
+}
+
+.shape-form__identity input {
+  width: min(280px, 100%);
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(133, 89, 189, 0.22);
+  border-radius: 12px;
+  outline: 0;
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.7);
+  font: inherit;
+  font-size: 13px;
+}
+
+.shape-form__identity input:focus {
+  border-color: rgba(133, 89, 189, 0.52);
+  box-shadow: 0 0 0 4px rgba(133, 89, 189, 0.08);
+}
+
 .manifestation-result,
 .manifestation-progress {
   margin-top: 29px;
@@ -3074,6 +3096,308 @@
   }
 }
 
+/* The same sunlit room holds every primary story surface. */
+.surface-story-screen {
+  grid-template-rows: auto auto auto;
+}
+
+.surface-story-screen .screen-topline {
+  grid-column: 1 / -1;
+}
+
+.surface-room-hero {
+  position: relative;
+  grid-column: 1 / -1;
+  width: 100%;
+  aspect-ratio: 1487 / 850;
+  margin-top: clamp(24px, 4vh, 42px);
+  overflow: hidden;
+  border: 1px solid rgba(94, 78, 49, 0.18);
+  border-radius: 28px;
+  color: #393a2f;
+  background: #d7ca9f;
+  box-shadow:
+    0 28px 78px rgba(79, 63, 37, 0.16),
+    0 2px 0 rgba(255, 255, 255, 0.62) inset;
+  isolation: isolate;
+}
+
+.surface-room-hero__visuals {
+  position: absolute;
+  inset: 0;
+}
+
+.surface-room-hero__background,
+.surface-room-hero__foreground {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  object-position: center 44%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.surface-room-hero__background {
+  z-index: 0;
+  animation: room-light-breathe 12s ease-in-out infinite;
+}
+
+.surface-room-hero__foreground {
+  z-index: 4;
+  opacity: 0.2;
+  animation: room-foreground-breathe 11s ease-in-out infinite;
+}
+
+.surface-room-hero__asset {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 18px rgba(73, 57, 30, 0.15));
+  pointer-events: none;
+  user-select: none;
+  will-change: opacity, transform;
+}
+
+.surface-room-hero--me .surface-room-hero__asset {
+  bottom: 5%;
+  left: 3.4%;
+  width: 39%;
+}
+
+.surface-room-hero--found .surface-room-hero__asset {
+  top: 32%;
+  right: 4.5%;
+  width: 31%;
+}
+
+.surface-room-hero--connections .surface-room-hero__asset {
+  bottom: 3.5%;
+  left: 8%;
+  width: 84%;
+}
+
+.surface-room-hero__companion {
+  position: absolute;
+  z-index: 2;
+  bottom: 13%;
+  left: 4.5%;
+  display: grid;
+  width: 31%;
+  height: 58%;
+  place-items: center;
+}
+
+.surface-room-hero__companion .orb-stage,
+.surface-room-hero__companion .companion-stage {
+  width: min(92%, 360px);
+}
+
+.surface-room-hero__companion .companion-stage__aura,
+.surface-room-hero__companion .companion-stage__sheen {
+  display: none;
+}
+
+.surface-room-hero__companion .companion-stage__image {
+  width: 84%;
+  border-color: rgba(88, 75, 49, 0.13);
+  border-radius: 42% 46% 40% 44%;
+  box-shadow: 0 18px 42px rgba(68, 55, 34, 0.18);
+}
+
+.surface-room-hero__copy {
+  position: absolute;
+  z-index: 5;
+  top: 17%;
+  left: 47%;
+  width: 44%;
+  max-width: 560px;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.56);
+  isolation: isolate;
+}
+
+.surface-room-hero--found .surface-room-hero__copy {
+  top: 13%;
+  left: 36%;
+  width: 43%;
+}
+
+.surface-room-hero--connections .surface-room-hero__copy {
+  top: 10%;
+  left: 24%;
+  width: 52%;
+  max-width: 680px;
+  text-align: center;
+}
+
+.surface-room-hero--found .surface-room-hero__copy::before,
+.surface-room-hero--connections .surface-room-hero__copy::before {
+  position: absolute;
+  z-index: -1;
+  inset: -26% -14% -24%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(249, 246, 225, 0.72) 0%,
+    rgba(249, 246, 225, 0.34) 48%,
+    rgba(249, 246, 225, 0) 76%
+  );
+  content: '';
+  pointer-events: none;
+}
+
+.surface-room-hero__copy .kicker {
+  color: #6b6d57;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+.surface-room-hero__copy h1 {
+  max-width: 680px;
+  margin: 12px 0 0;
+  color: #393a2f;
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4.4vw, 68px);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.surface-room-hero--found .surface-room-hero__copy h1 {
+  font-size: clamp(34px, 3.8vw, 58px);
+}
+
+.surface-room-hero__copy > p:last-child {
+  max-width: 520px;
+  margin: 18px 0 0;
+  color: #5f5d48;
+  font-size: clamp(13px, 1.25vw, 17px);
+  line-height: 1.52;
+}
+
+.surface-room-hero--connections .surface-room-hero__copy > p:last-child {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.surface-story-screen > .empty-story,
+.surface-story-screen > .memory-collection,
+.surface-story-screen > .world-signal-card,
+.surface-story-screen > .connection-loading,
+.surface-story-screen > .connection-empty,
+.surface-story-screen > .connection-story,
+.surface-story-screen > .editorial-note {
+  margin-top: clamp(28px, 4vw, 48px);
+}
+
+@media (max-width: 960px) {
+  .surface-room-hero__copy h1 {
+    font-size: clamp(34px, 5.2vw, 52px);
+  }
+
+  .surface-room-hero--found .surface-room-hero__copy h1 {
+    font-size: clamp(31px, 4.7vw, 46px);
+  }
+}
+
+@media (max-width: 720px) {
+  .surface-story-screen {
+    display: block;
+  }
+
+  .surface-room-hero {
+    display: grid;
+    aspect-ratio: auto;
+    margin-top: 20px;
+    overflow: visible;
+    border: 0;
+    border-radius: 22px;
+    background: #f6f1da;
+    box-shadow: 0 20px 54px rgba(79, 63, 37, 0.14);
+  }
+
+  .surface-room-hero__visuals {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 1487 / 1058;
+    border: 1px solid rgba(94, 78, 49, 0.16);
+    border-radius: 22px 22px 0 0;
+  }
+
+  .surface-room-hero__background,
+  .surface-room-hero__foreground {
+    object-position: center;
+  }
+
+  .surface-room-hero__copy,
+  .surface-room-hero--found .surface-room-hero__copy,
+  .surface-room-hero--connections .surface-room-hero__copy {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    max-width: none;
+    padding: 28px 23px 30px;
+    text-align: left;
+    text-shadow: none;
+    background: #f9f5df;
+    border-radius: 0 0 22px 22px;
+  }
+
+  .surface-room-hero--found .surface-room-hero__copy::before,
+  .surface-room-hero--connections .surface-room-hero__copy::before {
+    display: none;
+  }
+
+  .surface-room-hero__copy h1,
+  .surface-room-hero--found .surface-room-hero__copy h1 {
+    max-width: 560px;
+    font-size: clamp(39px, 12vw, 52px);
+    line-height: 1.01;
+  }
+
+  .surface-room-hero__copy > p:last-child,
+  .surface-room-hero--connections .surface-room-hero__copy > p:last-child {
+    margin-right: 0;
+    margin-left: 0;
+    font-size: 15px;
+  }
+
+  .surface-room-hero--me .surface-room-hero__asset {
+    bottom: 5%;
+    left: 2.5%;
+    width: 46%;
+  }
+
+  .surface-room-hero--found .surface-room-hero__asset {
+    top: 30%;
+    right: 1.5%;
+    width: 38%;
+  }
+
+  .surface-room-hero--connections .surface-room-hero__asset {
+    bottom: 5%;
+    left: 4%;
+    width: 92%;
+  }
+
+  .surface-room-hero__companion {
+    bottom: 15%;
+    left: 2.5%;
+    width: 39%;
+    height: 56%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .surface-room-hero__background,
+  .surface-room-hero__foreground {
+    animation: none;
+  }
+}
+
 /* Talk opening room: the home stays still while Might and the light breathe. */
 .orb__image {
   display: block;
@@ -3317,6 +3641,17 @@
 .talk-room-scene__conversation .manifestation-result,
 .talk-room-scene__conversation .manifestation-progress {
   margin-top: 22px;
+}
+
+.talk-room-scene__conversation .shape-form__identity input {
+  border-color: rgba(92, 86, 55, 0.2);
+  color: #444536;
+  background: rgba(255, 253, 240, 0.86);
+}
+
+.talk-room-scene__conversation .shape-form__identity input:focus {
+  border-color: rgba(94, 115, 81, 0.58);
+  box-shadow: 0 0 0 4px rgba(94, 115, 81, 0.1);
 }
 
 .talk-room-scene__conversation .manifestation-result h2,

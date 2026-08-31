@@ -3,15 +3,16 @@ import { motion, useReducedMotion } from 'motion/react'
 type OrbProps = {
   compact?: boolean
   state?: 'idle' | 'thinking'
+  name?: string
 }
 
-export function Orb({ compact = false, state = 'idle' }: OrbProps) {
+export function Orb({ compact = false, state = 'idle', name = 'Might' }: OrbProps) {
   const reduceMotion = useReducedMotion()
   const duration = state === 'thinking' ? 3.2 : 7.4
 
   return (
     <motion.div
-      aria-label="Might in its original glowing orb form"
+      aria-label={`${name} in its original glowing orb form`}
       className={`orb-stage${compact ? ' orb-stage--compact' : ''}`}
       initial={{ opacity: 0, scale: 0.82 }}
       animate={{

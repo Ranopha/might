@@ -19,6 +19,7 @@ const MIN_SESSION_KEY_LENGTH = 32;
 const MAX_SESSION_KEY_LENGTH = 256;
 const MIN_REQUEST_ID_LENGTH = 16;
 const MAX_REQUEST_ID_LENGTH = 128;
+const MAX_COMPANION_NAME_LENGTH = 40;
 const MAX_DESCRIPTION_LENGTH = 1_000;
 const MAX_ART_BRIEF_LENGTH = 8_000;
 const MAX_ADAPTATION_NOTE_LENGTH = 2_000;
@@ -43,6 +44,7 @@ const nullableStringValidator = v.union(v.string(), v.null());
 
 const manifestationViewValidator = v.object({
   id: v.id("companionManifestations"),
+  name: v.string(),
   status: manifestationStatusValidator,
   description: v.string(),
   artBrief: nullableStringValidator,
@@ -92,6 +94,23 @@ function normalizeDescription(description: string): string {
   return normalized;
 }
 
+function normalizeCompanionName(name: string | undefined): string {
+  const normalized = name?.trim() || "Might";
+  const hasControlCharacter = Array.from(normalized).some((character) => {
+    const codePoint = character.codePointAt(0);
+    return codePoint !== undefined && (codePoint <= 0x1f || codePoint === 0x7f);
+  });
+  if (
+    normalized.length > MAX_COMPANION_NAME_LENGTH ||
+    hasControlCharacter
+  ) {
+    throw new ConvexError(
+      "Companion name must be between 1 and 40 visible characters.",
+    );
+  }
+  return normalized;
+}
+
 function normalizeModel(model: string | undefined, fallback: string): string {
   const normalized = model?.trim();
   return normalized ? normalized : fallback;
@@ -123,6 +142,7 @@ async function toManifestationView(
 
   return {
     id: manifestation._id,
+    name: manifestation.name ?? "Might",
     status: manifestation.status,
     description: manifestation.description,
     artBrief: manifestation.artBrief,
@@ -204,6 +224,7 @@ export const beginGeneration = internalMutation({
   args: {
     clientSessionKey: v.string(),
     clientRequestId: v.string(),
+    name: v.optional(v.string()),
     description: v.string(),
     textModel: v.string(),
     imageModel: v.string(),
@@ -215,6 +236,7 @@ export const beginGeneration = internalMutation({
   handler: async (ctx, args) => {
     assertClientSessionKey(args.clientSessionKey);
     assertClientRequestId(args.clientRequestId);
+    const name = normalizeCompanionName(args.name);
     const description = normalizeDescription(args.description);
     const now = Date.now();
 
@@ -252,9 +274,12 @@ export const beginGeneration = internalMutation({
       )
       .unique();
     if (existing !== null) {
-      if (existing.description !== description) {
+      if (
+        existing.description !== description ||
+        (existing.name ?? "Might") !== name
+      ) {
         throw new ConvexError(
-          "A manifestation request id cannot be reused with a new description.",
+          "A manifestation request id cannot be reused with a new name or description.",
         );
       }
       return {
@@ -345,6 +370,7 @@ export const beginGeneration = internalMutation({
     const manifestationId = await ctx.db.insert("companionManifestations", {
       anonymousSessionId: sessionId,
       clientRequestId: args.clientRequestId,
+      name,
       status: "generating_brief",
       description,
       artBrief: null,
@@ -535,6 +561,7 @@ async function readOwnedView(
 export const generate = action({
   args: {
     clientSessionKey: v.string(),
+    name: v.optional(v.string()),
     description: v.string(),
     clientRequestId: v.string(),
   },
@@ -542,6 +569,7 @@ export const generate = action({
   handler: async (ctx, args): Promise<ManifestationView> => {
     assertClientSessionKey(args.clientSessionKey);
     assertClientRequestId(args.clientRequestId);
+    const name = normalizeCompanionName(args.name);
     const description = normalizeDescription(args.description);
     const textModel = normalizeModel(env.OPENAI_TEXT_MODEL, DEFAULT_TEXT_MODEL);
     const imageModel = normalizeModel(
@@ -555,6 +583,7 @@ export const generate = action({
     } = await ctx.runMutation(internal.manifestation.beginGeneration, {
       clientSessionKey: args.clientSessionKey,
       clientRequestId: args.clientRequestId,
+      name,
       description,
       textModel,
       imageModel,

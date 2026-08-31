@@ -4,6 +4,7 @@ import { motion } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../convex/_generated/api'
 import { CompanionPresence } from '../components/companion/CompanionPresence'
+import { SurfaceRoomHero } from '../components/room/SurfaceRoomHero'
 import { getOrCreateSessionKey } from '../lib/session'
 
 export function FoundScreen() {
@@ -158,27 +159,36 @@ export function FoundScreen() {
         : 'verified'
 
   return (
-    <section className="screen editorial-screen" aria-labelledby="found-title">
+    <section className="screen editorial-screen surface-story-screen" aria-labelledby="found-title">
       <header className="screen-topline">
         <span className="eyebrow">World signals</span>
         <CompanionPresence compact state="thinking" />
       </header>
 
-      <div className="editorial-heading">
-        <p className="kicker">Might Found</p>
-        <h1 id="found-title">
-          {surfacedMatch
+      <SurfaceRoomHero
+        variant="found"
+        kicker="Might Found · The world knocks"
+        title={
+          surfacedMatch
             ? 'I found something you might be great for.'
             : completedSignal
               ? 'Something real came into view.'
-              : 'Somewhere, something may need you.'}
-        </h1>
-        <p>
-          {surfacedMatch
+              : 'Somewhere, something may need you.'
+        }
+        titleId="found-title"
+        description={
+          surfacedMatch
             ? 'Not a label. A source-backed overlap between one real situation and what you chose to remember.'
-            : 'Might looks for public situations, not job titles.'}
-        </p>
-      </div>
+            : 'Might looks for public situations, not job titles.'
+        }
+        state={
+          isProcessing || isMatching || clarificationPending
+            ? 'active'
+            : completedSignal
+              ? 'replied'
+              : 'idle'
+        }
+      />
 
       {completedSignal ? (
         <motion.article

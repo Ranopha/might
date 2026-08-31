@@ -9,6 +9,7 @@ type TalkPhase = 'manifestation' | 'chat'
 
 export function TalkScreen() {
   const [shaping, setShaping] = useState(false)
+  const [companionNameDraft, setCompanionNameDraft] = useState('')
   const [description, setDescription] = useState('')
   const [phase, setPhase] = useState<TalkPhase>('manifestation')
   const [message, setMessage] = useState('')
@@ -57,6 +58,7 @@ export function TalkScreen() {
       const result = await generateManifestation({
         clientSessionKey: sessionKey,
         clientRequestId: crypto.randomUUID(),
+        name: companionNameDraft.trim() || 'Might',
         description: companionDescription,
       })
       if (result.status === 'failed') {
@@ -100,6 +102,7 @@ export function TalkScreen() {
     manifestation?.status === 'generating_brief' ||
     manifestation?.status === 'generating_image'
   const isReady = manifestation?.status === 'ready' && manifestation.imageUrl !== null
+  const companionName = manifestation?.name ?? 'Might'
   const persistedFailure =
     manifestation?.status === 'failed'
       ? manifestationFailureCopy(manifestation.errorCode)
@@ -124,7 +127,7 @@ export function TalkScreen() {
         <div className="chat-layout">
           <aside className="chat-companion">
             <CompanionPresence />
-            <span>Might</span>
+            <span>{companionName}</span>
             <p>
               {isReady
                 ? 'In the form you imagined.'
@@ -136,7 +139,7 @@ export function TalkScreen() {
 
           <div className="chat-column">
             <div className="chat-intro">
-              <span className="speaker">Might</span>
+              <span className="speaker">{companionName}</span>
               <h1 id="talk-title">Now I’d like to know you.</h1>
               <p>What should I call you?</p>
             </div>
@@ -152,7 +155,7 @@ export function TalkScreen() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                   >
-                    <span>{item.role === 'user' ? 'You' : 'Might'}</span>
+                    <span>{item.role === 'user' ? 'You' : companionName}</span>
                     <p>{item.content}</p>
                   </motion.article>
                 ))
@@ -162,9 +165,9 @@ export function TalkScreen() {
                   className="message message--assistant message--thinking"
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  aria-label="Might is thinking"
+                  aria-label={`${companionName} is thinking`}
                 >
-                  <span>Might</span>
+                  <span>{companionName}</span>
                   <p>
                     <i aria-hidden="true" />
                     <i aria-hidden="true" />
@@ -176,7 +179,7 @@ export function TalkScreen() {
 
             <form className="chat-composer" onSubmit={sendMessage}>
               <label className="sr-only" htmlFor="message">
-                Message Might
+                Message {companionName}
               </label>
               <textarea
                 id="message"
@@ -187,7 +190,7 @@ export function TalkScreen() {
                   }
                   setMessage(event.target.value)
                 }}
-                placeholder="Tell Might something about your day…"
+                placeholder={`Tell ${companionName} something about your day…`}
                 rows={2}
                 maxLength={8000}
               />
@@ -234,9 +237,9 @@ export function TalkScreen() {
               <CompanionPresence />
               <p className="orb-caption">
                 {isReady
-                  ? 'Your original Might, safely remembered.'
+                  ? `${companionName}, safely remembered.`
                   : isGenerating
-                    ? 'Your Might is finding an original shape.'
+                    ? `${companionName} is finding an original shape.`
                     : 'Your Might, before it takes shape.'}
               </p>
             </div>
@@ -255,8 +258,8 @@ export function TalkScreen() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.16 }}
           >
-            <span className="speaker">Might</span>
-            <h1 id="talk-title">Hi. I’m Might.</h1>
+            <span className="speaker">{companionName}</span>
+            <h1 id="talk-title">Hi. I’m {companionName}.</h1>
             <p className="opening-copy">
               Before we get to know each other… would you like me to keep this form,
               or become something you imagine?
@@ -272,7 +275,7 @@ export function TalkScreen() {
                   exit={{ opacity: 0, y: -8 }}
                 >
                   <span className="manifestation-result__status">Original form created</span>
-                  <h2>There you are.</h2>
+                  <h2>There you are, {companionName}.</h2>
                   <p>
                     {manifestation.adaptationNote ??
                       'Might kept the feeling you described and became something entirely its own.'}
@@ -282,7 +285,7 @@ export function TalkScreen() {
                     type="button"
                     onClick={() => setPhase('chat')}
                   >
-                    Start talking
+                    Talk with {companionName}
                   </button>
                 </motion.div>
               ) : isGenerating ? (
@@ -317,6 +320,17 @@ export function TalkScreen() {
                   exit={{ opacity: 0, y: -8 }}
                   onSubmit={manifestCompanion}
                 >
+                  <div className="shape-form__identity">
+                    <label htmlFor="companion-name">What should this Mighty be called?</label>
+                    <input
+                      id="companion-name"
+                      value={companionNameDraft}
+                      onChange={(event) => setCompanionNameDraft(event.target.value)}
+                      placeholder="Might"
+                      maxLength={40}
+                      autoComplete="off"
+                    />
+                  </div>
                   <label htmlFor="companion-description">
                     What would you like me to feel like?
                   </label>
@@ -373,7 +387,7 @@ export function TalkScreen() {
             </p>
             {shaping ? (
               <p className="integration-note">
-                Your description is used only to create this companion. The image is stored with your private Convex session.
+                The name, description, and resulting image stay with this private Convex session. The default remains available if creation pauses.
               </p>
             ) : null}
           </motion.div>

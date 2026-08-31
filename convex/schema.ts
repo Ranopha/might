@@ -581,6 +581,7 @@ export default defineSchema({
   companionManifestations: defineTable({
     anonymousSessionId: v.id("anonymousSessions"),
     clientRequestId: v.string(),
+    name: v.optional(v.string()),
     status: v.union(
       v.literal("generating_brief"),
       v.literal("generating_image"),
