@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-31T02:24:21Z
+- **Last updated:** 2026-08-31T03:16:29Z
 
 ## Log
 
@@ -423,3 +423,16 @@ into chat. The approved button plate changes on hover, reduced-motion fallbacks
 remain in place, and the browser console returned no warning or error. Typecheck,
 lint, 24 behavior tests, and the production build passed. This slice is locally
 verified only; production and Sponsor runtime state were not changed.
+
+### 2026-08-31 - working tree
+
+Completed the matching visual asset family for Me, Might Found, and
+Connections. Living memory is represented by a botanical folio in the alcove,
+the world knocks as a paper-leaf messenger from the doorway, and a real reply
+becomes two lantern-pods joined by a living thread
+(`public/assets/surfaces/`, `docs/design/fixed-room-surface-assets-v1.md`).
+
+The three original Webtoon-style PNGs have real alpha channels, no baked UI
+text, and were composited over the approved room for local scale and edge
+review. This is an asset-only working-tree checkpoint: the three screens,
+runtime integrations, and public production deployment were not changed.
