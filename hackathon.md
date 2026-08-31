@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-31T06:49:35Z
+- **Last updated:** 2026-08-31T07:51:09Z
 
 ## Log
 
@@ -497,3 +497,25 @@ This correction is locally verified only. Ordinary browser QA may have created
 one empty, browser-scoped development session through the existing Talk
 `ensureSession` path. It changed no Convex schema, function, environment,
 production row, Sponsor provider call, email, webhook, or production deployment.
+
+### 2026-08-31 - e74cf37
+
+Rotated the previously exposed OpenAI, Firecrawl, and AgentMail credentials,
+verified each replacement through an official read-only endpoint, promoted the
+hidden values to Convex development and production, and revoked the superseded
+keys. No scrape, generation, email, webhook registration, or application-data
+mutation occurred; production intentionally still has no AgentMail webhook
+secret.
+
+Deployed the room-native settings backend and Talk room-continuity correction
+to production `hushed-stork-401` with no index deletion, then published the
+matching 13-file static release as deployment
+`902b0117-b08c-4b15-a858-18595a308443`. Public Talk now keeps the fixed sunlit
+room during conversation, and the settings drawer exposes private naming,
+appearance, sound, volume, an honest unavailable-music state, and no secret
+input.
+
+All six public routes returned `200`. Browser verification at 1280 × 900 and
+390 × 844 found no horizontal overflow or console warning/error; the mobile
+composer remained above navigation. This is a verified public UI/backend
+release, not a new production Sponsor E2E or inbound-email proof.
