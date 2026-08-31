@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-31T05:30:10Z
+- **Last updated:** 2026-08-31T06:02:30Z
 
 ## Log
 
@@ -464,3 +464,17 @@ The released bundle targets the production Convex deployment; browser checks at
 1280 and 390 px found no horizontal overflow or console error. This proves the
 new UI and backend are publicly deployed, not a production AgentMail reply E2E:
 no OpenAI, Firecrawl, or AgentMail call ran and no email was sent in this release.
+
+### 2026-08-31 - working tree
+
+Added one room-native settings drawer without changing the four primary
+surfaces. Companion name and house-orb/generated-form choice now persist in the
+browser-scoped Convex session and update shared companion presence reactively;
+the existing OpenAI manifestation entry remains available for a first form
+(`convex/companionSettings.ts`, `src/components/settings/SettingsDrawer.tsx`).
+
+Added a device-local sound switch, master volume, and user-triggered preview.
+Background music remains explicitly unavailable, and the anonymous app exposes
+no API-key input. Six test files / 26 tests, lint, typecheck, build, Convex dev
+sync, and 1280/390 px browser QA passed. This work is not deployed to production
+and triggered no OpenAI, Firecrawl, AgentMail, email, or webhook call.

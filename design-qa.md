@@ -95,6 +95,42 @@ Result: passed
 - The production Found composition visibly places Might at the right-hand door and leaves the alcove available for copy. Connections computed idle asset opacity is `0.64`.
 - The released bundle targets `https://hushed-stork-401.convex.cloud`; live Convex-backed Me and Found content rendered and the browser console returned no warning or error.
 
+## Room-native settings drawer
+
+- Source capture: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-settings-drawer/source-production-desktop.png` at 1280 × 900.
+- Final desktop capture: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-settings-drawer/implementation-desktop-final.png` at 1280 × 900.
+- Final mobile captures: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-settings-drawer/implementation-mobile-final.png` and `/Users/liuenyan/.codex/visualizations/2026/08/31/might-settings-drawer/implementation-mobile-lower-final.png` at 390 × 844.
+- Combined source-to-implementation review: `/Users/liuenyan/.codex/visualizations/2026/08/31/might-settings-drawer/source-vs-settings-final.png`.
+
+### P0 — Product intent and visual continuity
+
+Result: passed
+
+- Settings opens as one continuous paper drawer over the existing room, not a fifth primary surface, route, dashboard, or collection of generic cards.
+- The panel reuses the approved room foreground, paper, sage, amber, botanical line, and restrained blur language. Lucide supplies interface icons; no emoji, placeholder art, custom SVG, or CSS-drawn mascot was introduced.
+- The four primary navigation destinations remain unchanged and visible as spatial context behind the drawer.
+- Identity, appearance, sound, AI access, and privacy are presented in consumer language. The API area contains no key input and explicitly preserves the authenticated server-vault boundary.
+
+### P1 — Layout and responsive behavior
+
+Result: passed
+
+- At 1280 × 900 the drawer grows out from the desktop rail, leaves the fixed room legible, and keeps its own scrolling region without moving the app or clipping the header.
+- At 390 × 844 the same object becomes a bottom sheet below the mobile brand bar. Both top and lower states keep a fixed header, readable controls, and `scrollWidth === innerWidth === 390`.
+- The parent drawer initially accepted programmatic scroll even with `overflow: hidden`, which let an auto-focused lower control pull the header upward. The parent now uses non-scrollable clipping while only the inner paper body scrolls; explicit stacking keeps the title and close control visible.
+
+### P2 — Behavior, accessibility, and honest states
+
+Result: passed
+
+- A synthetic development session changed the companion name to `Aster`, Talk updated through the live Convex query, and the same field was restored to `Might`. Cross-session privacy and invalid generated-form selection are covered by Convex behavior tests.
+- House orb / generated-form selection is real and persisted. A new session can reveal the original OpenAI manifestation prompt, while an unavailable generated form remains disabled instead of being faked.
+- The global sound control and drawer switch stay synchronized. Disabling sound also disables the volume slider and preview; a local two-note Web Audio preview respects the stored master volume. A dedicated browser-local preference test covers reload restoration.
+- Background music is visibly disabled and labeled as not yet available. The API section exposes Sponsor mode and an official OpenAI link but contains zero password or key-named inputs.
+- The dialog has an accessible name, close control, Escape handling, focus return, and a Tab loop. Reduced-motion mode removes drawer movement.
+- Browser console inspection returned no warnings or errors. Six test files / 26 tests, ESLint, TypeScript, production build, Convex development sync, and `git diff --check` passed.
+- Visual QA triggered no OpenAI, Firecrawl, AgentMail, email, webhook, production deploy, or production application-data change.
+
 ## Final result
 
 passed

@@ -154,6 +154,78 @@ test("turns a famous-IP reference into an original brief before storing the gene
     imageRequestId: "req_image_public_seam",
     storageId: expect.any(String),
   });
+
+  await expect(
+    t.query(api.companionSettings.current, {
+      clientSessionKey: browserAKey,
+    }),
+  ).resolves.toEqual({
+    name: "Lumi",
+    appearance: "generated",
+    hasGeneratedAppearance: true,
+  });
+  await expect(
+    t.mutation(api.companionSettings.updateName, {
+      clientSessionKey: browserAKey,
+      name: "Lumen",
+    }),
+  ).resolves.toEqual({ name: "Lumen" });
+  await expect(
+    t.mutation(api.companionSettings.updateAppearance, {
+      clientSessionKey: browserAKey,
+      appearance: "orb",
+    }),
+  ).resolves.toEqual({ appearance: "orb" });
+  await expect(
+    t.query(api.companionSettings.current, {
+      clientSessionKey: browserAKey,
+    }),
+  ).resolves.toEqual({
+    name: "Lumen",
+    appearance: "orb",
+    hasGeneratedAppearance: true,
+  });
+});
+
+test("keeps companion settings private and refuses an unavailable generated form", async () => {
+  const t = initTest();
+  await t.mutation(api.talk.ensureSession, {
+    clientSessionKey: browserAKey,
+  });
+  await t.mutation(api.talk.ensureSession, {
+    clientSessionKey: browserBKey,
+  });
+
+  await expect(
+    t.mutation(api.companionSettings.updateName, {
+      clientSessionKey: browserAKey,
+      name: "  Sol  ",
+    }),
+  ).resolves.toEqual({ name: "Sol" });
+  await expect(
+    t.query(api.companionSettings.current, {
+      clientSessionKey: browserAKey,
+    }),
+  ).resolves.toEqual({
+    name: "Sol",
+    appearance: "orb",
+    hasGeneratedAppearance: false,
+  });
+  await expect(
+    t.query(api.companionSettings.current, {
+      clientSessionKey: browserBKey,
+    }),
+  ).resolves.toEqual({
+    name: "Might",
+    appearance: "orb",
+    hasGeneratedAppearance: false,
+  });
+  await expect(
+    t.mutation(api.companionSettings.updateAppearance, {
+      clientSessionKey: browserAKey,
+      appearance: "generated",
+    }),
+  ).rejects.toThrow("A generated companion form is not ready yet.");
 });
 
 test("one private session reuses an active companion generation", async () => {

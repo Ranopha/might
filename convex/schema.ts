@@ -4,6 +4,10 @@ import { v } from "convex/values";
 export default defineSchema({
   anonymousSessions: defineTable({
     clientSessionKey: v.string(),
+    companionName: v.optional(v.string()),
+    companionAppearance: v.optional(
+      v.union(v.literal("orb"), v.literal("generated")),
+    ),
     createdAt: v.number(),
     lastActiveAt: v.number(),
   }).index("by_clientSessionKey", ["clientSessionKey"]),

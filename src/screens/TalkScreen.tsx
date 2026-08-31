@@ -25,6 +25,9 @@ export function TalkScreen() {
   const manifestation = useQuery(api.manifestation.current, {
     clientSessionKey: sessionKey,
   })
+  const companionSettings = useQuery(api.companionSettings.current, {
+    clientSessionKey: sessionKey,
+  })
   const messages = useQuery(api.talk.listMessages, {
     clientSessionKey: sessionKey,
     limit: 50,
@@ -102,7 +105,7 @@ export function TalkScreen() {
     manifestation?.status === 'generating_brief' ||
     manifestation?.status === 'generating_image'
   const isReady = manifestation?.status === 'ready' && manifestation.imageUrl !== null
-  const companionName = manifestation?.name ?? 'Might'
+  const companionName = companionSettings?.name ?? manifestation?.name ?? 'Might'
   const persistedFailure =
     manifestation?.status === 'failed'
       ? manifestationFailureCopy(manifestation.errorCode)

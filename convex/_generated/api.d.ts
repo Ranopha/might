@@ -11,6 +11,7 @@
 import type * as abuseProtection from "../abuseProtection.js";
 import type * as agentMailInbound from "../agentMailInbound.js";
 import type * as agentMailOutbound from "../agentMailOutbound.js";
+import type * as companionSettings from "../companionSettings.js";
 import type * as connectionPitchOpenai from "../connectionPitchOpenai.js";
 import type * as connections from "../connections.js";
 import type * as http from "../http.js";
@@ -36,6 +37,7 @@ declare const fullApi: ApiFromModules<{
   abuseProtection: typeof abuseProtection;
   agentMailInbound: typeof agentMailInbound;
   agentMailOutbound: typeof agentMailOutbound;
+  companionSettings: typeof companionSettings;
   connectionPitchOpenai: typeof connectionPitchOpenai;
   connections: typeof connections;
   http: typeof http;

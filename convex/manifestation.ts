@@ -261,6 +261,7 @@ export const beginGeneration = internalMutation({
       existingSession?._id ??
       (await ctx.db.insert("anonymousSessions", {
         clientSessionKey: args.clientSessionKey,
+        companionName: name,
         createdAt: now,
         lastActiveAt: now,
       }));
@@ -363,6 +364,7 @@ export const beginGeneration = internalMutation({
 
     if (existingSession !== null) {
       await ctx.db.patch("anonymousSessions", sessionId, {
+        companionName: name,
         lastActiveAt: now,
       });
     }
@@ -465,6 +467,7 @@ export const completeGeneration = internalMutation({
       "adaptationNote",
       MAX_ADAPTATION_NOTE_LENGTH,
     );
+    const completedAt = Date.now();
     await ctx.db.patch("companionManifestations", manifestation._id, {
       status: "ready",
       artBrief,
@@ -473,7 +476,11 @@ export const completeGeneration = internalMutation({
       textRequestId: args.textRequestId,
       imageRequestId: args.imageRequestId,
       errorCode: null,
-      updatedAt: Date.now(),
+      updatedAt: completedAt,
+    });
+    await ctx.db.patch("anonymousSessions", manifestation.anonymousSessionId, {
+      companionAppearance: "generated",
+      lastActiveAt: completedAt,
     });
     return null;
   },

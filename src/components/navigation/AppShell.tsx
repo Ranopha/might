@@ -1,8 +1,15 @@
-import { useState, type PropsWithChildren } from 'react'
-import { useQuery } from 'convex/react'
+import { Settings2, Volume2, VolumeX } from 'lucide-react'
+import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
+import { useMutation, useQuery } from 'convex/react'
 import { NavLink } from 'react-router-dom'
 import { api } from '../../../convex/_generated/api'
 import { CompanionPresence } from '../companion/CompanionPresence'
+import { SettingsDrawer } from '../settings/SettingsDrawer'
+import {
+  playMightSoundPreview,
+  useAudioPreferences,
+} from '../../lib/audioPreferences'
+import { getOrCreateSessionKey } from '../../lib/session'
 
 const navigation = [
   { to: '/talk', label: 'Talk', marker: '◌' },
@@ -12,8 +19,37 @@ const navigation = [
 ] as const
 
 export function AppShell({ children }: PropsWithChildren) {
-  const [muted, setMuted] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false)
+  const [sessionKey] = useState(getOrCreateSessionKey)
   const backendStatus = useQuery(api.talk.status)
+  const ensureSession = useMutation(api.talk.ensureSession)
+  const {
+    soundEffectsEnabled,
+    volume,
+    setSoundEffectsEnabled,
+    setVolume,
+  } = useAudioPreferences()
+
+  useEffect(() => {
+    void ensureSession({ clientSessionKey: sessionKey }).catch(() => undefined)
+  }, [ensureSession, sessionKey])
+
+  const previewSound = useCallback(() => {
+    if (soundEffectsEnabled && volume > 0) {
+      void playMightSoundPreview(volume)
+    }
+  }, [soundEffectsEnabled, volume])
+
+  const changeSoundEffects = useCallback(
+    (enabled: boolean) => {
+      setSoundEffectsEnabled(enabled)
+      if (enabled && volume > 0) {
+        void playMightSoundPreview(volume)
+      }
+    },
+    [setSoundEffectsEnabled, volume],
+  )
+  const closeSettings = useCallback(() => setSettingsOpen(false), [])
 
   return (
     <div className="app-shell">
@@ -21,10 +57,22 @@ export function AppShell({ children }: PropsWithChildren) {
       <div className="ambient ambient--apricot" />
 
       <aside className="side-rail">
-        <NavLink className="brand" to="/talk" aria-label="Might home">
-          <CompanionPresence compact />
-          <span>Might</span>
-        </NavLink>
+        <div className="rail-heading">
+          <NavLink className="brand" to="/talk" aria-label="Might home">
+            <CompanionPresence compact />
+            <span>Might</span>
+          </NavLink>
+          <button
+            className="settings-trigger settings-trigger--top"
+            type="button"
+            aria-label="Open settings"
+            aria-expanded={settingsOpen}
+            aria-controls="settings-drawer"
+            onClick={() => setSettingsOpen(true)}
+          >
+            <Settings2 size={19} strokeWidth={1.6} aria-hidden="true" />
+          </button>
+        </div>
 
         <nav className="primary-nav" aria-label="Primary navigation">
           {navigation.map((item) => (
@@ -44,15 +92,32 @@ export function AppShell({ children }: PropsWithChildren) {
         </nav>
 
         <div className="rail-footer">
-          <button
-            className="sound-toggle"
-            type="button"
-            aria-pressed={muted}
-            onClick={() => setMuted((value) => !value)}
-          >
-            <span aria-hidden="true">{muted ? '♪̸' : '♪'}</span>
-            {muted ? 'Sound off' : 'Sound on'}
-          </button>
+          <div className="rail-control-row">
+            <button
+              className="sound-toggle"
+              type="button"
+              aria-pressed={!soundEffectsEnabled}
+              onClick={() => changeSoundEffects(!soundEffectsEnabled)}
+            >
+              {soundEffectsEnabled ? (
+                <Volume2 size={15} strokeWidth={1.6} aria-hidden="true" />
+              ) : (
+                <VolumeX size={15} strokeWidth={1.6} aria-hidden="true" />
+              )}
+              {soundEffectsEnabled ? 'Sound on' : 'Sound off'}
+            </button>
+            <button
+              className="settings-trigger"
+              type="button"
+              aria-label="Open settings"
+              aria-expanded={settingsOpen}
+              aria-controls="settings-drawer"
+              onClick={() => setSettingsOpen(true)}
+            >
+              <Settings2 size={16} strokeWidth={1.6} aria-hidden="true" />
+              <span>Settings</span>
+            </button>
+          </div>
           <span className="privacy-note">Private by default</span>
           <span className="backend-note">
             <i className={backendStatus?.status === 'live' ? 'is-live' : ''} />
@@ -77,6 +142,17 @@ export function AppShell({ children }: PropsWithChildren) {
           </NavLink>
         ))}
       </nav>
+
+      <SettingsDrawer
+        open={settingsOpen}
+        onClose={closeSettings}
+        sessionKey={sessionKey}
+        soundEffectsEnabled={soundEffectsEnabled}
+        volume={volume}
+        onSoundEffectsChange={changeSoundEffects}
+        onVolumeChange={setVolume}
+        onPreviewSound={previewSound}
+      />
     </div>
   )
 }

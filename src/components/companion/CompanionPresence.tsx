@@ -19,12 +19,23 @@ export function CompanionPresence({
   const manifestation = useQuery(api.manifestation.current, {
     clientSessionKey: sessionKey,
   })
+  const settings = useQuery(api.companionSettings.current, {
+    clientSessionKey: sessionKey,
+  })
   const isGenerating =
     manifestation?.status === 'generating_brief' ||
     manifestation?.status === 'generating_image'
-  const companionName = manifestation?.name ?? 'Might'
+  const companionName = settings?.name ?? manifestation?.name ?? 'Might'
+  const useGeneratedAppearance =
+    settings === undefined
+      ? manifestation?.status === 'ready'
+      : settings.appearance === 'generated'
 
-  if (manifestation?.status !== 'ready' || manifestation.imageUrl === null) {
+  if (
+    !useGeneratedAppearance ||
+    manifestation?.status !== 'ready' ||
+    manifestation.imageUrl === null
+  ) {
     return (
       <Orb
         compact={compact}
