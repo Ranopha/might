@@ -88,6 +88,13 @@ Result: passed
 - Medium and mobile browser checks showed no horizontal overflow, clipped control, text collision, or displaced illustration. The room, paper texture, door, platform, live HTML copy, persistent navigation, and reduced-motion behavior were all retained.
 - Focused comparison found no remaining actionable P0, P1, or P2 defect in these three owner-requested corrections.
 
+### Production verification
+
+- Public target: `https://hushed-stork-401.convex.site` at static deployment `bb26da34-811a-461a-8abb-c316daff83b5`.
+- Talk, Me, Found, and Connections were verified in the in-app browser at the default 1280 px viewport and at 390 × 844. Each mobile route had `scrollWidth === innerWidth`.
+- The production Found composition visibly places Might at the right-hand door and leaves the alcove available for copy. Connections computed idle asset opacity is `0.64`.
+- The released bundle targets `https://hushed-stork-401.convex.cloud`; live Convex-backed Me and Found content rendered and the browser console returned no warning or error.
+
 ## Final result
 
 passed

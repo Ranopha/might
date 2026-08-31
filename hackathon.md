@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-31T04:48:27Z
+- **Last updated:** 2026-08-31T05:30:10Z
 
 ## Log
 
@@ -409,7 +409,7 @@ tracer. Total `sendCount` remains four, all provider receipts remain present,
 and no new email was sent. Full navigation restored the same selective state.
 Production promotion remains open.
 
-### 2026-08-31 - working tree
+### 2026-08-31 - 2163ec3
 
 Rebuilt the Talk opening as a fixed, sunlit Webtoon-style room using original
 room, foreground, companion, and interaction-state image assets. The default
@@ -424,7 +424,7 @@ remain in place, and the browser console returned no warning or error. Typecheck
 lint, 24 behavior tests, and the production build passed. This slice is locally
 verified only; production and Sponsor runtime state were not changed.
 
-### 2026-08-31 - working tree
+### 2026-08-31 - 3b053a4
 
 Integrated the matching Webtoon-style asset family into Me, Might Found, and
 Connections so all four primary surfaces now tell different moments in one
@@ -449,5 +449,18 @@ development Convex sync passed.
 
 Documented—but did not implement—a future authenticated user-owned OpenAI-key
 option. The anonymous app does not collect secrets, no Sponsor call or email was
-triggered, and production was not deployed in this working-tree checkpoint
+triggered while building this slice
 (`docs/design/companion-identity-and-byok-boundary-v1.md`, `design-qa.md`).
+
+Promoted the consent, AgentMail, inbound-reply, and Connected functions plus 17
+additive indexes to production `hushed-stork-401`, then published static
+deployment `bb26da34-811a-461a-8abb-c316daff83b5`. The release required three
+AgentMail configuration names to be copied without exposing their values; the
+webhook secret was intentionally not copied and no production webhook was
+registered.
+
+The public `/`, Talk, Me, Found, Connections, and health routes returned `200`.
+The released bundle targets the production Convex deployment; browser checks at
+1280 and 390 px found no horizontal overflow or console error. This proves the
+new UI and backend are publicly deployed, not a production AgentMail reply E2E:
+no OpenAI, Firecrawl, or AgentMail call ran and no email was sent in this release.
