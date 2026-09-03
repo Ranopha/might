@@ -1,4 +1,4 @@
-# Might design QA — living accordion, paper controls, and mobile shell
+# Might design QA — living accordion, paper controls, navigation, and mobile shell
 
 ## Findings
 
@@ -421,6 +421,106 @@ No actionable P0, P1, or P2 findings remain.
     responsive and its label was kept intact. The refreshed desktop/mobile
     captures, combined comparisons, 14-width matrix, interactions, tests,
     build, and console review passed.
+
+## Living-paper navigation correction — 2026-09-03
+
+### Finding and source truth
+
+- [Resolved P1] The desktop Talk, Me, Might Found, and Connections links were
+  still a flat text list beside a tactile storybook room. Their lavender
+  active pill belonged to the earlier dashboard language and visually broke
+  the approved living-paper system.
+- [Resolved P2] The navigation used Unicode marks as stand-in icons. They did
+  not share stroke weight, optical size, or meaning with the rest of Might's
+  real icon library.
+- The owner-provided source is the conversation attachment
+  `Safari Appshot 2026-09-03T05-16-29.235Z.png`; it has no stable local
+  filesystem path. A same-state, same-viewport production baseline was
+  captured and privacy-cropped to the navigation at:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-living-paper-navigation/source-production-nav-1152x768.png`.
+- The selected target is the paper-button language already approved within
+  that same screen: warm ivory secondary plates, a muted-sage primary plate,
+  restrained botanical ink, tactile depth, and dark olive text.
+
+### Implementation evidence and combined comparison
+
+- Desktop implementation at a 1152 × 768 CSS viewport and device pixel ratio
+  1:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-living-paper-navigation/implementation-local-full-1152x768.png`.
+- Privacy-cropped desktop navigation at the same viewport and state:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-living-paper-navigation/implementation-local-nav-1152x768.png`.
+- Source-versus-final combined comparison, production on the left and local
+  implementation on the right:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-living-paper-navigation/comparison-nav-1152x768.png`
+  at 504 × 768 pixels. Both halves show Talk as the current room.
+- Mobile implementation at a 390 × 844 CSS viewport and device pixel ratio
+  1:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-living-paper-navigation/implementation-local-mobile-390x844.png`.
+
+### Full-view and focused comparison
+
+- The full implementation keeps the existing 252 px rail, brand, room hero,
+  footer utilities, content width, and four-route information architecture.
+  The navigation no longer reads as an unrelated settings list.
+- In the combined focused input, all four room entries now use the same real
+  paper plate asset family as Shape, Sound, and Settings. The current room is
+  the warm sage plate and sits 6 px forward, reading as a gently pulled
+  bookmark without adding another panel or dashboard rail.
+- The inactive ivory plates remain quieter than the current room, while their
+  consistent height and 4 px rhythm preserve scanability. The botanical edge
+  remains visible without competing with labels.
+
+### Required fidelity surfaces
+
+- Typography: established Might type remains unchanged. Navigation labels use
+  one 12 px semibold ink treatment with sufficient room for `Might Found` and
+  `Connections`; no copy is truncated at the supported desktop rail width.
+- Spacing and layout: four 203 × 57 px desktop targets occupy a simple vertical
+  rhythm. The active target ends at x=233 inside the 252 px rail; paper shadow
+  and forward movement remain contained.
+- Color, texture, and elevation: existing generated primary, hover, pressed,
+  and secondary RGBA plates are reused at their intended wide aspect. No new
+  generic gradient card, asset stretch, or foreign palette was introduced.
+- Icons: MessageCircle, BookOpen, Sparkles, and Link2 come from the installed
+  Lucide library. No emoji, text glyph, handcrafted SVG, CSS drawing, or
+  placeholder icon remains.
+- States: inactive, active, hover, press, and focus-visible each have a clear
+  material or positional response. Reduced-motion removes navigation
+  transitions while preserving the current-room distinction.
+- Mobile: the bottom navigation retains four compact 50 px tap targets, adopts
+  the same real icons and warm paper palette, and keeps the active room clear
+  without forcing the wide desktop plate into a distorted mobile slot.
+
+### Responsive, accessibility, and interaction evidence
+
+- Desktop links navigated successfully to `/talk`, `/me`, `/found`, and
+  `/connections`; each route exposed the correct `aria-current="page"` link
+  and the sage paper state.
+- The same four route checks passed through the mobile navigation at 390 px.
+- Width checks passed at 320, 390, 720, 980, 981, 1152, and 1440 px. Desktop
+  and mobile navigation switched exactly at the existing breakpoint, all four
+  Lucide icons remained present, and document and shell horizontal overflow
+  stayed zero.
+- Keyboard traversal reached the current Talk link, matched
+  `:focus-visible`, and rendered a 2 px solid focus outline. Every mobile tap
+  target measured 50 px high.
+- The settled local browser log contained no warning or error. Seven test
+  files / 27 tests, lint, typecheck, and the production build passed.
+- No route, Convex function or data, Sponsor provider call, email, webhook, or
+  production deployment changed during this visual correction.
+
+### Comparison history continuation
+
+14. Production baseline: four Unicode markers and text labels floated directly
+    on the rail; only the current item received a flat lavender pill. Result:
+    blocked by one P1 material-system mismatch and one P2 icon mismatch.
+15. Living-paper pass: reused the approved paper plates, replaced glyphs with
+    Lucide icons, added current/hover/press/focus/reduced-motion states, and
+    carried the language into the compact bottom navigation. The combined
+    comparison, route checks, responsive matrix, console review, tests, lint,
+    typecheck, and build passed.
+
+No actionable P0, P1, or P2 findings remain.
 
 ## Final result
 

@@ -1,4 +1,12 @@
-import { Settings2, Volume2, VolumeX } from 'lucide-react'
+import {
+  BookOpen,
+  Link2,
+  MessageCircle,
+  Settings2,
+  Sparkles,
+  Volume2,
+  VolumeX,
+} from 'lucide-react'
 import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
 import { useMutation, useQuery } from 'convex/react'
 import { NavLink } from 'react-router-dom'
@@ -12,10 +20,10 @@ import {
 import { getOrCreateSessionKey } from '../../lib/session'
 
 const navigation = [
-  { to: '/talk', label: 'Talk', marker: '◌' },
-  { to: '/me', label: 'Me', marker: '◇' },
-  { to: '/found', label: 'Might Found', marker: '✦' },
-  { to: '/connections', label: 'Connections', marker: '⌁' },
+  { to: '/talk', label: 'Talk', icon: MessageCircle },
+  { to: '/me', label: 'Me', icon: BookOpen },
+  { to: '/found', label: 'Might Found', icon: Sparkles },
+  { to: '/connections', label: 'Connections', icon: Link2 },
 ] as const
 
 export function AppShell({ children }: PropsWithChildren) {
@@ -75,20 +83,24 @@ export function AppShell({ children }: PropsWithChildren) {
         </div>
 
         <nav className="primary-nav" aria-label="Primary navigation">
-          {navigation.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `nav-item${isActive ? ' nav-item--active' : ''}`
-              }
-            >
-              <span className="nav-item__marker" aria-hidden="true">
-                {item.marker}
-              </span>
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
+          {navigation.map((item) => {
+            const Icon = item.icon
+
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `nav-item${isActive ? ' nav-item--active' : ''}`
+                }
+              >
+                <span className="nav-item__icon" aria-hidden="true">
+                  <Icon size={17} strokeWidth={1.55} />
+                </span>
+                <span className="nav-item__label">{item.label}</span>
+              </NavLink>
+            )
+          })}
         </nav>
 
         <div className="rail-footer">
@@ -129,18 +141,24 @@ export function AppShell({ children }: PropsWithChildren) {
       <main className="main-stage">{children}</main>
 
       <nav className="mobile-nav" aria-label="Primary navigation">
-        {navigation.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className={({ isActive }) =>
-              `mobile-nav__item${isActive ? ' mobile-nav__item--active' : ''}`
-            }
-          >
-            <span aria-hidden="true">{item.marker}</span>
-            <span>{item.label === 'Might Found' ? 'Found' : item.label}</span>
-          </NavLink>
-        ))}
+        {navigation.map((item) => {
+          const Icon = item.icon
+
+          return (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className={({ isActive }) =>
+                `mobile-nav__item${isActive ? ' mobile-nav__item--active' : ''}`
+              }
+            >
+              <span className="mobile-nav__icon" aria-hidden="true">
+                <Icon size={17} strokeWidth={1.55} />
+              </span>
+              <span>{item.label === 'Might Found' ? 'Found' : item.label}</span>
+            </NavLink>
+          )
+        })}
       </nav>
 
       <SettingsDrawer
