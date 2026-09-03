@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-03T02:02:50Z
+- **Last updated:** 2026-09-03T02:48:06Z
 
 ## Log
 
@@ -520,7 +520,7 @@ All six public routes returned `200`. Browser verification at 1280 × 900 and
 composer remained above navigation. This is a verified public UI/backend
 release, not a new production Sponsor E2E or inbound-email proof.
 
-### 2026-09-03 - working tree
+### 2026-09-03 - c1d7e86
 
 Replaced the flat Connections card and timeline with a generated, responsive
 six-fold paper journey whose live stages follow a seed-to-two-way botanical
@@ -537,3 +537,18 @@ tests, lint, typecheck, production build, 1490 × 1058 desktop comparison,
 This slice is locally verified only. It did not change Convex functions or
 data, call OpenAI/Firecrawl/AgentMail, send email, register a webhook, or deploy
 production.
+
+### 2026-09-03 - working tree
+
+Corrected the mobile Connections regression exposed by an owner Safari capture.
+The six semantic lifecycle stages now stay on their matching botanical folds
+instead of becoming detached stacked cards, and the responsive shell gives
+scrolling content and bottom navigation separate viewport rows
+(`src/screens/ConnectionsScreen.tsx`, `src/App.css`).
+
+A deterministic browser geometry check failed on the reported structure before
+the fix and passed twice at 390 × 844 and 540 × 1058 afterward. Checks at 320,
+420, 980, and 981 px, four-route navigation, Settings, the Connections CTA,
+27 tests, lint, typecheck, build, combined visual comparison, and the browser
+console also passed (`design-qa.md`). This is local UI verification only; no
+Convex data/function, Sponsor call, email, webhook, or production deploy changed.

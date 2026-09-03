@@ -21,32 +21,34 @@ function ConnectionJourney({
 
   return (
     <section className="connection-accordion" aria-label="Connection journey">
-      <motion.img
-        className="connection-accordion__paper"
-        src="/assets/surfaces/connections-accordion-letter-v1.png"
-        alt=""
-        aria-hidden="true"
-        initial={{ opacity: 0, scaleX: 0.94 }}
-        animate={{ opacity: 1, scaleX: 1 }}
-        transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}
-      />
-      <ol className="connection-accordion__steps">
-        {steps.map((step, index) => {
-          const isComplete = index < completedSteps
-          const isCurrent = index === currentStep
+      <div className="connection-accordion__canvas">
+        <motion.img
+          className="connection-accordion__paper"
+          src="/assets/surfaces/connections-accordion-letter-v1.png"
+          alt=""
+          aria-hidden="true"
+          initial={{ opacity: 0, scaleX: 0.94 }}
+          animate={{ opacity: 1, scaleX: 1 }}
+          transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}
+        />
+        <ol className="connection-accordion__steps">
+          {steps.map((step, index) => {
+            const isComplete = index < completedSteps
+            const isCurrent = index === currentStep
 
-          return (
-            <li
-              key={step}
-              className={`${isComplete ? 'is-complete' : ''}${isCurrent ? ' is-current' : ''}`.trim() || undefined}
-              aria-current={isCurrent ? 'step' : undefined}
-            >
-              <span>{index + 1}</span>
-              <p>{step}</p>
-            </li>
-          )
-        })}
-      </ol>
+            return (
+              <li
+                key={step}
+                className={`${isComplete ? 'is-complete' : ''}${isCurrent ? ' is-current' : ''}`.trim() || undefined}
+                aria-current={isCurrent ? 'step' : undefined}
+              >
+                <span>{index + 1}</span>
+                <p>{step}</p>
+              </li>
+            )
+          })}
+        </ol>
+      </div>
       {children}
     </section>
   )

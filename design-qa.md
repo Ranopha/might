@@ -1,4 +1,4 @@
-# Might design QA — living accordion and paper controls
+# Might design QA — living accordion, paper controls, and mobile shell
 
 ## Findings
 
@@ -23,9 +23,19 @@
     separate curled note carries the consent boundary.
 - [Resolved P2] A desktop-only overlay would have made six stage labels
   unreadable on mobile.
-  - Fix: at 720 px and below, the same real accordion asset remains visible,
-    while the live stage labels reflow into a two-column paper list and then a
-    single column at 420 px.
+  - Earlier fix: at 720 px and below, the same real accordion asset remained
+    visible while the labels moved into a separate paper list.
+- [Resolved P1] The owner's 420 px Safari capture exposed that the earlier
+  responsive list had become a second generic card beneath the accordion; the
+  copy then became a third layer, making one story feel like stacked UI.
+  - Fix: the artwork and semantic six-stage list now share one responsive
+    canvas. All six stages remain aligned to their botanical folds down to the
+    supported 320 px width; the detached two-column/single-column card is gone.
+- [Resolved P1] The fixed bottom navigation covered the start of “Your first
+  connection will unfold here” in the reported mobile state.
+  - Fix: the mobile shell is now a `100dvh` two-row app frame. The main story
+    owns scrolling and the navigation occupies a separate bottom row with
+    safe-area margin, so content never renders beneath the dock.
 
 No actionable P0, P1, or P2 findings remain.
 
@@ -40,6 +50,15 @@ No actionable P0, P1, or P2 findings remain.
   keeps its production aspect ratio. The selected concept compresses the hero
   vertically, but this implementation changes only the requested functional
   layer beneath it.
+- Reported mobile defect:
+  `/var/folders/75/d_z3yqjs27xbcrxzm3vqpnwh0000gn/T/TemporaryItems/NSIRD_screencaptureui_yhWEPq/截圖 2026-09-03 上午10.10.03.png`
+  - Original pixels: 2940 × 1912.
+  - App-content crop:
+    `/Users/liuenyan/.codex/visualizations/2026/09/03/might-mobile-connections-stack/source-user-mobile-content.png`
+    at 840 × 1550 pixels, representing a 420 × 775 CSS viewport at 2× density.
+  - Normalized source:
+    `/Users/liuenyan/.codex/visualizations/2026/09/03/might-mobile-connections-stack/source-user-mobile-content-420x775.png`
+    at 420 × 775 pixels for 1:1 comparison.
 
 ## Implementation evidence
 
@@ -62,6 +81,20 @@ No actionable P0, P1, or P2 findings remain.
   `/Users/liuenyan/.codex/visualizations/2026/09/03/might-accordion-controls/comparison-full.png`
 - Focused comparison:
   `/Users/liuenyan/.codex/visualizations/2026/09/03/might-accordion-controls/comparison-fold.png`
+- Mobile implementation at the reported viewport and state:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-mobile-connections-stack/after-420x775-matched-state-final.png`
+  - Browser viewport and capture: 420 × 775 CSS pixels at device pixel ratio 1.
+  - State: anonymous local empty Connections state, main scroll position 345,
+    with the same hero-copy/accordion/empty-copy region visible as the source.
+- Mobile source-versus-final combined comparison:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-mobile-connections-stack/compare-source-vs-final-420x775.png`
+  at 876 × 823 pixels.
+- Mobile focused comparison:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-mobile-connections-stack/compare-focused-final.png`
+  at 876 × 523 pixels.
+- Desktop regression capture:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-mobile-connections-stack/after-desktop-1490x1058-viewport-final.png`
+  at 1490 × 1058 pixels.
 
 ## Full-view comparison
 
@@ -72,6 +105,11 @@ No actionable P0, P1, or P2 findings remain.
   are all represented directly.
 - The functional layer spans the full story width instead of returning to the
   former narrow card plus detached editorial aside.
+- In the normalized mobile comparison, the source has three successive layers
+  (accordion art, detached six-stage card, and empty-state copy) and the dock
+  covers the heading. The final view has one accordion journey, exposes the
+  complete heading above the dock, and preserves the same room, type, copy,
+  palette, and asset crop.
 
 ## Focused-region comparison
 
@@ -86,13 +124,19 @@ No actionable P0, P1, or P2 findings remain.
 - The primary action is live HTML placed over its own generated paper tray;
   the privacy lock and separate reminder remain readable rather than being
   baked into artwork.
+- The mobile focused comparison confirms that every label now sits on the fold
+  represented by its botanical stage. No generated asset was stretched or
+  replaced, and the removed white list card no longer interrupts the story.
 
 ## Required fidelity surfaces
 
 - Typography: established Might display and body families are retained. The
   desktop empty-state heading is constrained to the target's three-line rhythm.
+  At 420 px the heading remains complete above the dock; 9 px supporting stage
+  labels remain secondary but readable and keep full semantic text.
 - Spacing: desktop preserves broad room margins; mobile reports
-  `scrollWidth === innerWidth === 390` and keeps all objects inside the page.
+  `scrollWidth === innerWidth` at 320, 390, 420, 540, 980, and 981 px. The
+  mobile main viewport ends exactly where the 62 px navigation row begins.
 - Color and texture: ivory washi, warm amber, antique gold, muted sage, and
   soft brown ink match the approved room and companion assets.
 - Image quality: the accordion, tray, and consent note are real generated RGBA
@@ -101,9 +145,9 @@ No actionable P0, P1, or P2 findings remain.
 - Accessibility: all stage labels, button labels, `aria-current`, focus states,
   privacy copy, and status content remain semantic HTML. Decorative artwork is
   hidden from assistive technology.
-- Responsive behavior: desktop overlays live text on the folds; mobile keeps
-  the accordion as an establishing object and reflows the semantic stages below
-  it without horizontal overflow.
+- Responsive behavior: desktop and mobile both overlay live text on the real
+  folds. The main story is the only scrolling region below 980 px, while the
+  bottom navigation stays available outside that content region.
 
 ## Interaction and browser checks
 
@@ -113,6 +157,18 @@ No actionable P0, P1, or P2 findings remain.
   name, appearance, sound, background-music, and AI-access sections remained
   present.
 - The browser console reported no warnings or errors after settling.
+- The repeatable mobile geometry check failed before the fix at 540 × 1058:
+  the accordion was 631 px tall around a 246 px image, its list and copy were
+  separate vertical layers, and the 78 px bottom reserve was 16 px short.
+- The same check passed twice at both 390 × 844 and 540 × 1058 after the fix:
+  all stages remained inside the paper, copy cleared the paper by 24 px, the
+  navigation was outside the main content, and horizontal overflow was zero.
+- At 320 × 720 the same checks passed; at the page end both the action tray and
+  consent note can scroll entirely above the navigation.
+- Talk, Me, Found, and Connections all retained working navigation, contained
+  width, and the same docked mobile shell. The Settings drawer opened and
+  closed correctly. `See what Might found` still navigated to the expected
+  Found heading.
 - Desktop and mobile screenshots were captured after the generated assets and
   final responsive CSS loaded.
 - The existing sponsor-critical connection mutations, payload-bound approval,
@@ -131,6 +187,17 @@ No actionable P0, P1, or P2 findings remain.
 4. Final pass: heading constrained to the selected three-line rhythm; desktop
    and 390 px responsive captures, combined comparisons, navigation, settings,
    and console checks passed.
+5. Owner Safari capture: the 420 px state showed the responsive stage list as a
+   detached white card and the fixed dock obscuring the next story heading.
+   Result: blocked by two P1 mobile composition/usability regressions.
+6. Structure pass: added one accordion canvas and returned all six semantic
+   stages to the botanical folds; removed the 420 px single-column expansion.
+   Result: stage-stack check passed, but the floating dock still occupied the
+   content layer.
+7. Shell pass: converted the responsive shell to a viewport-height main-scroll
+   row plus a separate safe-area navigation row. The matched 420 × 775 combined
+   comparison, 320/390/540 geometry checks, 980/981 breakpoint checks, four-route
+   navigation, settings, CTA, desktop regression, and console review passed.
 
 ## Final result
 
