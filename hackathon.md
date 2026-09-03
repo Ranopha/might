@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-03T04:45:54Z
+- **Last updated:** 2026-09-03T05:33:40Z
 
 ## Log
 
@@ -591,3 +591,16 @@ All six public routes returned `200`. Public browser checks at 1152 × 768 and
 navigation, zero horizontal overflow, working Found and Settings controls, and
 no warning or error. No backend, Sponsor API, email, webhook, or application
 data action ran during this release.
+
+### 2026-09-03 - c37ca2f
+
+Turned the four primary routes into tactile paper room bookmarks using the
+existing approved plate assets and real Lucide icons. The current room now
+reads as a gently pulled sage bookmark; the responsive bottom dock keeps the
+same icon and paper language (`src/components/navigation/AppShell.tsx`,
+`src/App.css`).
+
+Four-route desktop/mobile checks, keyboard focus, a seven-width responsive
+matrix, 27 tests, lint, typecheck, build, combined visual comparison, and the
+browser console passed (`design-qa.md`). This is a local frontend change only;
+no production deploy, Convex state, Sponsor call, email, or webhook changed.
