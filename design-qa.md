@@ -199,6 +199,117 @@ No actionable P0, P1, or P2 findings remain.
    comparison, 320/390/540 geometry checks, 980/981 breakpoint checks, four-route
    navigation, settings, CTA, desktop regression, and console review passed.
 
+## Medium-desktop RWD correction — 2026-09-03
+
+### Finding and source truth
+
+- [Resolved P1] The owner's Safari capture at a 1152 × 768 app viewport showed
+  the empty-state paragraph crossing the lifecycle labels and the action tray
+  covering the privacy chip. This made the desktop composition read as broken,
+  even though the prior wide-desktop and mobile checkpoints passed.
+- The selected visual truth remains
+  `/var/folders/75/d_z3yqjs27xbcrxzm3vqpnwh0000gn/T/codex-clipboard-8e09c97c-7843-41b0-aeb2-fd0dbb506c14.png`
+  at 1487 × 1058 pixels. The new user defect evidence is the conversation
+  attachment `Safari Appshot 2026-09-03T03-04-36.928Z.png`; it has no stable
+  local filesystem path.
+- Root cause was measured rather than inferred: at 1152 px the fixed 252 px
+  rail and screen padding left the accordion only 784.8125 px wide, while its
+  inner type still used viewport units and its 76 px tray overlap stayed fixed.
+
+### Implementation evidence
+
+- Repaired 1152 × 768 viewport:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-connections-rwd-medium-desktop/implementation-final-1152x768.jpg`
+  at 1152 × 768 pixels and device pixel ratio 1.
+- Narrow desktop reflow:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-connections-rwd-medium-desktop/implementation-final-1024x900.jpg`
+  at 1024 × 900 pixels and device pixel ratio 1.
+- Retained mobile composition:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-connections-rwd-medium-desktop/implementation-final-390x844.jpg`
+  at 390 × 844 pixels and device pixel ratio 1.
+- Wide desktop implementation:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-connections-rwd-medium-desktop/implementation-final-1490x1058.jpg`.
+  The CSS viewport was 1490 × 1058 at device pixel ratio 1; the in-app browser
+  capture surface returned 1397 × 1058 pixels, so the source was normalized to
+  that exact raster size before comparison.
+- Full source-versus-final comparison:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-connections-rwd-medium-desktop/comparison-source-final-desktop.jpg`
+  at 2794 × 1058 pixels.
+- Focused source-versus-1152 comparison:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-connections-rwd-medium-desktop/comparison-source-final-1152-focus.jpg`
+  at 2232 × 768 pixels. The source was proportionally scaled to 768 px high;
+  the implementation remained a 1:1 1152 × 768 capture.
+
+### Fix and focused comparison
+
+- The accordion and populated journey now establish named inline-size
+  containers. Type, label scale, copy rhythm, and tray overlap respond to the
+  component's own width rather than the browser viewport.
+- When the empty accordion receives 740 px or less, the real paper and all six
+  semantic stages remain together while the explanatory copy and privacy chip
+  enter normal document flow below it. This is a structural reflow, not another
+  viewport-specific coordinate patch.
+- The focused combined comparison was opened and inspected with the target on
+  the left and repaired 1152 px state on the right. Both preserve the warm
+  first fold, three-line story heading, six botanical stages, paper action
+  tray, and separate consent note. The repaired state no longer crosses text
+  with stage labels or hides the privacy boundary.
+
+### Required fidelity surfaces
+
+- Typography: the display heading, body copy, stage numbers, and labels now
+  scale from accordion inline size. At 1152 px the paragraph ends 20.7578 px
+  before the stage row; no truncation or unreadable emergency shrink remains.
+- Spacing and layout: the privacy chip ends 8 px before the action tray at the
+  reported width. At narrower component widths the copy, chip, and tray use
+  flow spacing of at least 16 px instead of negative stacking.
+- Colors and tokens: the accepted ivory, amber, sage, and ink palette is
+  unchanged; the correction introduces no generic card surface or new color.
+- Image quality: the original generated accordion, tray, room, and note assets
+  remain unscaled beyond their responsive slots and retain their alpha edges.
+- Copy and content: every lifecycle label and the full consent/privacy wording
+  remain visible and semantic. No wording was removed to make the layout fit.
+- Accessibility and behavior: DOM order, `aria-current`, link/button semantics,
+  focus states, reduced-motion behavior, and the four-route information
+  architecture are unchanged.
+
+### Responsive and interaction evidence
+
+- The red-capable browser check failed identically twice before the fix at
+  1152 × 768: paragraph bottom 818.5469 exceeded stage-row top 780.7031, and
+  privacy-chip bottom 942.9297 exceeded action-tray top 896.
+- The same original check passed twice after the fix: paragraph bottom
+  759.9453, stage-row top 780.7031, privacy-chip bottom 916.9141, and tray top
+  924.9141. Horizontal overflow remained zero.
+- A 15-viewport matrix passed at 320, 390, 420, 540, 720, 721, 800, 980, 981,
+  1024, 1100, 1104, 1152, 1280, and 1440 px. Every stage stayed inside its
+  paper, copy cleared either the stage row or paper edge, privacy cleared the
+  tray, and no viewport gained horizontal overflow.
+- At maximum scroll on 390 × 844, the action tray cleared the navigation by
+  195.0781 px and the consent note by 42.0781 px; the main viewport and 62 px
+  navigation row met with zero overlap.
+- `See what Might found` still reached `/found` and its expected heading.
+  Settings opened and closed. Talk, Me, Found, and Connections navigation all
+  reached the expected route and heading. The settled browser log contained no
+  warning or error.
+- The repository has no real-browser test runner at this layout seam. The
+  regression is therefore locked by the repeatable in-app-browser geometry
+  check; adding a jsdom assertion would not measure layout and would provide
+  false confidence.
+
+### Comparison history continuation
+
+8. Owner medium-desktop capture: viewport-sized type and a fixed negative tray
+   margin collided inside a narrower post-sidebar accordion. Result: blocked by
+   one P1 responsive composition regression.
+9. Container-scale probe: changing only inner type to accordion-relative units
+   cleared copy from the stage row but left the privacy/tray collision. This
+   falsified a single-cause explanation and confirmed two independent causes.
+10. Final responsive pass: tied tray overlap and privacy clearance to the same
+    component scale, added a 740 px component-width structural reflow, and kept
+    the established mobile shell. Combined visual comparison, the full geometry
+    matrix, interactions, tests, build, and console review passed.
+
 ## Final result
 
 passed

@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-03T02:48:06Z
+- **Last updated:** 2026-09-03T03:37:00Z
 
 ## Log
 
@@ -538,7 +538,7 @@ This slice is locally verified only. It did not change Convex functions or
 data, call OpenAI/Firecrawl/AgentMail, send email, register a webhook, or deploy
 production.
 
-### 2026-09-03 - working tree
+### 2026-09-03 - a61c486
 
 Corrected the mobile Connections regression exposed by an owner Safari capture.
 The six semantic lifecycle stages now stay on their matching botanical folds
@@ -552,3 +552,18 @@ the fix and passed twice at 390 × 844 and 540 × 1058 afterward. Checks at 320,
 27 tests, lint, typecheck, build, combined visual comparison, and the browser
 console also passed (`design-qa.md`). This is local UI verification only; no
 Convex data/function, Sponsor call, email, webhook, or production deploy changed.
+
+### 2026-09-03 - working tree
+
+Repaired the medium-desktop Connections collision exposed at 1152 px. The
+accordion now scales typography and paper overlap from its own inline size;
+below 740 px of available component width, the story copy and privacy boundary
+move into normal flow instead of being squeezed into fixed artwork coordinates
+(`src/App.css`).
+
+The original browser geometry check failed twice before the fix and passed
+twice afterward. A 15-viewport matrix from 320 through 1440 px, four-route
+navigation, Settings, the Connections action, 27 tests, lint, typecheck, build,
+combined visual comparison, and browser-console review passed
+(`design-qa.md`). This is local frontend evidence only; no Convex state,
+Sponsor call, email, webhook, or production deployment changed.

@@ -4932,6 +4932,10 @@
 }
 
 .connection-empty--accordion {
+  /* The paper owns its scale; the surrounding rail or viewport must not size its contents. */
+  --connection-tray-overlap: clamp(38px, 6cqi, 76px);
+
+  container: connection-empty / inline-size;
   display: grid;
   min-height: 0;
   grid-template-columns: 1fr;
@@ -5013,14 +5017,14 @@
 
 .connection-accordion__steps span {
   font-family: var(--font-display);
-  font-size: clamp(12px, 1.15vw, 16px);
+  font-size: clamp(10px, 1.45cqi, 16px);
   font-weight: 650;
 }
 
 .connection-accordion__steps p {
   margin: 0;
   color: currentColor;
-  font-size: clamp(9px, 0.85vw, 12px);
+  font-size: clamp(8px, 1.05cqi, 12px);
   font-weight: 580;
   line-height: 1.2;
 }
@@ -5037,7 +5041,7 @@
 .connection-empty--accordion .connection-empty__copy h2 {
   max-width: 270px;
   color: #454438;
-  font-size: clamp(23px, 2.55vw, 34px);
+  font-size: clamp(20px, 3.05cqi, 34px);
   font-weight: 500;
   line-height: 1.02;
   text-wrap: balance;
@@ -5045,16 +5049,16 @@
 
 .connection-empty--accordion .connection-empty__copy p {
   max-width: 360px;
-  margin-top: 12px;
+  margin-top: clamp(8px, 1cqi, 12px);
   color: #6d6b58;
-  font-size: clamp(10px, 0.95vw, 13px);
-  line-height: 1.48;
+  font-size: clamp(10px, 1.12cqi, 13px);
+  line-height: 1.42;
 }
 
 .connection-empty__privacy {
   position: absolute;
   z-index: 3;
-  bottom: 7.6%;
+  bottom: calc(var(--connection-tray-overlap) + clamp(8px, 1cqi, 12px));
   left: 12.2%;
   display: inline-flex;
   min-height: 42px;
@@ -5066,7 +5070,7 @@
   color: #6b6b55;
   background: rgba(255, 252, 232, 0.76);
   box-shadow: 0 8px 18px rgba(82, 66, 35, 0.08);
-  font-size: clamp(9px, 0.82vw, 11px);
+  font-size: clamp(9px, 0.95cqi, 11px);
 }
 
 .connection-empty__action-row {
@@ -5077,7 +5081,7 @@
   min-height: 126px;
   align-items: center;
   justify-content: center;
-  margin: -76px auto 0;
+  margin: calc(0px - var(--connection-tray-overlap)) auto 0;
   padding: 20px 88px 16px 122px;
   border: 0;
   border-radius: 0;
@@ -5098,6 +5102,7 @@
 }
 
 .connection-story {
+  container: connection-story / inline-size;
   display: grid;
   gap: 0;
   padding: 0 0 34px;
@@ -5167,6 +5172,59 @@
   margin-top: 9px;
   color: #686956;
   font-size: 10px;
+}
+
+@container connection-empty (max-width: 740px) {
+  .connection-empty--accordion .connection-accordion {
+    display: grid;
+    aspect-ratio: auto;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .connection-empty--accordion .connection-accordion__canvas {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    aspect-ratio: 1600 / 780;
+  }
+
+  .connection-empty--accordion .connection-empty__copy,
+  .connection-empty--accordion .connection-empty__privacy {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    width: auto;
+    grid-column: 1;
+    margin-right: clamp(18px, 4cqi, 32px);
+    margin-left: clamp(18px, 4cqi, 32px);
+  }
+
+  .connection-empty--accordion .connection-empty__copy {
+    grid-row: 2;
+    margin-top: clamp(20px, 3.2cqi, 28px);
+  }
+
+  .connection-empty--accordion .connection-empty__copy h2 {
+    max-width: 560px;
+    font-size: clamp(28px, 5.2cqi, 38px);
+  }
+
+  .connection-empty--accordion .connection-empty__copy p {
+    max-width: 620px;
+    font-size: clamp(11px, 1.8cqi, 13px);
+  }
+
+  .connection-empty--accordion .connection-empty__privacy {
+    grid-row: 3;
+    width: fit-content;
+    margin-top: 16px;
+  }
+
+  .connection-empty--accordion .connection-empty__action-row {
+    margin-top: 16px;
+  }
 }
 
 @media (max-width: 980px) {
