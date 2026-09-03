@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-03T04:11:53Z
+- **Last updated:** 2026-09-03T04:45:54Z
 
 ## Log
 
@@ -568,7 +568,7 @@ combined visual comparison, and browser-console review passed
 (`design-qa.md`). This is local frontend evidence only; no Convex state,
 Sponsor call, email, webhook, or production deployment changed.
 
-### 2026-09-03 - working tree
+### 2026-09-03 - 90877cd
 
 Rebalanced the empty Connections ending so the real `See what Might found`
 action and consent note share one responsive footer: left/right on desktop and
@@ -579,6 +579,15 @@ unchanged.
 The reported 1152 × 768 collision failed twice before the fix and passed twice
 afterward. A 14-width browser matrix from 320 through 1440 px, CTA and Settings
 interactions, 27 tests, lint, typecheck, build, combined visual comparison, and
-browser-console review passed (`design-qa.md`). This is local frontend evidence
-only; no Convex data/function, Sponsor call, email, webhook, or production
-deployment changed.
+browser-console review passed (`design-qa.md`).
+
+Published the exact frontend to production `hushed-stork-401` as Static Hosting
+deployment `9dc00640-55ee-4993-be0f-7d1f9c500750`. The release command rebuilt
+against the production Convex URL, explicitly skipped the backend deployment,
+and atomically replaced the prior static manifest.
+
+All six public routes returned `200`. Public browser checks at 1152 × 768 and
+390 × 844 confirmed the responsive footer, paper-bound stages, separated mobile
+navigation, zero horizontal overflow, working Found and Settings controls, and
+no warning or error. No backend, Sponsor API, email, webhook, or application
+data action ran during this release.
