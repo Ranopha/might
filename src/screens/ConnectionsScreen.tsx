@@ -54,6 +54,19 @@ function ConnectionJourney({
   )
 }
 
+function ConnectionBoundaryNote({ hasConnection = false }: { hasConnection?: boolean }) {
+  return (
+    <aside className="editorial-note editorial-note--paper">
+      <span>{hasConnection ? 'Explicit by design' : 'One step at a time'}</span>
+      <p>
+        {hasConnection
+          ? 'Interest starts a private draft. Approval is a separate, payload-bound decision. Editing the recipient or words invalidates it.'
+          : 'Notice is not contact. Interest is not consent. A reply is not a deal.'}
+      </p>
+    </aside>
+  )
+}
+
 export function ConnectionsScreen() {
   const [sessionKey] = useState(getOrCreateSessionKey)
   const [approvalPending, setApprovalPending] = useState(false)
@@ -258,12 +271,15 @@ export function ConnectionsScreen() {
               <span>Only you can decide when to share.</span>
             </div>
           </ConnectionJourney>
-          <footer className="connection-empty__action-row">
-            <Link className="paper-control paper-control--primary connection-unfold-action" to="/found">
-              See what Might found
-              <Leaf size={16} strokeWidth={1.45} aria-hidden="true" />
-            </Link>
-          </footer>
+          <div className="connection-empty__footer">
+            <footer className="connection-empty__action-row">
+              <Link className="paper-control paper-control--primary connection-unfold-action" to="/found">
+                See what Might found
+                <Leaf size={16} strokeWidth={1.45} aria-hidden="true" />
+              </Link>
+            </footer>
+            <ConnectionBoundaryNote />
+          </div>
         </motion.div>
       ) : (
         <motion.div
@@ -509,14 +525,7 @@ export function ConnectionsScreen() {
         </motion.div>
       )}
 
-      <aside className="editorial-note editorial-note--paper">
-        <span>{connection ? 'Explicit by design' : 'One step at a time'}</span>
-        <p>
-          {connection
-            ? 'Interest starts a private draft. Approval is a separate, payload-bound decision. Editing the recipient or words invalidates it.'
-            : 'Notice is not contact. Interest is not consent. A reply is not a deal.'}
-        </p>
-      </aside>
+      {connection === null ? null : <ConnectionBoundaryNote hasConnection={Boolean(connection)} />}
     </section>
   )
 }

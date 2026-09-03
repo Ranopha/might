@@ -36,6 +36,13 @@
   - Fix: the mobile shell is now a `100dvh` two-row app frame. The main story
     owns scrolling and the navigation occupies a separate bottom row with
     safe-area margin, so content never renders beneath the dock.
+- [Resolved P1] The owner's follow-up desktop capture showed that the action
+  tray and consent note still formed two offset layers and overlapped at the
+  right edge, so the lower composition remained center-heavy even after its
+  text collisions were fixed.
+  - Fix: both pieces now share one responsive footer grid. At desktop widths
+    the action sits on the left and the note on the right with one common
+    centerline; only constrained layouts switch to a clean vertical flow.
 
 No actionable P0, P1, or P2 findings remain.
 
@@ -309,6 +316,111 @@ No actionable P0, P1, or P2 findings remain.
     component scale, added a 740 px component-width structural reflow, and kept
     the established mobile shell. Combined visual comparison, the full geometry
     matrix, interactions, tests, build, and console review passed.
+
+## Balanced footer correction — 2026-09-03
+
+### Finding and source truth
+
+- [Resolved P1] At the owner's reported 1152 × 768 viewport, `See what Might
+  found` still occupied a centered layer above and partly beneath `One step at
+  a time`, rather than reading as the note's left-hand companion. The two
+  surfaces overlapped horizontally by 100.125 px and their vertical centers
+  differed by 77.25 px.
+- The selected visual truth remains
+  `/var/folders/75/d_z3yqjs27xbcrxzm3vqpnwh0000gn/T/codex-clipboard-8e09c97c-7843-41b0-aeb2-fd0dbb506c14.png`
+  at 1487 × 1058 pixels and device pixel ratio 1. Its lower paper band defines
+  the relationship: the action tray is left of the consent note in one visual
+  footer, not a third centered tier.
+- The newest defect evidence is the conversation attachment
+  `Safari Appshot 2026-09-03T03-48-06.857Z.png`; it has no stable local
+  filesystem path.
+
+### Implementation evidence and normalization
+
+- Final 1152 × 768 browser capture at device pixel ratio 1:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-connections-balanced-footer/implementation-final-1152x768.jpg`.
+- Narrow desktop 1024 × 900 capture at device pixel ratio 1:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-connections-balanced-footer/implementation-final-1024x900.jpg`.
+- Mobile 390 × 844 capture at device pixel ratio 1:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-connections-balanced-footer/implementation-final-390x844.jpg`.
+- Full combined comparison:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-connections-balanced-footer/comparison-source-final-full.png`
+  at 2232 × 768 pixels. The 1487 × 1058 source was proportionally normalized
+  to 768 px high; the implementation remains its 1:1 1152 × 768 capture.
+- Focused paper/footer comparison:
+  `/Users/liuenyan/.codex/visualizations/2026/09/03/might-connections-balanced-footer/comparison-source-final-footer.png`
+  at 1800 × 620 pixels. Both sides were cropped to the accordion and footer,
+  normalized to 900 px wide, and padded rather than distorted.
+- State for every capture: anonymous local empty Connections state with the
+  relevant paper/footer region visible. No connection or provider state was
+  synthesized.
+
+### Full-view and focused comparison
+
+- The combined full view confirms that the room, rail, accordion, botanical
+  journey, privacy boundary, and tactile paper assets remain the same visual
+  family. The implementation now closes with two balanced surfaces instead of
+  a centered tray plus a lower-right collision.
+- In the focused combined image, source and implementation both place the long
+  action on the left and the smaller consent note on the right. The
+  implementation deliberately keeps the pieces separated rather than baking
+  them into one raster so the link and privacy copy remain semantic.
+- The final 1152 px geometry gives the left action `309.5938–860.8672`, the
+  right note `884.4063–1094.4063`, and a 23.5391 px gap. Both share center Y
+  `1069.9453`, and neither leaves the 784.8125 px component boundary.
+
+### Required fidelity surfaces
+
+- Typography: the established display/body families and hierarchy are
+  unchanged. Component-relative tray padding keeps `See what Might found` on
+  one line from 320 through 1440 px without clipping or emergency type shrink.
+- Spacing and layout rhythm: the footer owns one proportional left track, one
+  minimum-safe note track, and a component-relative gap. Desktop uses a common
+  centerline; at 650 px of component width or below, and at the mobile
+  breakpoint, the same semantic order becomes a 10 px clean stack.
+- Colors and tokens: no palette, opacity, border, radius, elevation, or state
+  token changed. The approved ivory, sage, amber, and ink treatment remains.
+- Image quality and asset fidelity: the existing generated action tray and
+  curled note are preserved at their intended aspect ratios. No CSS drawing,
+  placeholder, emoji, custom SVG, or stretched screenshot was introduced.
+- Copy and content: CTA, consent wording, all six journey labels, and privacy
+  disclosure are unchanged and remain visible.
+- Accessibility and behavior: the real link stays keyboard/focus accessible;
+  the note remains semantic adjacent content. Mobile navigation separation,
+  reduced-motion behavior, and the four-screen information architecture are
+  unchanged.
+
+### Responsive and interaction evidence
+
+- The exact 1152 × 768 browser check failed twice before the structural fix
+  with three failures: the CTA was not left of the note, their centerlines were
+  not balanced, and their boxes overlapped. It passed twice after the fix.
+- A 14-width matrix passed at 320, 390, 420, 540, 720, 721, 800, 980, 981,
+  1024, 1100, 1152, 1280, and 1440 px. Desktop widths from 1024 px use the
+  left/right row; constrained widths use either that row when it fits or a
+  non-overlapping stack. Horizontal overflow remained zero, the earlier
+  paper/copy/privacy/navigation assertions remained green, and CTA content
+  never exceeded its box.
+- `See what Might found` still navigated to `/found` and rendered the expected
+  heading. Settings opened and closed. The settled browser log contained no
+  warning or error; only Vite debug and React development information appeared.
+- The repository still has no real-browser test runner at this geometry seam,
+  so the red-capable in-app-browser check is retained as the honest regression
+  loop rather than adding a jsdom test that cannot measure layout.
+
+### Comparison history continuation
+
+11. Owner composition capture: the individually offset action tray and note
+    overlapped and produced a third visual layer. Result: blocked by one P1
+    hierarchy/responsive-layout regression.
+12. Shared-footer structure: moving both surfaces under one responsive grid
+    removed the collision and aligned their centers, confirming the first
+    ranked hypothesis. Result: geometry passed, but 1024 px review exposed a
+    two-line CTA label.
+13. Component-relative inset pass: only the tray's inner spacing was made
+    responsive and its label was kept intact. The refreshed desktop/mobile
+    captures, combined comparisons, 14-width matrix, interactions, tests,
+    build, and console review passed.
 
 ## Final result
 

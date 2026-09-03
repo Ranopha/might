@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-03T03:37:00Z
+- **Last updated:** 2026-09-03T04:11:53Z
 
 ## Log
 
@@ -567,3 +567,18 @@ navigation, Settings, the Connections action, 27 tests, lint, typecheck, build,
 combined visual comparison, and browser-console review passed
 (`design-qa.md`). This is local frontend evidence only; no Convex state,
 Sponsor call, email, webhook, or production deployment changed.
+
+### 2026-09-03 - working tree
+
+Rebalanced the empty Connections ending so the real `See what Might found`
+action and consent note share one responsive footer: left/right on desktop and
+a clean stack only when space is constrained (`src/screens/ConnectionsScreen.tsx`,
+`src/App.css`). The selected paper assets and all connection behavior remain
+unchanged.
+
+The reported 1152 × 768 collision failed twice before the fix and passed twice
+afterward. A 14-width browser matrix from 320 through 1440 px, CTA and Settings
+interactions, 27 tests, lint, typecheck, build, combined visual comparison, and
+browser-console review passed (`design-qa.md`). This is local frontend evidence
+only; no Convex data/function, Sponsor call, email, webhook, or production
+deployment changed.
