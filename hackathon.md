@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-03T05:33:40Z
+- **Last updated:** 2026-09-03T05:56:03Z
 
 ## Log
 
@@ -604,3 +604,16 @@ Four-route desktop/mobile checks, keyboard focus, a seven-width responsive
 matrix, 27 tests, lint, typecheck, build, combined visual comparison, and the
 browser console passed (`design-qa.md`). This is a local frontend change only;
 no production deploy, Convex state, Sponsor call, email, or webhook changed.
+
+### 2026-09-03 - 8b1c651
+
+Published the living-paper navigation frontend to production
+`hushed-stork-401` as Static Hosting deployment
+`72151b06-5f88-45b1-b8d9-6e361c0af7e3`. The release rebuilt against the
+production Convex URL and explicitly skipped the backend deployment.
+
+All six public routes returned `200`. Desktop and mobile browser checks
+confirmed the four paper room bookmarks, real icons, current-room state,
+`Convex live`, zero horizontal overflow, and no warning or error. No backend,
+Sponsor API, webhook, connection state, or email changed or ran during this
+release.
