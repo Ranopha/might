@@ -553,7 +553,7 @@ the fix and passed twice at 390 × 844 and 540 × 1058 afterward. Checks at 320,
 console also passed (`design-qa.md`). This is local UI verification only; no
 Convex data/function, Sponsor call, email, webhook, or production deploy changed.
 
-### 2026-09-03 - working tree
+### 2026-09-03 - 44c25e1
 
 Repaired the medium-desktop Connections collision exposed at 1152 px. The
 accordion now scales typography and paper overlap from its own inline size;
