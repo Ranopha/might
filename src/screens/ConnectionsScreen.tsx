@@ -1,12 +1,56 @@
-import { useRef, useState, type FormEvent } from 'react'
+import { useRef, useState, type FormEvent, type ReactNode } from 'react'
 import { useMutation, useQuery } from 'convex/react'
+import { ArrowRight, Leaf, LockKeyhole } from 'lucide-react'
 import { motion } from 'motion/react'
+import { Link } from 'react-router-dom'
 import { api } from '../../convex/_generated/api'
 import { CompanionPresence } from '../components/companion/CompanionPresence'
 import { SurfaceRoomHero } from '../components/room/SurfaceRoomHero'
 import { getOrCreateSessionKey } from '../lib/session'
 
 const steps = ['Noticed', 'Interested', 'You approve', 'Reached out', 'They replied', 'Connected']
+
+function ConnectionJourney({
+  completedSteps,
+  children,
+}: {
+  completedSteps: number
+  children?: ReactNode
+}) {
+  const currentStep = Math.max(0, Math.min(steps.length - 1, completedSteps - 1))
+
+  return (
+    <section className="connection-accordion" aria-label="Connection journey">
+      <motion.img
+        className="connection-accordion__paper"
+        src="/assets/surfaces/connections-accordion-letter-v1.png"
+        alt=""
+        aria-hidden="true"
+        initial={{ opacity: 0, scaleX: 0.94 }}
+        animate={{ opacity: 1, scaleX: 1 }}
+        transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}
+      />
+      <ol className="connection-accordion__steps">
+        {steps.map((step, index) => {
+          const isComplete = index < completedSteps
+          const isCurrent = index === currentStep
+
+          return (
+            <li
+              key={step}
+              className={`${isComplete ? 'is-complete' : ''}${isCurrent ? ' is-current' : ''}`.trim() || undefined}
+              aria-current={isCurrent ? 'step' : undefined}
+            >
+              <span>{index + 1}</span>
+              <p>{step}</p>
+            </li>
+          )
+        })}
+      </ol>
+      {children}
+    </section>
+  )
+}
 
 export function ConnectionsScreen() {
   const [sessionKey] = useState(getOrCreateSessionKey)
@@ -197,23 +241,27 @@ export function ConnectionsScreen() {
         </motion.div>
       ) : connection === null ? (
         <motion.div
-          className="connection-empty"
+          className="connection-empty connection-empty--accordion"
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65 }}
         >
-          <ol className="connection-path" aria-label="Connection journey">
-            {steps.map((step, index) => (
-              <li key={step}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <p>{step}</p>
-              </li>
-            ))}
-          </ol>
-          <div className="connection-empty__copy">
-            <h2>Your first connection will unfold here.</h2>
-            <p>When a match feels right, choose “I’m interested.” Might will prepare a private draft without contacting anyone.</p>
-          </div>
+          <ConnectionJourney completedSteps={1}>
+            <div className="connection-empty__copy">
+              <h2>Your first connection will unfold here.</h2>
+              <p>When a match feels right, choose “I’m interested.” Might will prepare a private draft without contacting anyone.</p>
+            </div>
+            <div className="connection-empty__privacy">
+              <LockKeyhole size={15} strokeWidth={1.55} aria-hidden="true" />
+              <span>Only you can decide when to share.</span>
+            </div>
+          </ConnectionJourney>
+          <footer className="connection-empty__action-row">
+            <Link className="paper-control paper-control--primary connection-unfold-action" to="/found">
+              See what Might found
+              <Leaf size={16} strokeWidth={1.45} aria-hidden="true" />
+            </Link>
+          </footer>
         </motion.div>
       ) : (
         <motion.div
@@ -222,14 +270,7 @@ export function ConnectionsScreen() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.65 }}
         >
-          <ol className="connection-path connection-path--live" aria-label="Connection journey">
-            {steps.map((step, index) => (
-              <li key={step} className={index < approvedSteps ? 'is-current' : undefined}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <p>{step}</p>
-              </li>
-            ))}
-          </ol>
+          <ConnectionJourney completedSteps={Math.max(1, approvedSteps)} />
 
           <article className="connection-letter">
             <header className="connection-letter__topline">
@@ -284,7 +325,7 @@ export function ConnectionsScreen() {
                       </i>
                     </p>
                     {!connection.mail ? (
-                      <button type="button" onClick={beginEditingDraft}>
+                      <button className="paper-control paper-control--secondary paper-control--small" type="button" onClick={beginEditingDraft}>
                         {pitch.target.email ? 'Change recipient or words' : 'Add recipient and review'}
                       </button>
                     ) : null}
@@ -329,10 +370,10 @@ export function ConnectionsScreen() {
                       />
                     </label>
                     <div>
-                      <button type="button" onClick={() => setEditingDraft(false)} disabled={revisionPending}>
+                      <button className="paper-control paper-control--secondary" type="button" onClick={() => setEditingDraft(false)} disabled={revisionPending}>
                         Keep previous draft
                       </button>
-                      <button className="connection-save-revision" type="submit" disabled={revisionPending}>
+                      <button className="connection-save-revision paper-control paper-control--primary" type="submit" disabled={revisionPending}>
                         {revisionPending ? 'Saving a new fingerprint…' : 'Save and review exact draft'}
                       </button>
                     </div>
@@ -358,7 +399,7 @@ export function ConnectionsScreen() {
                   <div>
                     {pitch.privateFields.map((field) => (
                       <p key={`${field.memoryId}-${field.statement}`}>
-                        <span aria-hidden="true">✦</span>
+                        <Leaf size={14} strokeWidth={1.45} aria-hidden="true" />
                         “{field.statement}”
                       </p>
                     ))}
@@ -396,24 +437,24 @@ export function ConnectionsScreen() {
                         <p>One final action will send only this fingerprint through Might’s inbox.</p>
                       </div>
                       <button
-                        className="connection-send-consent"
+                        className="connection-send-consent paper-control paper-control--primary"
                         type="button"
                         onClick={() => void sendExactMessage()}
                         disabled={sendPending}
                       >
                         {sendPending ? 'Handing it to AgentMail…' : 'Send this exact email'}
-                        {!sendPending ? <span aria-hidden="true">→</span> : null}
+                        {!sendPending ? <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" /> : null}
                       </button>
                     </div>
                   ) : pitch.canApprove ? (
                     <button
-                      className="connection-send-consent"
+                      className="connection-send-consent paper-control paper-control--primary"
                       type="button"
                       onClick={() => void approveExactMessage()}
                       disabled={approvalPending}
                     >
                       {approvalPending ? 'Recording this approval…' : 'Approve this exact email'}
-                      {!approvalPending ? <span aria-hidden="true">→</span> : null}
+                      {!approvalPending ? <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" /> : null}
                     </button>
                   ) : (
                     <div className="connection-send-locked">
@@ -445,12 +486,13 @@ export function ConnectionsScreen() {
                       <small>From {connection.reply.from}</small>
                       {connection.status === 'replied' ? (
                         <button
+                          className="paper-control paper-control--primary"
                           type="button"
                           onClick={() => void continueConnection()}
                           disabled={connectPending}
                         >
                           {connectPending ? 'Opening the connection…' : 'Yes, help me continue'}
-                          {!connectPending ? <span aria-hidden="true">→</span> : null}
+                          {!connectPending ? <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" /> : null}
                         </button>
                       ) : (
                         <strong>Two-way contact is open.</strong>
@@ -465,7 +507,7 @@ export function ConnectionsScreen() {
         </motion.div>
       )}
 
-      <aside className="editorial-note">
+      <aside className="editorial-note editorial-note--paper">
         <span>{connection ? 'Explicit by design' : 'One step at a time'}</span>
         <p>
           {connection

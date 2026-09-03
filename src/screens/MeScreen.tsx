@@ -162,10 +162,11 @@ export function MeScreen() {
                           autoFocus
                         />
                         <div>
-                          <button type="submit" disabled={draft.trim().length < 8 || isPending}>
+                          <button className="paper-control paper-control--primary paper-control--small" type="submit" disabled={draft.trim().length < 8 || isPending}>
                             Save correction
                           </button>
                           <button
+                            className="paper-control paper-control--secondary paper-control--small"
                             type="button"
                             onClick={() => {
                               setEditingId(null)
@@ -188,6 +189,7 @@ export function MeScreen() {
                       {!isEditing ? (
                         <div className="memory-actions">
                           <button
+                            className="paper-control paper-control--primary paper-control--small"
                             type="button"
                             disabled={isPending || memory.lastConfirmedAt !== null}
                             onClick={() => confirm(memory.id)}
@@ -195,6 +197,7 @@ export function MeScreen() {
                             {memory.lastConfirmedAt === null ? 'That’s right' : 'Confirmed'}
                           </button>
                           <button
+                            className="paper-control paper-control--secondary paper-control--small"
                             type="button"
                             disabled={isPending}
                             onClick={() => {

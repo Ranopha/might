@@ -12,7 +12,7 @@
 - **Auth:** none
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-08-31T07:51:09Z
+- **Last updated:** 2026-09-03T02:02:50Z
 
 ## Log
 
@@ -519,3 +519,21 @@ All six public routes returned `200`. Browser verification at 1280 × 900 and
 390 × 844 found no horizontal overflow or console warning/error; the mobile
 composer remained above navigation. This is a verified public UI/backend
 release, not a new production Sponsor E2E or inbound-email proof.
+
+### 2026-09-03 - working tree
+
+Replaced the flat Connections card and timeline with a generated, responsive
+six-fold paper journey whose live stages follow a seed-to-two-way botanical
+line. Added separate generated action-tray and consent-note assets while
+keeping all labels, current state, privacy copy, and navigation as semantic UI
+(`src/screens/ConnectionsScreen.tsx`, `src/App.css`, `public/assets/`).
+
+Reused the paper control language for real actions on Me, Might Found,
+Connections, Talk manifestation, Sound, and Settings. Seven test files / 27
+tests, lint, typecheck, production build, 1490 × 1058 desktop comparison,
+390 × 844 mobile QA, interaction checks, and browser console review passed
+(`docs/design/living-paper-controls-v1.md`, `design-qa.md`).
+
+This slice is locally verified only. It did not change Convex functions or
+data, call OpenAI/Firecrawl/AgentMail, send email, register a webhook, or deploy
+production.

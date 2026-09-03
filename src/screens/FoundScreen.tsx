@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useMutation, useQuery } from 'convex/react'
+import { ArrowRight } from 'lucide-react'
 import { motion } from 'motion/react'
 import { useNavigate } from 'react-router-dom'
 import { api } from '../../convex/_generated/api'
@@ -305,11 +306,11 @@ export function FoundScreen() {
                   />
                   <div>
                     <button
-                      className="world-match-action"
+                      className="world-match-action paper-control paper-control--primary"
                       type="submit"
                       disabled={clarificationDraft.trim().length === 0}
                     >
-                      Reconsider with this answer <span aria-hidden="true">→</span>
+                      Reconsider with this answer <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" />
                     </button>
                     <span>Still private · not Send consent</span>
                   </div>
@@ -335,7 +336,7 @@ export function FoundScreen() {
                 <div className="match-choice-boundary">
                   <div className="match-choice-boundary__primary">
                     <button
-                      className="world-match-action"
+                      className="world-match-action paper-control paper-control--primary"
                       type="button"
                       onClick={() => {
                         if (existingConnection) {
@@ -351,13 +352,14 @@ export function FoundScreen() {
                         : existingConnection
                           ? 'View my private draft'
                           : 'I’m interested'}
-                      {!interestPending ? <span aria-hidden="true">→</span> : null}
+                      {!interestPending ? <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" /> : null}
                     </button>
                     <span>Creates a private draft · does not send</span>
                   </div>
                   <div className="match-choice-boundary__secondary">
                     <span>Not your path?</span>
                     <button
+                      className="paper-control paper-control--secondary paper-control--small"
                       type="button"
                       onClick={() => void dismissCurrentMatch()}
                       disabled={dismissPending || clarificationPending || interestPending}
@@ -406,13 +408,13 @@ export function FoundScreen() {
             )}
             {!isMatching && !surfacedMatch && !matchIsClosed ? (
               <button
-                className="world-match-action"
+                className="world-match-action paper-control paper-control--primary"
                 type="button"
                 onClick={() => void lookForOverlap()}
                 disabled={matchRun === undefined}
               >
                 {matchFailed ? 'Try the private comparison again' : 'See why Might thought of me'}
-                <span aria-hidden="true">→</span>
+                <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" />
               </button>
             ) : null}
           </footer>
@@ -445,13 +447,13 @@ export function FoundScreen() {
                   : 'Let Might inspect one stable public source. It will keep the evidence and stop before matching.'}
             </p>
             <button
-              className="world-listen-action"
+              className="world-listen-action paper-control paper-control--primary"
               type="button"
               onClick={() => void listenToWorld()}
               disabled={isProcessing || worldSignal === undefined}
             >
               {isProcessing ? 'Listening…' : isFailed ? 'Try the public source again' : 'Listen to the public world'}
-              {!isProcessing ? <span aria-hidden="true">→</span> : null}
+              {!isProcessing ? <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" /> : null}
             </button>
             {requestError ? <p className="inline-error" role="alert">{requestError}</p> : null}
           </div>
