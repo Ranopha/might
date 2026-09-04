@@ -4,7 +4,8 @@ import { FirecrawlClient, type FirecrawlDocument } from "@firecrawl/firecrawl-co
 import OpenAI from "openai";
 import { v } from "convex/values";
 import { components, internal } from "./_generated/api";
-import { env, internalAction } from "./_generated/server";
+import { internalAction } from "./_generated/server";
+import { resolveOpenAiApiKey } from "./openAiCredentialRuntime";
 
 const firecrawl = new FirecrawlClient(components.firecrawl);
 
@@ -189,7 +190,10 @@ export const scanSource = internalAction({
       });
       return null;
     }
-    if (!env.OPENAI_API_KEY) {
+    let credential: Awaited<ReturnType<typeof resolveOpenAiApiKey>>;
+    try {
+      credential = await resolveOpenAiApiKey(ctx, run);
+    } catch {
       await ctx.runMutation(internal.worldSignals.failRun, {
         runId: args.runId,
         errorCode: "OPENAI_CONFIGURATION_MISSING",
@@ -197,7 +201,7 @@ export const scanSource = internalAction({
       return null;
     }
 
-    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: credential.apiKey });
     let interpreted: InterpretedSignal;
     let interpreterResponseId: string | null;
     try {
@@ -274,6 +278,7 @@ export const scanSource = internalAction({
       interpreted = parseInterpretedSignal(response.output_text);
       assertEvidenceComesFromSource(markdown, interpreted);
       interpreterResponseId = readTraceId(response);
+      await credential.markUsed().catch(() => undefined);
     } catch {
       await ctx.runMutation(internal.worldSignals.failRun, {
         runId: args.runId,

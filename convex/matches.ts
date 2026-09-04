@@ -8,6 +8,7 @@ import {
   mutation,
   query,
 } from "./_generated/server";
+import { selectOpenAiCredential } from "./openAiCredentialPolicy";
 
 const DEFAULT_TEXT_MODEL = "gpt-5.6-luna";
 const MIN_SESSION_KEY_LENGTH = 32;
@@ -327,6 +328,7 @@ export const requestMatch = mutation({
     }
 
     const now = Date.now();
+    const openAiCredential = await selectOpenAiCredential(ctx, session);
     const runId = await ctx.db.insert("matchRuns", {
       anonymousSessionId: session._id,
       worldSignalId: worldSignal._id,
@@ -334,6 +336,7 @@ export const requestMatch = mutation({
       candidateMemoryIds: activeMemories.map((memory) => memory._id),
       status: "processing",
       judgeModel: env.OPENAI_TEXT_MODEL ?? DEFAULT_TEXT_MODEL,
+      ...openAiCredential,
       judgeResponseId: null,
       matchId: null,
       errorCode: null,
@@ -604,6 +607,12 @@ export const getRunContext = internalQuery({
       runId: v.id("matchRuns"),
       status: runStatusValidator,
       judgeModel: v.string(),
+      openAiCredentialSource: v.union(
+        v.literal("hackathon_demo"),
+        v.literal("user_supplied"),
+      ),
+      openAiCredentialId: v.union(v.id("openAiCredentials"), v.null()),
+      openAiCredentialVersion: v.union(v.number(), v.null()),
       worldSignal: worldSignalViewValidator,
       memories: v.array(
         v.object({
@@ -643,6 +652,10 @@ export const getRunContext = internalQuery({
       runId: run._id,
       status: run.status,
       judgeModel: run.judgeModel,
+      openAiCredentialSource:
+        run.openAiCredentialSource ?? "hackathon_demo",
+      openAiCredentialId: run.openAiCredentialId ?? null,
+      openAiCredentialVersion: run.openAiCredentialVersion ?? null,
       worldSignal: {
         id: worldSignal._id,
         sourceUrl: worldSignal.sourceUrl,

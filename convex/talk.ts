@@ -9,6 +9,7 @@ import {
   query,
 } from "./_generated/server";
 import { abuseProtection } from "./abuseProtection";
+import { selectOpenAiCredential } from "./openAiCredentialPolicy";
 
 const MIN_SESSION_KEY_LENGTH = 32;
 const MAX_SESSION_KEY_LENGTH = 256;
@@ -340,6 +341,7 @@ export const appendUserMessage = mutation({
       lastActiveAt: createdAt,
     });
 
+    const openAiCredential = await selectOpenAiCredential(ctx, session);
     const turnId = await ctx.db.insert("talkTurns", {
       anonymousSessionId: session._id,
       conversationId: conversation._id,
@@ -351,6 +353,7 @@ export const appendUserMessage = mutation({
       memoryStatus: "pending",
       replyModel: env.OPENAI_TEXT_MODEL ?? DEFAULT_TEXT_MODEL,
       extractionModel: env.OPENAI_TEXT_MODEL ?? DEFAULT_TEXT_MODEL,
+      ...openAiCredential,
       replyResponseId: null,
       extractionResponseId: null,
       errorCode: null,
@@ -434,6 +437,12 @@ export const getTurnContext = internalQuery({
       promptMessageId: v.string(),
       replyModel: v.string(),
       extractionModel: v.string(),
+      openAiCredentialSource: v.union(
+        v.literal("hackathon_demo"),
+        v.literal("user_supplied"),
+      ),
+      openAiCredentialId: v.union(v.id("openAiCredentials"), v.null()),
+      openAiCredentialVersion: v.union(v.number(), v.null()),
       recentMessages: v.array(
         v.object({
           role: messageRoleValidator,
@@ -470,6 +479,10 @@ export const getTurnContext = internalQuery({
       promptMessageId: turn.promptMessageId,
       replyModel: turn.replyModel,
       extractionModel: turn.extractionModel,
+      openAiCredentialSource:
+        turn.openAiCredentialSource ?? "hackathon_demo",
+      openAiCredentialId: turn.openAiCredentialId ?? null,
+      openAiCredentialVersion: turn.openAiCredentialVersion ?? null,
       recentMessages: recentMessages.reverse().map((message) => ({
         role: message.role,
         content: message.content,

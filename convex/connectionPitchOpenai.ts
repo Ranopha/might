@@ -4,7 +4,8 @@ import OpenAI from "openai";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { env, internalAction } from "./_generated/server";
+import { internalAction } from "./_generated/server";
+import { resolveOpenAiApiKey } from "./openAiCredentialRuntime";
 
 const PITCH_INSTRUCTIONS = `You are Might's contextual introduction writer. Prepare one concise email preview for a single, already-surfaced low-risk opportunity.
 
@@ -93,7 +94,10 @@ export const generate = internalAction({
     if (context.status !== "processing") {
       return null;
     }
-    if (!env.OPENAI_API_KEY) {
+    let credential: Awaited<ReturnType<typeof resolveOpenAiApiKey>>;
+    try {
+      credential = await resolveOpenAiApiKey(ctx, context);
+    } catch {
       await ctx.runMutation(internal.connections.failPitchRun, {
         pitchRunId: args.pitchRunId,
         errorCode: "OPENAI_CONFIGURATION_MISSING",
@@ -101,7 +105,7 @@ export const generate = internalAction({
       return null;
     }
 
-    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: credential.apiKey });
     let generated: GeneratedPitch;
     let responseId: string | null;
     try {
@@ -163,6 +167,7 @@ export const generate = internalAction({
         throw new Error("Pitch writer selected an unavailable memory.");
       }
       responseId = readTraceId(response);
+      await credential.markUsed().catch(() => undefined);
     } catch {
       await ctx.runMutation(internal.connections.failPitchRun, {
         pitchRunId: args.pitchRunId,

@@ -5,7 +5,8 @@ import { createOpenAI } from "@ai-sdk/openai";
 import OpenAI from "openai";
 import { v } from "convex/values";
 import { components, internal } from "./_generated/api";
-import { env, internalAction } from "./_generated/server";
+import { internalAction } from "./_generated/server";
+import { resolveOpenAiApiKey } from "./openAiCredentialRuntime";
 
 const CONVERSATION_INSTRUCTIONS = `You are Might, a warm, calm, observant companion getting to know one person through natural conversation.
 
@@ -112,7 +113,10 @@ export const generateTurn = internalAction({
     if (context === null) {
       return null;
     }
-    if (!env.OPENAI_API_KEY) {
+    let credential: Awaited<ReturnType<typeof resolveOpenAiApiKey>>;
+    try {
+      credential = await resolveOpenAiApiKey(ctx, context);
+    } catch {
       await ctx.runMutation(internal.talk.failTurn, {
         turnId: args.turnId,
         errorCode: "OPENAI_CONFIGURATION_MISSING",
@@ -120,7 +124,7 @@ export const generateTurn = internalAction({
       return null;
     }
 
-    const aiSdkOpenAI = createOpenAI({ apiKey: env.OPENAI_API_KEY });
+    const aiSdkOpenAI = createOpenAI({ apiKey: credential.apiKey });
     const conversationAgent = new Agent(components.agent, {
       name: "Might Conversation Explorer",
       languageModel: aiSdkOpenAI.responses(context.replyModel),
@@ -143,6 +147,7 @@ export const generateTurn = internalAction({
         throw new Error("OpenAI returned an invalid conversation reply.");
       }
       replyResponseId = readResponseId(reply.response);
+      await credential.markUsed().catch(() => undefined);
     } catch {
       await ctx.runMutation(internal.talk.failTurn, {
         turnId: args.turnId,
@@ -151,7 +156,7 @@ export const generateTurn = internalAction({
       return null;
     }
 
-    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: credential.apiKey });
     let candidates: MemoryCandidate[] = [];
     let extractionResponseId: string | null = null;
     let memoryStatus: "completed" | "failed" = "completed";

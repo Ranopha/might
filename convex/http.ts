@@ -2,11 +2,15 @@ import { AgentMail } from "@agentmail/convex";
 import { httpRouter } from "convex/server";
 import { components, internal } from "./_generated/api";
 import { httpAction } from "./_generated/server";
+import { auth } from "./auth";
+import { saveOpenAiCredential } from "./openAiCredentialHttp";
 
 const http = httpRouter();
 const agentmail = new AgentMail(components.agentmail, {
   onMessageReceived: internal.agentMailInbound.onMessageReceived,
 });
+
+auth.addHttpRoutes(http);
 
 const jsonHeaders = {
   "cache-control": "no-store",
@@ -25,6 +29,12 @@ http.route({
       { headers: jsonHeaders },
     ),
   ),
+});
+
+http.route({
+  path: "/openai/credential",
+  method: "POST",
+  handler: saveOpenAiCredential,
 });
 
 http.route({

@@ -3,7 +3,8 @@
 import OpenAI from "openai";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { env, internalAction } from "./_generated/server";
+import { internalAction } from "./_generated/server";
+import { resolveOpenAiApiKey } from "./openAiCredentialRuntime";
 
 const CLARIFICATION_JUDGE_INSTRUCTIONS = `You are Might's final Serendipity Judge. Re-evaluate one contextual overlap after the person answered Might's one clarification question.
 
@@ -123,7 +124,10 @@ export const rejudge = internalAction({
       });
       return null;
     }
-    if (!env.OPENAI_API_KEY) {
+    let credential: Awaited<ReturnType<typeof resolveOpenAiApiKey>>;
+    try {
+      credential = await resolveOpenAiApiKey(ctx, context);
+    } catch {
       await ctx.runMutation(internal.matchClarifications.failRun, {
         runId: args.runId,
         errorCode: "OPENAI_CONFIGURATION_MISSING",
@@ -131,7 +135,7 @@ export const rejudge = internalAction({
       return null;
     }
 
-    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: credential.apiKey });
     let judgment: FinalJudgment;
     let judgeResponseId: string | null;
     try {
@@ -193,6 +197,7 @@ export const rejudge = internalAction({
       });
       judgment = parseFinalJudgment(response.output_text);
       judgeResponseId = readTraceId(response);
+      await credential.markUsed().catch(() => undefined);
     } catch {
       await ctx.runMutation(internal.matchClarifications.failRun, {
         runId: args.runId,

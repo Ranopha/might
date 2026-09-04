@@ -34,4 +34,24 @@ export const abuseProtection = new RateLimiter(components.rateLimiter, {
     rate: 12,
     period: DAY,
   },
+  openAiCredentialBurst: {
+    kind: "fixed window",
+    rate: 3,
+    period: HOUR,
+  },
+  openAiCredentialDaily: {
+    kind: "fixed window",
+    rate: 8,
+    period: DAY,
+  },
+  openAiByokHourly: {
+    kind: "fixed window",
+    rate: 30,
+    period: HOUR,
+  },
+  openAiByokDaily: {
+    kind: "fixed window",
+    rate: 120,
+    period: DAY,
+  },
 });

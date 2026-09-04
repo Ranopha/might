@@ -349,6 +349,9 @@ test("persists one session-private generated companion and reuses a client reque
   expect(replay).toEqual({
     manifestationId: first.manifestationId,
     shouldGenerate: false,
+    openAiCredentialSource: "hackathon_demo",
+    openAiCredentialId: null,
+    openAiCredentialVersion: null,
   });
 
   const storageId = await t.run(async (ctx) =>

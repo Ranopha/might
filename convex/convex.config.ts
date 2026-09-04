@@ -12,6 +12,7 @@ const app = defineApp({
   httpPrefix: "/api",
   env: {
     OPENAI_API_KEY: v.optional(v.string()),
+    OPENAI_BYOK_ENCRYPTION_KEY: v.optional(v.string()),
     OPENAI_TEXT_MODEL: v.optional(v.string()),
     OPENAI_IMAGE_MODEL: v.optional(v.string()),
     FIRECRAWL_API_KEY: v.string(),
@@ -19,6 +20,9 @@ const app = defineApp({
     AGENTMAIL_BASE_URL: v.optional(v.string()),
     AGENTMAIL_INBOX_ID: v.optional(v.string()),
     AGENTMAIL_ALLOWED_RECIPIENTS: v.optional(v.string()),
+    SITE_URL: v.optional(v.string()),
+    JWT_PRIVATE_KEY: v.optional(v.string()),
+    JWKS: v.optional(v.string()),
   },
 });
 app.use(agent);

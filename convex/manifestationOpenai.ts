@@ -5,10 +5,10 @@ import { v } from "convex/values";
 import type { Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
 import {
-  env,
   internalAction,
   type ActionCtx,
 } from "./_generated/server";
+import { resolveOpenAiApiKey } from "./openAiCredentialRuntime";
 
 const MAX_ART_BRIEF_LENGTH = 8_000;
 const MAX_ADAPTATION_NOTE_LENGTH = 2_000;
@@ -95,10 +95,19 @@ export const generateAssets = internalAction({
     description: v.string(),
     textModel: v.string(),
     imageModel: v.string(),
+    openAiCredentialSource: v.union(
+      v.literal("hackathon_demo"),
+      v.literal("user_supplied"),
+    ),
+    openAiCredentialId: v.union(v.id("openAiCredentials"), v.null()),
+    openAiCredentialVersion: v.union(v.number(), v.null()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
-    if (!env.OPENAI_API_KEY) {
+    let credential: Awaited<ReturnType<typeof resolveOpenAiApiKey>>;
+    try {
+      credential = await resolveOpenAiApiKey(ctx, args);
+    } catch {
       await persistFailure(ctx, {
         manifestationId: args.manifestationId,
         errorCode: "OPENAI_CONFIGURATION_MISSING",
@@ -112,7 +121,7 @@ export const generateAssets = internalAction({
 
     // SDK construction is intentionally outside the mapped provider catches.
     // The public wrapper owns the final catch-all lifecycle transition.
-    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: credential.apiKey });
     let artBrief: string;
     let adaptationNote: string;
     let textRequestId: string | null = null;
@@ -148,6 +157,7 @@ export const generateAssets = internalAction({
         },
       });
       textRequestId = readRequestId(response);
+      await credential.markUsed().catch(() => undefined);
       const parsed: unknown = JSON.parse(response.output_text);
       if (typeof parsed !== "object" || parsed === null) {
         throw new Error("Art brief response is not an object.");

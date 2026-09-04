@@ -1,7 +1,6 @@
 import {
   Check,
   Circle,
-  KeyRound,
   Music2,
   ShieldCheck,
   Sparkles,
@@ -15,6 +14,7 @@ import { useAction, useMutation, useQuery } from 'convex/react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { api } from '../../../convex/_generated/api'
 import { CompanionPresence } from '../companion/CompanionPresence'
+import { PersonalOpenAiAccess } from './PersonalOpenAiAccess'
 
 type SettingsDrawerProps = {
   open: boolean
@@ -363,23 +363,14 @@ export function SettingsDrawer({
                   <span>04</span>
                   <div>
                     <h3 id="api-settings-title">AI access</h3>
-                    <p>No API secret is collected by this anonymous browser app.</p>
+                    <p>Choose sponsor mode or bring your own private OpenAI access.</p>
                   </div>
                 </div>
-                <div className="settings-control-row settings-control-row--status">
-                  <KeyRound size={19} aria-hidden="true" />
-                  <span><strong>OpenAI API</strong><small>Hackathon sponsor mode</small></span>
-                  <em>Active</em>
-                </div>
-                <div className="settings-api-note">
-                  <ShieldCheck size={20} strokeWidth={1.5} aria-hidden="true" />
-                  <p><strong>Your own key comes later, safely.</strong> It needs sign-in and a server-only vault, with rotate and delete controls. Might will never ask you to paste a secret into this drawer.</p>
-                </div>
-                <a className="settings-documentation-link" href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer">Open the official OpenAI key page</a>
+                <PersonalOpenAiAccess sessionKey={sessionKey} />
               </section>
 
               {error ? <p className="settings-error" role="alert">{error}</p> : null}
-              <p className="settings-private-note"><ShieldCheck size={14} aria-hidden="true" /> Names and appearance stay inside this browser’s private Convex session. Audio preferences stay only on this device.</p>
+              <p className="settings-private-note"><ShieldCheck size={14} aria-hidden="true" /> Names and appearance stay in this private Convex room. Audio preferences stay only on this device. Personal API keys are encrypted server-side and never returned.</p>
             </div>
           </motion.aside>
         </motion.div>

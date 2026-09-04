@@ -11,6 +11,7 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { abuseProtection } from "./abuseProtection";
+import { selectOpenAiCredential } from "./openAiCredentialPolicy";
 
 const DEFAULT_TEXT_MODEL = "gpt-5.6-luna";
 const DEFAULT_IMAGE_MODEL = "gpt-image-2";
@@ -232,6 +233,12 @@ export const beginGeneration = internalMutation({
   returns: v.object({
     manifestationId: v.id("companionManifestations"),
     shouldGenerate: v.boolean(),
+    openAiCredentialSource: v.union(
+      v.literal("hackathon_demo"),
+      v.literal("user_supplied"),
+    ),
+    openAiCredentialId: v.union(v.id("openAiCredentials"), v.null()),
+    openAiCredentialVersion: v.union(v.number(), v.null()),
   }),
   handler: async (ctx, args) => {
     assertClientSessionKey(args.clientSessionKey);
@@ -286,6 +293,10 @@ export const beginGeneration = internalMutation({
       return {
         manifestationId: existing._id,
         shouldGenerate: false,
+        openAiCredentialSource:
+          existing.openAiCredentialSource ?? "hackathon_demo",
+        openAiCredentialId: existing.openAiCredentialId ?? null,
+        openAiCredentialVersion: existing.openAiCredentialVersion ?? null,
       };
     }
 
@@ -301,7 +312,14 @@ export const beginGeneration = internalMutation({
       .order("desc")
       .first();
     if (ready !== null) {
-      return { manifestationId: ready._id, shouldGenerate: false };
+      return {
+        manifestationId: ready._id,
+        shouldGenerate: false,
+        openAiCredentialSource:
+          ready.openAiCredentialSource ?? "hackathon_demo",
+        openAiCredentialId: ready.openAiCredentialId ?? null,
+        openAiCredentialVersion: ready.openAiCredentialVersion ?? null,
+      };
     }
 
     const generatingImage = await ctx.db
@@ -328,7 +346,14 @@ export const beginGeneration = internalMutation({
       .first();
     const active = generatingImage ?? generatingBrief;
     if (active !== null) {
-      return { manifestationId: active._id, shouldGenerate: false };
+      return {
+        manifestationId: active._id,
+        shouldGenerate: false,
+        openAiCredentialSource:
+          active.openAiCredentialSource ?? "hackathon_demo",
+        openAiCredentialId: active.openAiCredentialId ?? null,
+        openAiCredentialVersion: active.openAiCredentialVersion ?? null,
+      };
     }
 
     const failedAttempts = await ctx.db
@@ -369,6 +394,10 @@ export const beginGeneration = internalMutation({
       });
     }
 
+    const openAiCredential = await selectOpenAiCredential(ctx, {
+      _id: sessionId,
+      ownerUserId: existingSession?.ownerUserId,
+    });
     const manifestationId = await ctx.db.insert("companionManifestations", {
       anonymousSessionId: sessionId,
       clientRequestId: args.clientRequestId,
@@ -380,6 +409,7 @@ export const beginGeneration = internalMutation({
       storageId: null,
       textModel: args.textModel,
       imageModel: args.imageModel,
+      ...openAiCredential,
       textRequestId: null,
       imageRequestId: null,
       errorCode: null,
@@ -387,7 +417,13 @@ export const beginGeneration = internalMutation({
       updatedAt: now,
     });
 
-    return { manifestationId, shouldGenerate: true };
+    return {
+      manifestationId,
+      shouldGenerate: true,
+      openAiCredentialSource: openAiCredential.openAiCredentialSource,
+      openAiCredentialId: openAiCredential.openAiCredentialId ?? null,
+      openAiCredentialVersion: openAiCredential.openAiCredentialVersion ?? null,
+    };
   },
 });
 
@@ -587,6 +623,9 @@ export const generate = action({
     const started: {
       manifestationId: Id<"companionManifestations">;
       shouldGenerate: boolean;
+      openAiCredentialSource: "hackathon_demo" | "user_supplied";
+      openAiCredentialId: Id<"openAiCredentials"> | null;
+      openAiCredentialVersion: number | null;
     } = await ctx.runMutation(internal.manifestation.beginGeneration, {
       clientSessionKey: args.clientSessionKey,
       clientRequestId: args.clientRequestId,
@@ -610,6 +649,9 @@ export const generate = action({
         description,
         textModel,
         imageModel,
+        openAiCredentialSource: started.openAiCredentialSource,
+        openAiCredentialId: started.openAiCredentialId,
+        openAiCredentialVersion: started.openAiCredentialVersion,
       });
     } catch {
       await ctx.runMutation(

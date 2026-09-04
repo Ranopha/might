@@ -35,9 +35,13 @@ type Env = {
   readonly AGENTMAIL_BASE_URL: string | undefined;
   readonly AGENTMAIL_INBOX_ID: string | undefined;
   readonly FIRECRAWL_API_KEY: string;
+  readonly JWKS: string | undefined;
+  readonly JWT_PRIVATE_KEY: string | undefined;
   readonly OPENAI_API_KEY: string | undefined;
+  readonly OPENAI_BYOK_ENCRYPTION_KEY: string | undefined;
   readonly OPENAI_IMAGE_MODEL: string | undefined;
   readonly OPENAI_TEXT_MODEL: string | undefined;
+  readonly SITE_URL: string | undefined;
 };
 
 /**

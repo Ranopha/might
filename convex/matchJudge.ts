@@ -4,7 +4,8 @@ import OpenAI from "openai";
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { env, internalAction } from "./_generated/server";
+import { internalAction } from "./_generated/server";
+import { resolveOpenAiApiKey } from "./openAiCredentialRuntime";
 
 const SERENDIPITY_JUDGE_INSTRUCTIONS = `You are Might's Serendipity Judge. Decide whether something about one person plausibly matters in one public situation.
 
@@ -140,7 +141,10 @@ export const judge = internalAction({
       });
       return null;
     }
-    if (!env.OPENAI_API_KEY) {
+    let credential: Awaited<ReturnType<typeof resolveOpenAiApiKey>>;
+    try {
+      credential = await resolveOpenAiApiKey(ctx, context);
+    } catch {
       await ctx.runMutation(internal.matches.failRun, {
         runId: args.runId,
         errorCode: "OPENAI_CONFIGURATION_MISSING",
@@ -148,7 +152,7 @@ export const judge = internalAction({
       return null;
     }
 
-    const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY });
+    const openai = new OpenAI({ apiKey: credential.apiKey });
     let judged: JudgedMatch;
     let judgeResponseId: string | null;
     try {
@@ -226,6 +230,7 @@ export const judge = internalAction({
         throw new Error("Serendipity judge selected an unavailable memory.");
       }
       judgeResponseId = readTraceId(response);
+      await credential.markUsed().catch(() => undefined);
     } catch {
       await ctx.runMutation(internal.matches.failRun, {
         runId: args.runId,

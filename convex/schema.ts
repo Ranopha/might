@@ -1,9 +1,13 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { authTables } from "@convex-dev/auth/server";
 
 export default defineSchema({
+  ...authTables,
+
   anonymousSessions: defineTable({
     clientSessionKey: v.string(),
+    ownerUserId: v.optional(v.id("users")),
     companionName: v.optional(v.string()),
     companionAppearance: v.optional(
       v.union(v.literal("orb"), v.literal("generated")),
@@ -77,6 +81,11 @@ export default defineSchema({
     ),
     replyModel: v.string(),
     extractionModel: v.string(),
+    openAiCredentialSource: v.optional(
+      v.union(v.literal("hackathon_demo"), v.literal("user_supplied")),
+    ),
+    openAiCredentialId: v.optional(v.id("openAiCredentials")),
+    openAiCredentialVersion: v.optional(v.number()),
     replyResponseId: v.union(v.string(), v.null()),
     extractionResponseId: v.union(v.string(), v.null()),
     errorCode: v.union(
@@ -168,6 +177,11 @@ export default defineSchema({
     ),
     providerRequestId: v.union(v.string(), v.null()),
     interpreterModel: v.string(),
+    openAiCredentialSource: v.optional(
+      v.union(v.literal("hackathon_demo"), v.literal("user_supplied")),
+    ),
+    openAiCredentialId: v.optional(v.id("openAiCredentials")),
+    openAiCredentialVersion: v.optional(v.number()),
     interpreterResponseId: v.union(v.string(), v.null()),
     signalId: v.union(v.id("worldSignals"), v.null()),
     errorCode: v.union(
@@ -242,6 +256,11 @@ export default defineSchema({
       v.literal("failed"),
     ),
     judgeModel: v.string(),
+    openAiCredentialSource: v.optional(
+      v.union(v.literal("hackathon_demo"), v.literal("user_supplied")),
+    ),
+    openAiCredentialId: v.optional(v.id("openAiCredentials")),
+    openAiCredentialVersion: v.optional(v.number()),
     judgeResponseId: v.union(v.string(), v.null()),
     matchId: v.union(v.id("matches"), v.null()),
     errorCode: v.union(
@@ -319,6 +338,11 @@ export default defineSchema({
       v.literal("failed"),
     ),
     judgeModel: v.string(),
+    openAiCredentialSource: v.optional(
+      v.union(v.literal("hackathon_demo"), v.literal("user_supplied")),
+    ),
+    openAiCredentialId: v.optional(v.id("openAiCredentials")),
+    openAiCredentialVersion: v.optional(v.number()),
     judgeResponseId: v.union(v.string(), v.null()),
     resultId: v.union(v.id("matchClarifications"), v.null()),
     errorCode: v.union(
@@ -412,6 +436,11 @@ export default defineSchema({
       v.literal("failed"),
     ),
     model: v.string(),
+    openAiCredentialSource: v.optional(
+      v.union(v.literal("hackathon_demo"), v.literal("user_supplied")),
+    ),
+    openAiCredentialId: v.optional(v.id("openAiCredentials")),
+    openAiCredentialVersion: v.optional(v.number()),
     responseId: v.union(v.string(), v.null()),
     pitchId: v.union(v.id("connectionPitches"), v.null()),
     errorCode: v.union(
@@ -598,6 +627,11 @@ export default defineSchema({
     storageId: v.union(v.id("_storage"), v.null()),
     textModel: v.string(),
     imageModel: v.string(),
+    openAiCredentialSource: v.optional(
+      v.union(v.literal("hackathon_demo"), v.literal("user_supplied")),
+    ),
+    openAiCredentialId: v.optional(v.id("openAiCredentials")),
+    openAiCredentialVersion: v.optional(v.number()),
     textRequestId: v.union(v.string(), v.null()),
     imageRequestId: v.union(v.string(), v.null()),
     errorCode: v.union(
@@ -625,4 +659,18 @@ export default defineSchema({
       "anonymousSessionId",
       "updatedAt",
     ]),
+
+  openAiCredentials: defineTable({
+    userId: v.id("users"),
+    ciphertext: v.string(),
+    iv: v.string(),
+    version: v.number(),
+    lastFour: v.string(),
+    verifiedModel: v.string(),
+    verificationResponseId: v.union(v.string(), v.null()),
+    verifiedAt: v.number(),
+    lastUsedAt: v.union(v.number(), v.null()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_userId", ["userId"]),
 });

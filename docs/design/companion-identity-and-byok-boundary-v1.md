@@ -2,91 +2,108 @@
 
 ## Product decision
 
-Might opens with the house companion: the warm paper-and-leaf orb named
-`Might`. It works immediately. A person may then shape an original companion
-and give it a name without leaving Talk or entering a settings dashboard.
+Might still opens with the house companion: the warm paper-and-leaf orb named
+`Might`. It works immediately through the hackathon sponsor allowance. A
+personal OpenAI key is an optional advanced setting, never an onboarding gate
+and never a fifth primary surface.
 
-For the hackathon and first-value experience, OpenAI work continues through
-Might's server-side project key, existing anonymous-spend limits, and the
-one-success-per-session manifestation guard. A personal API key is not a gate
-before the user has met the companion, understood the value, or created an
-account.
+The Settings drawer now supports a real user-owned OpenAI connection. Because
+an anonymous browser token is not strong enough to own a paid credential, the
+key controls appear only after a Convex Auth account is created or signed in.
+This first slice uses the stable email-and-password provider with a 12-character
+minimum. It does not claim email verification or password recovery.
 
-Long-term personal use may offer a user-owned OpenAI connection, but only as
-an explicit advanced option after onboarding. The current anonymous web app
-must not collect or persist a pasted secret.
+## User experience
 
-## Intended first-run sequence
+1. **Meet the house Mighty.** Talk, Me, Might Found, and Connections remain
+   available without account setup.
+2. **Open AI access in Settings.** Guest mode clearly reports that the
+   hackathon OpenAI allowance is active.
+3. **Create or sign in to a private Might account.** The current browser room
+   is linked to that authenticated account and cannot be claimed by another
+   account.
+4. **Paste a dedicated OpenAI project key.** The form warns that verification
+   makes one small Responses request on the user's OpenAI billing.
+5. **Verify and seal.** A same-origin server endpoint verifies the configured
+   text model, encrypts the key, and returns only last-four and receipt
+   metadata.
+6. **Use, rotate, or delete.** OpenAI work begun while that account is signed
+   in binds the current credential ID and version. `Verify & replace` rotates
+   it in place; `Delete key` removes only the encrypted credential.
+7. **Sign out safely.** New work returns to hackathon sponsor mode. A claimed
+   anonymous room alone is never enough to spend through the personal key.
 
-1. **Meet the house Mighty.** The default orb and name make the room usable
-   without setup.
-2. **Choose, do not configure.** `Keep this form` starts the private Talk flow.
-   `Shape my form` asks for a companion name and a vibe-based visual
-   description.
-3. **Deliver first value.** The user sees one real OpenAI-generated original
-   manifestation saved to Convex.
-4. **Explain ownership later.** After the first useful conversation, a quiet
-   `Make this Mighty yours` entry may explain usage, cost, privacy, and the
-   optional user-owned connection.
-5. **Connect or keep the house mode.** Declining the connection never blocks
-   Talk, Me, Found, or Connections. The original orb remains a complete
-   fallback.
+## Implemented security boundary
 
-The API guide should therefore feel like a small illustrated handoff, not a
-developer console embedded in onboarding:
+OpenAI keys are secrets and are not placed in source, browser storage, Convex
+function arguments, analytics, screenshots, or public build evidence. The
+implemented path is:
 
-- why an OpenAI key may be useful;
-- what Might will use it for;
-- what it will not use it for;
-- an official link to create or manage a key;
-- a reminder that the key has its own billing and usage;
-- a visible disconnect, rotate, and delete path.
+`password input → same-origin /api HTTP action → tiny OpenAI verification → AES-256-GCM → dedicated Convex credential table`
 
-## Safety boundary
+Controls in this slice:
 
-OpenAI's current guidance says API keys are secrets, should not be exposed in
-browser or mobile client code, and should be loaded only on a server from an
-environment variable or key-management service:
+- authenticated Convex user identity is required before collection;
+- the browser input is uncontrolled and cleared after every save attempt;
+- production transport is same-origin HTTPS; local Vite and preview proxy only
+  `/api` to the configured Convex site;
+- the raw key is accepted only by an HTTP action, not a logged Convex action
+  argument;
+- AES-GCM additional authenticated data binds ciphertext to both user ID and
+  credential version;
+- the encryption master key lives only in Convex environment configuration;
+- the client can read email, last-four, verified model, timestamps, and status,
+  but can never read ciphertext or plaintext;
+- an internal provider resolver fails closed when the credential, version, or
+  encryption key is missing;
+- hourly and daily per-account BYOK limits are consumed before an OpenAI job is
+  scheduled;
+- account ownership is checked again on store, rotate, delete, and room claim;
+- another authenticated user cannot claim an already-linked room or overwrite
+  its credential;
+- deleting a key preserves the companion, messages, memories, matches, and
+  connection history.
+
+The stable Convex Auth release was selected for the hackathon path. The
+available passkey implementation was alpha/WIP at implementation time and was
+not introduced into the critical demo path.
+
+## OpenAI coverage
+
+The bound user credential is used by every current OpenAI seam:
+
+- companion art brief and image generation;
+- Talk reply and living-memory extraction;
+- Firecrawl result interpretation;
+- serendipity match judgment;
+- clarification re-judgment;
+- contextual outreach draft generation.
+
+Firecrawl crawling and AgentMail delivery continue to use Might's server-side
+integration credentials. BYOK does not authorize external outreach, expose a
+private memory, or bypass the existing exact-payload consent record.
+
+## Verification and maturity
+
+- AES-GCM round-trip, wrong-user/wrong-version failure, cross-account room
+  rejection, credential ownership, signed-in binding, signed-out fallback, and
+  delete-with-data-preservation are covered by deterministic tests.
+- Convex schema, Auth routes, vault functions, and OpenAI resolver are active in
+  development deployment `vibrant-wren-913`.
+- Guest Settings UI was visually checked at desktop and 390 px; the browser
+  warning/error log was empty.
+- The unauthenticated credential endpoint returned `401` without touching
+  OpenAI.
+- No personal key was supplied and no live BYOK OpenAI verification request was
+  made during implementation.
+- Production `hushed-stork-401` remains unchanged until the owner explicitly
+  approves the backend, auth environment, vault master key, and static release.
+
+Current maturity: **implemented and locally/development verified; personal-key
+provider verification and production release await owner action**.
+
+## References
 
 - [Best Practices for API Key Safety](https://help.openai.com/en/articles/5112595-best-practices-for-api-key-safety)
 - [OpenAI API authentication](https://platform.openai.com/docs/api-reference/authentication)
 - [Create or manage API keys](https://platform.openai.com/api-keys)
-
-That means Might must not put a personal key in `localStorage`,
-`sessionStorage`, a client-side Convex argument, application logs, analytics,
-screenshots, source control, or a normal Convex document. A generic anonymous
-key-paste form would contradict the intended consumer experience and create a
-credential-theft surface.
-
-If user-owned credentials become necessary before OpenAI provides a suitable
-delegated connection flow, the minimum acceptable implementation is:
-
-- authenticated user identity before collection;
-- an explicit warning that the user is granting Might access to their API
-  account and should use a dedicated, revocable project/key;
-- TLS transport into a server-only exchange;
-- immediate envelope encryption in a dedicated secret vault or KMS;
-- no secret value returned to the browser after submission;
-- server-side provider calls only;
-- redaction from Convex logs, traces, errors, support exports, and hackathon
-  evidence;
-- a test-connection receipt that stores only key fingerprint/last-four,
-  project label, created time, last-used time, and status;
-- user-visible rotate, revoke, and delete controls;
-- budget/usage guidance and a fail-closed spend cap;
-- deletion that removes the credential without deleting the user's companion,
-  memories, or connection history.
-
-Until those controls exist, the correct implementation is the current
-server-owned demo allowance plus a non-interactive explanation of the future
-option. Do not simulate a secure BYOK flow with a decorative input.
-
-## Scope boundary
-
-A user-owned OpenAI key would cover only the OpenAI calls that Might clearly
-discloses. It does not silently authorize Firecrawl, AgentMail outreach, or any
-release of private memory. The existing consent screen and exact-payload send
-approval remain mandatory regardless of who pays for the model call.
-
-This document is a product and security decision, not proof that BYOK has been
-implemented. Current maturity: **specified**.

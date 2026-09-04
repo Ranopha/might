@@ -8,6 +8,7 @@ import {
   mutation,
   query,
 } from "./_generated/server";
+import { selectOpenAiCredential } from "./openAiCredentialPolicy";
 
 const DEMO_SOURCE_URL =
   "https://carpenter.org.tw/%E5%BF%97%E5%B7%A5%E5%A0%B1%E5%90%8D/";
@@ -188,6 +189,7 @@ export const requestScan = mutation({
     }
 
     const now = Date.now();
+    const openAiCredential = await selectOpenAiCredential(ctx, session);
     const runId = await ctx.db.insert("worldSignalRuns", {
       anonymousSessionId: session._id,
       clientRequestId,
@@ -197,6 +199,7 @@ export const requestScan = mutation({
       sourceMode: null,
       providerRequestId: null,
       interpreterModel: env.OPENAI_TEXT_MODEL ?? DEFAULT_TEXT_MODEL,
+      ...openAiCredential,
       interpreterResponseId: null,
       signalId: null,
       errorCode: null,
@@ -286,6 +289,12 @@ export const getRunForAction = internalQuery({
       sourceUrl: v.string(),
       status: runStatusValidator,
       interpreterModel: v.string(),
+      openAiCredentialSource: v.union(
+        v.literal("hackathon_demo"),
+        v.literal("user_supplied"),
+      ),
+      openAiCredentialId: v.union(v.id("openAiCredentials"), v.null()),
+      openAiCredentialVersion: v.union(v.number(), v.null()),
     }),
   ),
   handler: async (ctx, args) => {
@@ -299,6 +308,10 @@ export const getRunForAction = internalQuery({
       sourceUrl: run.sourceUrl,
       status: run.status,
       interpreterModel: run.interpreterModel,
+      openAiCredentialSource:
+        run.openAiCredentialSource ?? "hackathon_demo",
+      openAiCredentialId: run.openAiCredentialId ?? null,
+      openAiCredentialVersion: run.openAiCredentialVersion ?? null,
     };
   },
 });

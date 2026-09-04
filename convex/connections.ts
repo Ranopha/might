@@ -10,6 +10,7 @@ import {
   query,
   type QueryCtx,
 } from "./_generated/server";
+import { selectOpenAiCredential } from "./openAiCredentialPolicy";
 
 const DEFAULT_TEXT_MODEL = "gpt-5.6-luna";
 const MIN_SESSION_KEY_LENGTH = 32;
@@ -428,6 +429,7 @@ export const expressInterest = mutation({
       createdAt: now,
       updatedAt: now,
     });
+    const openAiCredential = await selectOpenAiCredential(ctx, session);
     const pitchRunId = await ctx.db.insert("connectionPitchRuns", {
       anonymousSessionId: session._id,
       connectionId,
@@ -435,6 +437,7 @@ export const expressInterest = mutation({
       clientRequestId,
       status: "processing",
       model: env.OPENAI_TEXT_MODEL ?? DEFAULT_TEXT_MODEL,
+      ...openAiCredential,
       responseId: null,
       pitchId: null,
       errorCode: null,
@@ -1055,6 +1058,12 @@ export const getPitchRunContext = internalQuery({
       pitchRunId: v.id("connectionPitchRuns"),
       status: pitchRunStatusValidator,
       model: v.string(),
+      openAiCredentialSource: v.union(
+        v.literal("hackathon_demo"),
+        v.literal("user_supplied"),
+      ),
+      openAiCredentialId: v.union(v.id("openAiCredentials"), v.null()),
+      openAiCredentialVersion: v.union(v.number(), v.null()),
       targetDisplayName: v.string(),
       worldSignal: worldSignalContextValidator,
       memories: v.array(memoryContextValidator),
@@ -1091,6 +1100,10 @@ export const getPitchRunContext = internalQuery({
       pitchRunId: pitchRun._id,
       status: pitchRun.status,
       model: pitchRun.model,
+      openAiCredentialSource:
+        pitchRun.openAiCredentialSource ?? "hackathon_demo",
+      openAiCredentialId: pitchRun.openAiCredentialId ?? null,
+      openAiCredentialVersion: pitchRun.openAiCredentialVersion ?? null,
       targetDisplayName:
         surface.worldSignal.sourceTitle || surface.worldSignal.sourceDomain,
       worldSignal: {
