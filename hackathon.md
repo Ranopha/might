@@ -9,10 +9,10 @@
 - **Convex deployment:** https://hushed-stork-401.convex.cloud
 - **Components:** @convex-dev/agent, @agentmail/convex, @convex-dev/rate-limiter, @convex-dev/static-hosting, @firecrawl/firecrawl-convex
 - **Convex features:** schema, tables, indexes, queries, mutations, actions, scheduled functions, realtime queries, HTTP actions, file storage
-- **Auth:** none
+- **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-03T05:56:03Z
+- **Last updated:** 2026-09-04T01:48:19Z
 
 ## Log
 
@@ -617,3 +617,33 @@ confirmed the four paper room bookmarks, real icons, current-room state,
 `Convex live`, zero horizontal overflow, and no warning or error. No backend,
 Sponsor API, webhook, connection state, or email changed or ran during this
 release.
+
+### 2026-09-04 - eee496e
+
+Added optional, authenticated user-owned OpenAI access without removing the
+guest hackathon path. Convex Auth now links an account to the current private
+room, and Settings provides a paper-room account and key cabinet for verify,
+save, replace, delete, sign-out, and last-used state
+(`convex/auth.ts`, `convex/openAiCredentials.ts`,
+`src/components/settings/PersonalOpenAiAccess.tsx`).
+
+Personal keys enter through a same-origin authenticated HTTP action, are
+verified by one small real OpenAI Responses request, and are immediately sealed
+with AES-256-GCM using user- and version-bound additional data. Convex stores
+only ciphertext, last four characters, model, timestamp, and provider receipt
+metadata. Cross-account room claims fail closed, personal usage has hourly and
+daily limits, and a job already bound to a deleted or rotated key cannot fall
+back to the sponsor credential (`convex/openAiCredentialHttp.ts`,
+`convex/openAiCredentialCrypto.ts`, `convex/openAiCredentialPolicy.ts`).
+
+Manifestation, Talk/Memory, Firecrawl interpretation, Match, clarification, and
+pitch jobs now bind the credential source, ID, and version when work begins.
+Firecrawl and AgentMail credentials, private memory, and exact-payload outreach
+consent remain separate. Eight test files / 29 tests, lint, typecheck, build,
+development Convex sync, unauthenticated-endpoint rejection, secret-flow scan,
+and desktop/390 px browser QA passed.
+
+This slice is active only on development deployment `vibrant-wren-913`. No
+personal key was entered, no BYOK verification request reached OpenAI, no
+Firecrawl or AgentMail call ran, no email was sent, and production
+`hushed-stork-401` was not changed.
