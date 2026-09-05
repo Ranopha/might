@@ -12,7 +12,7 @@
 - **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-05T03:01:25Z
+- **Last updated:** 2026-09-05T03:17:11Z
 
 ## Log
 
@@ -648,7 +648,7 @@ personal key was entered, no BYOK verification request reached OpenAI, no
 Firecrawl or AgentMail call ran, no email was sent, and production
 `hushed-stork-401` was not changed.
 
-### 2026-09-05 - working tree
+### 2026-09-05 - d81a98b
 
 Completed and deployed the main reliability pass: bounded early-reply retention
 and exact-thread reconciliation; explicit uncertain delivery with a receipt-only
