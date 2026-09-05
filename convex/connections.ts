@@ -11,6 +11,8 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { selectOpenAiCredential } from "./openAiCredentialPolicy";
+import { checkOutboundReceipt } from "./agentMailOutbound";
+import { summaryViewValidator } from "./replySummaries";
 
 const DEFAULT_TEXT_MODEL = "gpt-5.6-luna";
 const MIN_SESSION_KEY_LENGTH = 32;
@@ -29,9 +31,11 @@ const connectionStatusValidator = v.union(
   v.literal("replied"),
   v.literal("connected"),
   v.literal("send_failed"),
+  v.literal("delivery_unknown"),
 );
 const mailStatusValidator = v.union(
   v.literal("queued"),
+  v.literal("status_unavailable"),
   v.literal("sent"),
   v.literal("delivered"),
   v.literal("failed"),
@@ -145,6 +149,7 @@ const latestViewValidator = v.object({
       subject: v.string(),
       preview: v.string(),
       receivedAt: v.number(),
+      summary: v.union(v.null(), summaryViewValidator),
     }),
   ),
   createdAt: v.number(),
@@ -413,14 +418,20 @@ export const expressInterest = mutation({
       )
       .unique();
     if (existing !== null && existing.pitchRunId !== null) {
-      return {
-        connectionId: existing._id,
-        pitchRunId: existing.pitchRunId,
-        created: false,
-      };
+      const requested = await ctx.db.query("connectionPitchRuns")
+        .withIndex("by_connectionId_and_clientRequestId", q => q.eq("connectionId", existing._id).eq("clientRequestId", clientRequestId)).unique();
+      const current = await ctx.db.get("connectionPitchRuns", existing.pitchRunId);
+      if (requested !== null || current?.status !== "failed") {
+        return { connectionId: existing._id, pitchRunId: requested?._id ?? existing.pitchRunId, created: false };
+      }
+      const recent = await ctx.db.query("connectionPitchRuns")
+        .withIndex("by_connectionId", q => q.eq("connectionId", existing._id)).order("desc").take(3);
+      if (recent.length === 3 && recent[2].startedAt > Date.now() - 600_000) {
+        throw new ConvexError("The draft has paused after three attempts. Please try again in ten minutes.");
+      }
     }
     const now = Date.now();
-    const connectionId = await ctx.db.insert("connections", {
+    const connectionId = existing?._id ?? await ctx.db.insert("connections", {
       anonymousSessionId: session._id,
       matchId: match._id,
       interestRequestId: clientRequestId,
@@ -452,6 +463,27 @@ export const expressInterest = mutation({
       pitchRunId,
     });
     return { connectionId, pitchRunId, created: true };
+  },
+});
+
+export const refreshDeliveryStatus = mutation({
+  args: { clientSessionKey: v.string(), connectionId: v.id("connections") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    assertClientSessionKey(args.clientSessionKey);
+    const session = await ctx.db.query("anonymousSessions")
+      .withIndex("by_clientSessionKey", q => q.eq("clientSessionKey", args.clientSessionKey)).unique();
+    const connection = await ctx.db.get("connections", args.connectionId);
+    if (session === null || connection === null || connection.anonymousSessionId !== session._id) {
+      throw new ConvexError("Connection is unavailable.");
+    }
+    const mail = await ctx.db.query("mailThreads").withIndex("by_connectionId", q => q.eq("connectionId", connection._id)).unique();
+    if (mail === null || mail.anonymousSessionId !== session._id || mail.status !== "status_unavailable") return null;
+    if (mail.lastStatusSyncAt !== null && Date.now() - mail.lastStatusSyncAt < 30_000) {
+      throw new ConvexError("Please wait 30 seconds before checking the receipt again.");
+    }
+    await checkOutboundReceipt(ctx, { mailThreadId: mail._id });
+    return null;
   },
 });
 
@@ -535,6 +567,8 @@ export const latest = query({
             .order("desc")
             .first();
 
+    const replySummary = reply === null ? null : await ctx.db.query("replySummaries")
+      .withIndex("by_inboundEventId", q => q.eq("inboundEventId", reply._id)).unique();
     return {
       id: connection._id,
       matchId: connection.matchId,
@@ -619,6 +653,10 @@ export const latest = query({
               subject: reply.subject,
               preview: reply.preview,
               receivedAt: reply.receivedAt,
+              summary: replySummary === null || replySummary.anonymousSessionId !== session._id ? null : {
+                id: replySummary._id, status: replySummary.status, summary: replySummary.summary,
+                nextStep: replySummary.nextStep, model: replySummary.model, responseId: replySummary.responseId, source: replySummary.source,
+              },
             },
       createdAt: connection.createdAt,
       updatedAt: connection.updatedAt,
@@ -934,7 +972,7 @@ export const sendApprovedPitch = mutation({
       pitchId: pitch._id,
       payloadHash: approval.payloadHash,
       sendRequestId: clientRequestId,
-      idempotencyKey: `connection:${connection._id}:approval:${approval._id}`,
+      idempotencyKey: `might-${outboundId}`,
       inboxId,
       recipientEmail: approval.recipientEmail,
       outboundId,

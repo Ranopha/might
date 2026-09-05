@@ -15,6 +15,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { api } from '../../../convex/_generated/api'
 import { CompanionPresence } from '../companion/CompanionPresence'
 import { PersonalOpenAiAccess } from './PersonalOpenAiAccess'
+import { createPrivateRoom, listPrivateRooms, selectPrivateRoom } from '../../lib/session'
 
 type SettingsDrawerProps = {
   open: boolean
@@ -57,6 +58,7 @@ export function SettingsDrawer({
   const [appearanceStatus, setAppearanceStatus] = useState<'idle' | 'saving'>('idle')
   const [isManifesting, setIsManifesting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [privateRooms] = useState(listPrivateRooms)
 
   const closeDrawer = useCallback(() => {
     setNameDraft(null)
@@ -370,6 +372,20 @@ export function SettingsDrawer({
               </section>
 
               {error ? <p className="settings-error" role="alert">{error}</p> : null}
+              <section className="settings-section" aria-label="Private rooms">
+                <h3>Private rooms</h3>
+                <p>Each room keeps a separate conversation, companion and memories. Return to an earlier room on this device anytime.</p>
+                {privateRooms.map(room => (
+                  <button key={room.key} type="button" className="settings-text-button" disabled={room.key === sessionKey} onClick={() => {
+                    try { selectPrivateRoom(room.key); window.location.assign('/talk') }
+                    catch { setError('This room could not be opened on this device.') }
+                  }}>{room.label}{room.key === sessionKey ? ' · current' : ''}</button>
+                ))}
+                <button type="button" className="settings-paper-button" onClick={() => {
+                  try { createPrivateRoom(); window.location.assign('/talk') }
+                  catch { setError('A new room could not be saved. Your current room is still available.') }
+                }}>Start a new private room</button>
+              </section>
               <p className="settings-private-note"><ShieldCheck size={14} aria-hidden="true" /> Names and appearance stay in this private Convex room. Audio preferences stay only on this device. Personal API keys are encrypted server-side and never returned.</p>
             </div>
           </motion.aside>

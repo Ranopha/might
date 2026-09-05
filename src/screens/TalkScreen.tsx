@@ -166,8 +166,8 @@ export function TalkScreen() {
               <div className="chat-column chat-column--room">
                 <div className="chat-intro">
                   <span className="speaker">{companionName}</span>
-                  <h1 id="talk-title">Now I’d like to know you.</h1>
-                  <p>What should I call you?</p>
+                  <h1 id="talk-title">I’m listening.</h1>
+                  <p>What has been on your mind lately?</p>
                 </div>
 
                 <div className="message-list" aria-live="polite">

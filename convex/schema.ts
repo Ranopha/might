@@ -411,6 +411,7 @@ export default defineSchema({
       v.literal("replied"),
       v.literal("connected"),
       v.literal("send_failed"),
+      v.literal("delivery_unknown"),
     ),
     pitchRunId: v.union(v.id("connectionPitchRuns"), v.null()),
     createdAt: v.number(),
@@ -455,6 +456,7 @@ export default defineSchema({
     updatedAt: v.number(),
   })
     .index("by_connectionId", ["connectionId"])
+    .index("by_connectionId_and_clientRequestId", ["connectionId", "clientRequestId"])
     .index("by_anonymousSessionId_and_updatedAt", [
       "anonymousSessionId",
       "updatedAt",
@@ -552,6 +554,7 @@ export default defineSchema({
     outboundId: v.string(),
     status: v.union(
       v.literal("queued"),
+      v.literal("status_unavailable"),
       v.literal("sent"),
       v.literal("delivered"),
       v.literal("failed"),
@@ -573,10 +576,27 @@ export default defineSchema({
   })
     .index("by_connectionId", ["connectionId"])
     .index("by_approvalId", ["approvalId"])
+    .index("by_inboxId_and_status", ["inboxId", "status"])
     .index("by_anonymousSessionId_and_sendRequestId", [
       "anonymousSessionId",
       "sendRequestId",
     ])
+    .index("by_inboxId_and_threadId", ["inboxId", "threadId"]),
+
+  pendingMailReplies: defineTable({
+    eventId: v.string(),
+    inboxId: v.string(),
+    threadId: v.string(),
+    messageId: v.string(),
+    from: v.string(),
+    to: v.array(v.string()),
+    subject: v.string(),
+    preview: v.string(),
+    receivedAt: v.number(),
+    expiresAt: v.number(),
+  })
+    .index("by_eventId", ["eventId"])
+    .index("by_inboxId", ["inboxId"])
     .index("by_inboxId_and_threadId", ["inboxId", "threadId"]),
 
   mailInboundEvents: defineTable({
@@ -597,6 +617,24 @@ export default defineSchema({
     .index("by_eventId", ["eventId"])
     .index("by_mailThreadId_and_receivedAt", ["mailThreadId", "receivedAt"])
     .index("by_connectionId_and_receivedAt", ["connectionId", "receivedAt"]),
+
+  replySummaries: defineTable({
+    anonymousSessionId: v.id("anonymousSessions"),
+    inboundEventId: v.id("mailInboundEvents"),
+    source: v.literal("reply_preview"),
+    status: v.union(v.literal("processing"), v.literal("completed"), v.literal("failed")),
+    model: v.string(),
+    responseId: v.union(v.string(), v.null()),
+    summary: v.union(v.string(), v.null()),
+    nextStep: v.union(v.string(), v.null()),
+    errorCode: v.union(v.string(), v.null()),
+    attempts: v.number(),
+    openAiCredentialSource: v.union(v.literal("hackathon_demo"), v.literal("user_supplied")),
+    openAiCredentialId: v.optional(v.id("openAiCredentials")),
+    openAiCredentialVersion: v.optional(v.number()),
+    createdAt: v.number(),
+    updatedAt: v.number(),
+  }).index("by_inboundEventId", ["inboundEventId"]),
 
   connectionContinuations: defineTable({
     anonymousSessionId: v.id("anonymousSessions"),

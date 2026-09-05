@@ -108,6 +108,11 @@ test("one browser receives one traceable live world signal without leaking it to
       ],
     },
   });
+  await t.run(async ctx => { await ctx.db.patch("worldSignalRuns", first.runId, { updatedAt: Date.now() - 900_001 }); });
+  const refreshed = await t.mutation(api.worldSignals.requestScan, { clientSessionKey: browserAKey, clientRequestId: "world-refresh-request-0002" });
+  expect(refreshed.created).toBe(true);
+  expect(refreshed.runId).not.toBe(first.runId);
+  expect(await t.mutation(api.worldSignals.requestScan, { clientSessionKey: browserAKey, clientRequestId: "world-scan-request-0001" })).toEqual({ runId: first.runId, created: false });
 });
 
 test("public anonymous sessions share a strict sponsor-call budget", async () => {

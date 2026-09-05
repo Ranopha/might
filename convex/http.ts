@@ -1,4 +1,5 @@
 import { AgentMail } from "@agentmail/convex";
+import { registerStaticRoutes } from "@convex-dev/static-hosting";
 import { httpRouter } from "convex/server";
 import { components, internal } from "./_generated/api";
 import { httpAction } from "./_generated/server";
@@ -18,7 +19,7 @@ const jsonHeaders = {
 };
 
 http.route({
-  path: "/health",
+  path: "/api/health",
   method: "GET",
   handler: httpAction(async () =>
     new Response(
@@ -32,13 +33,13 @@ http.route({
 });
 
 http.route({
-  path: "/openai/credential",
+  path: "/api/openai/credential",
   method: "POST",
   handler: saveOpenAiCredential,
 });
 
 http.route({
-  path: "/agentmail/webhook",
+  path: "/api/agentmail/webhook",
   method: "POST",
   handler: httpAction(async (ctx, request) =>
     agentmail.handleWebhook(
@@ -47,5 +48,7 @@ http.route({
     ),
   ),
 });
+
+registerStaticRoutes(http, components.staticHosting);
 
 export default http;

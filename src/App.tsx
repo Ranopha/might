@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { MotionConfig } from 'motion/react'
 import { AppShell } from './components/navigation/AppShell'
 import { ConnectionsScreen } from './screens/ConnectionsScreen'
 import { FoundScreen } from './screens/FoundScreen'
@@ -8,7 +9,8 @@ import './App.css'
 
 export default function App() {
   return (
-    <AppShell>
+    <MotionConfig reducedMotion="user">
+      <AppShell>
       <Routes>
         <Route path="/" element={<Navigate to="/talk" replace />} />
         <Route path="/talk" element={<TalkScreen />} />
@@ -17,6 +19,7 @@ export default function App() {
         <Route path="/connections" element={<ConnectionsScreen />} />
         <Route path="*" element={<Navigate to="/talk" replace />} />
       </Routes>
-    </AppShell>
+      </AppShell>
+    </MotionConfig>
   )
 }

@@ -28,6 +28,8 @@ import type * as openAiCredentialHttp from "../openAiCredentialHttp.js";
 import type * as openAiCredentialPolicy from "../openAiCredentialPolicy.js";
 import type * as openAiCredentialRuntime from "../openAiCredentialRuntime.js";
 import type * as openAiCredentials from "../openAiCredentials.js";
+import type * as replySummaries from "../replySummaries.js";
+import type * as replySummaryOpenai from "../replySummaryOpenai.js";
 import type * as talk from "../talk.js";
 import type * as talkOpenai from "../talkOpenai.js";
 import type * as worldSensor from "../worldSensor.js";
@@ -60,6 +62,8 @@ declare const fullApi: ApiFromModules<{
   openAiCredentialPolicy: typeof openAiCredentialPolicy;
   openAiCredentialRuntime: typeof openAiCredentialRuntime;
   openAiCredentials: typeof openAiCredentials;
+  replySummaries: typeof replySummaries;
+  replySummaryOpenai: typeof replySummaryOpenai;
   talk: typeof talk;
   talkOpenai: typeof talkOpenai;
   worldSensor: typeof worldSensor;

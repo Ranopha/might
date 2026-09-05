@@ -4,6 +4,7 @@ import { components } from "./_generated/api";
 // Sponsor-backed work is public for the hackathon demo, so every paid path
 // consumes a deployment-wide budget before it allocates durable work.
 export const abuseProtection = new RateLimiter(components.rateLimiter, {
+  replySummaryDaily: { kind: "fixed window", rate: 60, period: DAY },
   anonymousSessionCreation: {
     kind: "fixed window",
     rate: 30,

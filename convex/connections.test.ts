@@ -6,8 +6,9 @@ import agentmailTest from "@agentmail/convex/test";
 import rateLimiterTest from "@convex-dev/rate-limiter/test";
 import workpoolTest from "@convex-dev/workpool/test";
 import { convexTest } from "convex-test";
+import type { FunctionReference } from "convex/server";
 import { expect, test, vi } from "vitest";
-import { api, internal } from "./_generated/api";
+import { api, components, internal } from "./_generated/api";
 import schema from "./schema";
 
 const modules = import.meta.glob([
@@ -32,6 +33,77 @@ function initTest() {
   rateLimiterTest.register(t);
   return t;
 }
+
+async function seedQueuedMail(t: ReturnType<typeof initTest>) {
+  const fixture = await seedSurfacedMatch(t, ownerKey);
+  const interest = await t.mutation(api.connections.expressInterest, {
+    clientSessionKey: ownerKey, matchId: fixture.matchId,
+    clientRequestId: "recovery-interest-0001",
+  });
+  const pitchId = await t.mutation(internal.connections.commitGeneratedPitch, {
+    pitchRunId: interest.pitchRunId, model: "test-model", responseId: "test-response",
+    selectedMemoryIds: [fixture.memoryId], subject: "Woodworking help",
+    body: "Hello, I can help with woodworking on weekends. Could we discuss the project?",
+  });
+  const revised = await t.mutation(api.connections.reviseCurrentPitch, {
+    clientSessionKey: ownerKey, connectionId: interest.connectionId, pitchId,
+    recipientEmail: "repair@example.org", subject: "Woodworking help",
+    body: "Hello, I can help with woodworking on weekends. Could we discuss the project?",
+  });
+  const approval = await t.mutation(api.connections.approveCurrentPitch, {
+    clientSessionKey: ownerKey, connectionId: interest.connectionId, pitchId,
+    payloadHash: revised.payloadHash, recipientEmail: "repair@example.org",
+    clientRequestId: "recovery-approval-0001",
+  });
+  await t.mutation(api.connections.sendApprovedPitch, {
+    clientSessionKey: ownerKey, connectionId: interest.connectionId,
+    approvalId: approval.approvalId, clientRequestId: "recovery-send-0001",
+  });
+  const view = await t.query(api.connections.latest, { clientSessionKey: ownerKey });
+  if (!view?.mail) throw new Error("Expected queued mail.");
+  return { ...interest, mail: view.mail };
+}
+
+test("an early verified reply is reconciled when its outbound receipt arrives, without another send", async () => {
+  vi.useFakeTimers();
+  vi.stubEnv("AGENTMAIL_API_KEY", "agentmail-test-key");
+  vi.stubEnv("AGENTMAIL_INBOX_ID", "might-test@agentmail.to");
+  vi.stubEnv("AGENTMAIL_ALLOWED_RECIPIENTS", "repair@example.org");
+  try {
+    const t = initTest();
+    const { mail } = await seedQueuedMail(t);
+    const event = {
+      eventId: "early-verified-event-0001",
+      message: { inbox_id: mail.inboxId, thread_id: "early-thread-0001",
+        message_id: "early-reply-0001", from: "repair@example.org",
+        to: [mail.inboxId], subject: "Re: Woodworking help", text: "Yes, please tell us more." },
+      thread: { thread_id: "early-thread-0001" },
+    };
+    await t.mutation(internal.agentMailInbound.onMessageReceived, event);
+    expect((await t.query(api.connections.latest, { clientSessionKey: ownerKey }))?.reply).toBeNull();
+    await markAgentMailOutboundSent(t, mail.outboundId, "early-outbound-0001", "early-thread-0001");
+    await t.mutation(internal.agentMailOutbound.syncOutboundStatus, { mailThreadId: mail.id });
+    const view = await t.query(api.connections.latest, { clientSessionKey: ownerKey });
+    expect(view?.status).toBe("replied");
+    expect(view?.reply?.eventId).toBe(event.eventId);
+    expect(view?.reply?.summary?.status).toBe("processing");
+    const summaryId = view?.reply?.summary?.id;
+    if (!summaryId) throw new Error("Expected a source-bound reply summary.");
+    await t.mutation(internal.replySummaries.complete, {
+      summaryId, attempt: 1, responseId: "test-summary-response",
+      summary: "They are interested in hearing more.", nextStep: "Review their reply and decide what to share next.",
+    });
+    const summarized = await t.query(api.connections.latest, { clientSessionKey: ownerKey });
+    expect(summarized?.reply?.summary).toMatchObject({ status: "completed", responseId: "test-summary-response", source: "reply_preview" });
+    expect(summarized?.status).toBe("replied");
+    expect(view?.sendCount).toBe(1);
+    expect(await t.query(api.connections.latest, { clientSessionKey: strangerKey })).toBeNull();
+    expect(await t.mutation(internal.agentMailInbound.onMessageReceived, event)).toEqual({ processed: false, reason: "duplicate" });
+    const followup = { ...event, eventId: "followup-verified-event-0002", message: { ...event.message, message_id: "followup-reply-0002", text: "One correction: please discuss Sunday instead.", timestamp: new Date(Date.now() + 1000).toISOString() } };
+    expect((await t.mutation(internal.agentMailInbound.onMessageReceived, followup)).processed).toBe(true);
+    expect((await t.query(api.connections.latest, { clientSessionKey: ownerKey }))?.reply?.preview).toContain("Sunday");
+  } finally { vi.unstubAllEnvs(); vi.useRealTimers(); }
+});
 
 async function markAgentMailOutboundSent(
   t: ReturnType<typeof initTest>,
@@ -61,6 +133,110 @@ async function markAgentMailOutboundSent(
     });
   });
 }
+
+test("an exhausted receipt check can recover the same outbound without sending again", async () => {
+  vi.useFakeTimers();
+  vi.stubEnv("AGENTMAIL_API_KEY", "agentmail-test-key");
+  vi.stubEnv("AGENTMAIL_INBOX_ID", "might-test@agentmail.to");
+  vi.stubEnv("AGENTMAIL_ALLOWED_RECIPIENTS", "repair@example.org");
+  try {
+    const t = initTest();
+    const { mail, connectionId } = await seedQueuedMail(t);
+    await t.run(async ctx => { await ctx.db.patch("mailThreads", mail.id, { statusSyncAttempts: 19 }); });
+    await t.mutation(internal.agentMailOutbound.syncOutboundStatus, { mailThreadId: mail.id });
+    const delayed = await t.query(api.connections.latest, { clientSessionKey: ownerKey });
+    expect(delayed?.status).toBe("delivery_unknown");
+    expect(delayed?.mail?.status).toBe("status_unavailable");
+    await expect(t.mutation(api.connections.refreshDeliveryStatus, { clientSessionKey: strangerKey, connectionId })).rejects.toThrow();
+    vi.advanceTimersByTime(30_001);
+    await markAgentMailOutboundSent(t, mail.outboundId, "recovered-message-0001", "recovered-thread-0001");
+    await t.mutation(api.connections.refreshDeliveryStatus, { clientSessionKey: ownerKey, connectionId });
+    const recovered = await t.query(api.connections.latest, { clientSessionKey: ownerKey });
+    expect(recovered?.status).toBe("contacted");
+    expect(recovered?.mail?.outboundId).toBe(mail.outboundId);
+    expect(recovered?.sendCount).toBe(1);
+  } finally { vi.unstubAllEnvs(); vi.useRealTimers(); }
+});
+
+test("provider retries carry one transport idempotency key and recover the original send receipt", async () => {
+  vi.useFakeTimers();
+  vi.stubEnv("AGENTMAIL_API_KEY", "agentmail-test-key");
+  vi.stubEnv("AGENTMAIL_INBOX_ID", "might-test@agentmail.to");
+  vi.stubEnv("AGENTMAIL_ALLOWED_RECIPIENTS", "repair@example.org");
+  const requests: RequestInit[] = [];
+  vi.stubGlobal("fetch", vi.fn(async (_url: unknown, init: RequestInit) => {
+    requests.push(init);
+    if (requests.length === 1) throw new Error("Provider accepted, response connection lost");
+    return new Response(JSON.stringify({ message_id: "idempotent-message", thread_id: "idempotent-thread" }), { headers: { "content-type": "application/json" } });
+  }));
+  try {
+    const t = initTest();
+    const { mail } = await seedQueuedMail(t);
+    await t.finishAllScheduledFunctions(vi.runAllTimers);
+    expect(requests.length).toBe(2);
+    for (const request of requests) {
+      expect(new Headers(request.headers).get("Idempotency-Key")).toBe(`might-${mail.outboundId}`);
+    }
+    expect(requests[1].body).toBe(requests[0].body);
+    await t.mutation(internal.agentMailOutbound.syncOutboundStatus, { mailThreadId: mail.id });
+    const view = await t.query(api.connections.latest, { clientSessionKey: ownerKey });
+    expect(view?.mail?.providerMessageId).toBe("idempotent-message");
+    expect(view?.sendCount).toBe(1);
+  } finally { vi.unstubAllEnvs(); vi.unstubAllGlobals(); vi.useRealTimers(); }
+});
+
+test("a queued send past the provider idempotency window never makes a POST", async () => {
+  vi.useFakeTimers();
+  vi.stubEnv("AGENTMAIL_API_KEY", "agentmail-test-key");
+  vi.stubEnv("AGENTMAIL_INBOX_ID", "might-test@agentmail.to");
+  vi.stubEnv("AGENTMAIL_ALLOWED_RECIPIENTS", "repair@example.org");
+  const fetchMock = vi.fn(async () => { throw new Error("No provider request is allowed."); });
+  vi.stubGlobal("fetch", fetchMock);
+  try {
+    const t = initTest();
+    const { mail } = await seedQueuedMail(t);
+    vi.setSystemTime(Date.now() + 23 * 60 * 60 * 1000);
+    const componentFunctions = components.agentmail as unknown as {
+      lib: { performSend: FunctionReference<"action", "internal", { outboundId: string }, unknown> };
+    };
+    await t.action(componentFunctions.lib.performSend, { outboundId: mail.outboundId });
+    await t.mutation(internal.agentMailOutbound.syncOutboundStatus, { mailThreadId: mail.id });
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect((await t.query(api.connections.latest, { clientSessionKey: ownerKey }))?.status).toBe("delivery_unknown");
+  } finally { vi.unstubAllEnvs(); vi.unstubAllGlobals(); vi.useRealTimers(); }
+});
+
+test("two early replies are both retained and a stale queued send cannot hide the current unknown send", async () => {
+  vi.useFakeTimers();
+  vi.stubEnv("AGENTMAIL_API_KEY", "agentmail-test-key");
+  vi.stubEnv("AGENTMAIL_INBOX_ID", "might-test@agentmail.to");
+  vi.stubEnv("AGENTMAIL_ALLOWED_RECIPIENTS", "repair@example.org");
+  try {
+    const t = initTest();
+    const { mail } = await seedQueuedMail(t);
+    await t.run(async ctx => {
+      const row = await ctx.db.get("mailThreads", mail.id);
+      if (!row) throw new Error("Missing mail.");
+      const { _id, _creationTime, ...stale } = row;
+      void _id; void _creationTime;
+      await ctx.db.insert("mailThreads", { ...stale, status: "queued", createdAt: Date.now() - 86_400_001 });
+      await ctx.db.patch("mailThreads", mail.id, { status: "status_unavailable" });
+    });
+    for (let index = 1; index <= 2; index++) {
+      const result = await t.mutation(internal.agentMailInbound.onMessageReceived, {
+        eventId: `early-correction-${index}`, thread: { thread_id: "correction-thread" },
+        message: { inbox_id: mail.inboxId, thread_id: "correction-thread", message_id: `correction-${index}`,
+          from: "repair@example.org", to: [mail.inboxId], text: `Reply ${index}`, timestamp: new Date(Date.now() + index * 1000).toISOString() },
+      });
+      expect(result).toEqual({ processed: false, reason: "awaiting_outbound_receipt" });
+    }
+    await markAgentMailOutboundSent(t, mail.outboundId, "correction-outbound", "correction-thread");
+    await t.mutation(internal.agentMailOutbound.syncOutboundStatus, { mailThreadId: mail.id });
+    const events = await t.run(async ctx => await ctx.db.query("mailInboundEvents").collect());
+    expect(events.map(event => event.eventId)).toEqual(["early-correction-1", "early-correction-2"]);
+    expect(await t.run(async ctx => await ctx.db.query("pendingMailReplies").collect())).toEqual([]);
+  } finally { vi.unstubAllEnvs(); vi.useRealTimers(); }
+});
 
 async function seedSurfacedMatch(
   t: ReturnType<typeof initTest>,
@@ -201,6 +377,27 @@ async function seedSurfacedMatch(
     return { matchId, memoryId };
   });
 }
+
+test("a failed private pitch retries with a new request while preserving idempotency and ownership", async () => {
+  vi.useFakeTimers();
+  try {
+    const t = initTest();
+    const { matchId } = await seedSurfacedMatch(t, ownerKey);
+    const args = { clientSessionKey: ownerKey, matchId, clientRequestId: "pitch-retry-initial-0001" };
+    const initial = await t.mutation(api.connections.expressInterest, args);
+    await t.mutation(internal.connections.failPitchRun, { pitchRunId: initial.pitchRunId, errorCode: "PITCH_GENERATION_FAILED" });
+    expect((await t.mutation(api.connections.expressInterest, args)).pitchRunId).toBe(initial.pitchRunId);
+    await expect(t.mutation(api.connections.expressInterest, { ...args, clientSessionKey: strangerKey })).rejects.toThrow();
+    const retryArgs = { ...args, clientRequestId: "pitch-retry-second-0001" };
+    const retry = await t.mutation(api.connections.expressInterest, retryArgs);
+    expect(retry.connectionId).toBe(initial.connectionId);
+    expect(retry.pitchRunId).not.toBe(initial.pitchRunId);
+    expect((await t.mutation(api.connections.expressInterest, retryArgs)).pitchRunId).toBe(retry.pitchRunId);
+    const view = await t.query(api.connections.latest, { clientSessionKey: ownerKey });
+    expect(view?.pitchRun.status).toBe("processing");
+    expect(view?.sendCount).toBe(0);
+  } finally { vi.useRealTimers(); }
+});
 
 test("interest starts a private pitch intent without granting contact consent", async () => {
   const t = initTest();

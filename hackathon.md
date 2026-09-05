@@ -12,7 +12,7 @@
 - **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-04T01:48:19Z
+- **Last updated:** 2026-09-05T03:01:25Z
 
 ## Log
 
@@ -647,3 +647,55 @@ This slice is active only on development deployment `vibrant-wren-913`. No
 personal key was entered, no BYOK verification request reached OpenAI, no
 Firecrawl or AgentMail call ran, no email was sent, and production
 `hushed-stork-401` was not changed.
+
+### 2026-09-05 - working tree
+
+Completed and deployed the main reliability pass: bounded early-reply retention
+and exact-thread reconciliation; explicit uncertain delivery with a receipt-only
+recheck; idempotent retries for failed pitches and clarification; and source-bound
+OpenAI reply-excerpt summaries that cannot roll back a reply or send a follow-up
+(`convex/agentMailInbound.ts`, `convex/agentMailOutbound.ts`,
+`convex/connections.ts`, `convex/matchClarifications.ts`,
+`convex/replySummaries.ts`, `convex/replySummaryOpenai.ts`).
+
+Extended the existing official AgentMail component patch to pass a stable HTTP
+transport `Idempotency-Key`. Retries stop before the provider's documented
+24-hour retention window expires. The patch applies to a pristine package, and
+behavior tests cover an accepted send whose response is lost, late receipts,
+multiple early replies and the expired retry window. No old pending outbound
+records existed in dev or production before promotion.
+[AgentMail idempotency reference](https://docs.agentmail.to/idempotency).
+
+Added automatic one-source noticing from useful memories, visible source-check
+time and bounded refresh, real event sound cues with mute/volume, reduced-motion
+support, and separate private rooms that preserve earlier room access on the same
+device. The fixed volunteer-source demo and controlled recipients remain explicit.
+
+Live production checks exposed and fixed Auth discovery's root JWKS 404. The app
+now owns exact HTTP routing and delegates the frontend fallback to official
+Static Hosting; the existing `/api/agentmail/webhook` URL is unchanged. Verified
+root discovery and its advertised JWKS return 200, `/api/health` returns 200,
+and unsigned webhook/unauthenticated credential requests return 401.
+
+Configured independent production signing/encryption keys, a dedicated production
+inbox and an inbox-scoped webhook. Verified real OpenAI companion generation in
+the public browser. A separate synthetic test account verified authenticated room
+claim, encrypted BYOK save, a completed `user_supplied` Talk job with real
+reply/extraction response receipts, and removal of the test vault credential.
+This is API integration evidence; browser sign-in is not inferred from it.
+
+Verification passed: 37 tests in 10 files, lint, typecheck/build and diff whitespace
+checks. Production frontend release:
+`bbaf0d5a-2069-4fab-b04b-145d59802048`. The 2:40 video script and entry/social drafts
+are prepared under `docs/submission/`. The fresh public-browser rehearsal completed
+orb, original companion, real Talk, four confirmed memories, automatic Firecrawl
+inspection, OpenAI match, one clarification and a reviewed private pitch in the
+same isolated room. Trace IDs are in `docs/submission/evidence-2026-09-05.json`;
+the two exact controlled test emails are prepared for specific user approval.
+Exact-message approval, real outbound/inbound acceptance, final video, public
+social post and final submission remain open. No email was sent by this release
+setup. See `docs/worklogs/2026-09-05.md` for details and limits.
+
+The `/hackathon` slash-command interface was unavailable; the installed skill's
+workflow and log-format reference were applied manually. No slash invocation is
+claimed.

@@ -22,7 +22,24 @@ Sponsor integrations are counted only after a real runtime call and traceable re
 
 ## Current verified slice
 
-The public app currently ships the animated orb, four responsive product surfaces, a browser-scoped anonymous session, and a real Convex-backed Talk path. A production message has been sent, persisted, rendered through a realtime query, and recovered after reload. OpenAI replies and living memory, Firecrawl sensing, match reasoning, companion image generation, and AgentMail outbound/inbound are still explicitly unfinished.
+The full product path is implemented and deployed: original companion generation,
+private conversation and living memory, source-backed discovery and matching,
+clarification, exact-payload consent, AgentMail receipts, verified replies,
+reply-excerpt summaries, and explicit Connected confirmation. Separate private
+rooms support repeatable demonstrations without mixing memories.
+
+The September 5 release verifies real production OpenAI generation and authenticated
+BYOK use, and repairs Auth discovery at the public root. Its email recovery tests
+cover early replies, late receipts, transport idempotency and the provider's retry
+window. **Implementation and deployment are not complete E2E acceptance:** the
+latest controlled outbound/inbound run, final video, social post and submission
+must be recorded as verified in the build log before the hackathon build is called
+complete. See the [demo script](docs/submission/demo-script.md) and
+[entry draft](docs/submission/entry-draft.md).
+
+This competition slice observes one allowlisted public volunteer source. It uses
+a fictional demo persona and controlled email recipients; it does not imply a
+partnership or real volunteer arrangement with the source organization.
 
 ## Local development
 
@@ -35,6 +52,12 @@ npm run dev:web
 ```
 
 The Convex CLI creates `.env.local`. Provider secrets belong in the Convex deployment environment, never in client-side Vite variables or Git.
+
+The app owns HTTP routing: Auth discovery stays at `/.well-known/`, application
+endpoints stay under `/api`, and the official Static Hosting component handles
+the frontend fallback. The production callback remains
+`/api/agentmail/webhook`. Build production assets with the production
+`VITE_CONVEX_URL`; never upload a bundle pointing at the development deployment.
 
 ## Verification
 

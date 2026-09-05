@@ -1,0 +1,227 @@
+{
+  "capturedAt": "2026-09-05T03:10:55.449Z",
+  "deployment": "hushed-stork-401",
+  "classification": "SYNTHETIC_ONLY",
+  "verifiedThrough": "private exact-payload preview",
+  "outboundInboundVerified": false,
+  "notes": [
+    "All rows belong to the same fresh private room.",
+    "OpenAI and Firecrawl performed real work. Persona and mail destinations are controlled test data.",
+    "No approval or outgoing email existed at this snapshot.",
+    "Provider request and response IDs are trace metadata, not an assertion of commercial readiness."
+  ],
+  "rows": {
+    "companionManifestations": [
+      {
+        "_id": "jh77yrfas160mt8s5wy14kghf58dvkjw",
+        "createdAt": 1788577162598,
+        "imageModel": "gpt-image-2",
+        "imageRequestId": "req_d068cecbb9e347b8bb0dd1887543b0ea",
+        "status": "ready",
+        "storageId": "kg28va9acdrk24gf26jgdx2p798dv4ty",
+        "textModel": "gpt-5.6-luna",
+        "textRequestId": "req_0534bf0b2cef4687ba78642d2040913e",
+        "updatedAt": 1788577217957
+      }
+    ],
+    "conversations": [
+      {
+        "_id": "j979z0z8mhe5xz90pkgkr8m9zs8dt373",
+        "createdAt": 1788577136849,
+        "updatedAt": 1788577570718
+      }
+    ],
+    "messages": [
+      {
+        "_id": "jd77cc9pczwwgsvpevtzy5exx98dtdpq",
+        "conversationId": "j979z0z8mhe5xz90pkgkr8m9zs8dt373",
+        "createdAt": 1788577570718,
+        "model": "gpt-5.6-luna",
+        "source": "assistant_generated",
+        "sourceMessageId": "jd708a57vxydm8h7zfj8tax3d98dt0zj"
+      },
+      {
+        "_id": "jd708a57vxydm8h7zfj8tax3d98dt0zj",
+        "conversationId": "j979z0z8mhe5xz90pkgkr8m9zs8dt373",
+        "createdAt": 1788577562325,
+        "source": "user_input"
+      }
+    ],
+    "talkTurns": [
+      {
+        "_id": "js70hsad5ss31fmww60qrj401n8dta04",
+        "conversationId": "j979z0z8mhe5xz90pkgkr8m9zs8dt373",
+        "extractionResponseId": "req_a3d21c9837f146d4bd7bc45f881ae49e",
+        "replyResponseId": "resp_0346cec91b0f8e50006a9b871d23c887d2b84448f59ec548d4",
+        "sourceMessageId": "jd708a57vxydm8h7zfj8tax3d98dt0zj",
+        "status": "completed",
+        "updatedAt": 1788577570718
+      }
+    ],
+    "memories": [
+      {
+        "_id": "jn7e3xytknnpvdwb0yfdxxvr758dv93b",
+        "createdAt": 1788577570718,
+        "extractionResponseId": "req_a3d21c9837f146d4bd7bc45f881ae49e",
+        "source": "conversation",
+        "sourceMessageId": "jd708a57vxydm8h7zfj8tax3d98dt0zj",
+        "status": "active",
+        "updatedAt": 1788577592806
+      },
+      {
+        "_id": "jn7cpdcxcyvdtzftt0cv7eaaa58dt3md",
+        "createdAt": 1788577570718,
+        "extractionResponseId": "req_a3d21c9837f146d4bd7bc45f881ae49e",
+        "source": "conversation",
+        "sourceMessageId": "jd708a57vxydm8h7zfj8tax3d98dt0zj",
+        "status": "active",
+        "updatedAt": 1788577592827
+      },
+      {
+        "_id": "jn71vg13de2q7dw7zh9edgsfkd8dtwky",
+        "createdAt": 1788577570718,
+        "extractionResponseId": "req_a3d21c9837f146d4bd7bc45f881ae49e",
+        "source": "conversation",
+        "sourceMessageId": "jd708a57vxydm8h7zfj8tax3d98dt0zj",
+        "status": "active",
+        "updatedAt": 1788577592851
+      },
+      {
+        "_id": "jn71r6w702m35depm7fd8d60sh8dthqm",
+        "createdAt": 1788577570718,
+        "extractionResponseId": "req_a3d21c9837f146d4bd7bc45f881ae49e",
+        "source": "conversation",
+        "sourceMessageId": "jd708a57vxydm8h7zfj8tax3d98dt0zj",
+        "status": "active",
+        "updatedAt": 1788577592879
+      }
+    ],
+    "worldSignalRuns": [
+      {
+        "_id": "kh7459v4z9a9ez89j1ff2w2wdn8dvszn",
+        "interpreterModel": "gpt-5.6-luna",
+        "interpreterResponseId": "req_107202b65ffb4624beb93ae91a1af76d",
+        "provider": "firecrawl",
+        "providerRequestId": "01a06f87-e242-7149-87a1-093d2cedd1cd",
+        "sourceMode": "live",
+        "sourceUrl": "https://carpenter.org.tw/%E5%BF%97%E5%B7%A5%E5%A0%B1%E5%90%8D/",
+        "status": "completed",
+        "updatedAt": 1788577580771
+      }
+    ],
+    "worldSignals": [
+      {
+        "_id": "kn70xbbqhwwd6mqjdmebn8n8k58dtkg1",
+        "createdAt": 1788577580771,
+        "interpreterModel": "gpt-5.6-luna",
+        "interpreterResponseId": "req_107202b65ffb4624beb93ae91a1af76d",
+        "provider": "firecrawl",
+        "providerRequestId": "01a06f87-e242-7149-87a1-093d2cedd1cd",
+        "runId": "kh7459v4z9a9ez89j1ff2w2wdn8dvszn",
+        "sourceMode": "live",
+        "sourceUrl": "https://carpenter.org.tw/%E5%BF%97%E5%B7%A5%E5%A0%B1%E5%90%8D/"
+      }
+    ],
+    "matchRuns": [
+      {
+        "_id": "k97b7cxtt35mz6er278yedpwx18dtmt2",
+        "judgeModel": "gpt-5.6-luna",
+        "judgeResponseId": "req_5c295774ed8948009e2e4df202f46153",
+        "matchId": "kd72afmefnpxpnn2pzefa5ahq58dttw5",
+        "status": "completed",
+        "updatedAt": 1788577585234,
+        "worldSignalId": "kn70xbbqhwwd6mqjdmebn8n8k58dtkg1"
+      }
+    ],
+    "matches": [
+      {
+        "_id": "kd72afmefnpxpnn2pzefa5ahq58dttw5",
+        "createdAt": 1788577585234,
+        "judgeModel": "gpt-5.6-luna",
+        "judgeResponseId": "req_5c295774ed8948009e2e4df202f46153",
+        "relevantMemoryIds": [
+          "jn7e3xytknnpvdwb0yfdxxvr758dv93b",
+          "jn7cpdcxcyvdtzftt0cv7eaaa58dt3md",
+          "jn71vg13de2q7dw7zh9edgsfkd8dtwky"
+        ],
+        "runId": "k97b7cxtt35mz6er278yedpwx18dtmt2",
+        "status": "surfaced",
+        "updatedAt": 1788577602185,
+        "worldSignalId": "kn70xbbqhwwd6mqjdmebn8n8k58dtkg1"
+      }
+    ],
+    "matchClarificationRuns": [
+      {
+        "_id": "jx75q06vcwr8pj3n2v0smpq48h8dv6m5",
+        "judgeModel": "gpt-5.6-luna",
+        "judgeResponseId": "req_361e364c814c49aaa6510f745904631e",
+        "matchId": "kd72afmefnpxpnn2pzefa5ahq58dttw5",
+        "status": "completed",
+        "updatedAt": 1788577602185
+      }
+    ],
+    "matchClarifications": [
+      {
+        "_id": "k1789nkzpqw2ty8jxykyzmrrmx8dtt2a",
+        "createdAt": 1788577602185,
+        "judgeModel": "gpt-5.6-luna",
+        "judgeResponseId": "req_361e364c814c49aaa6510f745904631e",
+        "matchId": "kd72afmefnpxpnn2pzefa5ahq58dttw5",
+        "relevantMemoryIds": [
+          "jn7e3xytknnpvdwb0yfdxxvr758dv93b",
+          "jn7cpdcxcyvdtzftt0cv7eaaa58dt3md",
+          "jn71vg13de2q7dw7zh9edgsfkd8dtwky"
+        ],
+        "runId": "jx75q06vcwr8pj3n2v0smpq48h8dv6m5",
+        "status": "surfaced",
+        "updatedAt": 1788577602185,
+        "worldSignalId": "kn70xbbqhwwd6mqjdmebn8n8k58dtkg1"
+      }
+    ],
+    "connections": [
+      {
+        "_id": "m577j1r4q2cgdans61c3dxy2p18dv09g",
+        "createdAt": 1788577617177,
+        "matchId": "kd72afmefnpxpnn2pzefa5ahq58dttw5",
+        "pitchRunId": "kx70gzmhnmdt9gdzsqn4c789wd8dt8yk",
+        "status": "pitch_ready",
+        "updatedAt": 1788577623770
+      }
+    ],
+    "connectionPitchRuns": [
+      {
+        "_id": "kx70gzmhnmdt9gdzsqn4c789wd8dt8yk",
+        "connectionId": "m577j1r4q2cgdans61c3dxy2p18dv09g",
+        "matchId": "kd72afmefnpxpnn2pzefa5ahq58dttw5",
+        "model": "gpt-5.6-luna",
+        "responseId": "req_94bdaa50600b4efeb4dfa97449ef7fad",
+        "status": "completed",
+        "updatedAt": 1788577623770
+      }
+    ],
+    "connectionPitches": [
+      {
+        "_id": "m177ay1sm4zhc4n5z63bjz0cf58dt9y4",
+        "connectionId": "m577j1r4q2cgdans61c3dxy2p18dv09g",
+        "createdAt": 1788577623770,
+        "matchId": "kd72afmefnpxpnn2pzefa5ahq58dttw5",
+        "model": "gpt-5.6-luna",
+        "payloadHash": "sha256:f913b2c97d402c6dabb0a75c6df4364ca44fae6efb9d1de3ff2eb215be107b35",
+        "pitchRunId": "kx70gzmhnmdt9gdzsqn4c789wd8dt8yk",
+        "responseId": "req_94bdaa50600b4efeb4dfa97449ef7fad",
+        "revision": 2,
+        "selectedMemoryIds": [
+          "jn7e3xytknnpvdwb0yfdxxvr758dv93b",
+          "jn7cpdcxcyvdtzftt0cv7eaaa58dt3md",
+          "jn71vg13de2q7dw7zh9edgsfkd8dtwky"
+        ],
+        "updatedAt": 1788577662991
+      }
+    ],
+    "sendApprovals": [],
+    "mailThreads": [],
+    "mailInboundEvents": [],
+    "replySummaries": [],
+    "connectionContinuations": []
+  }
+}

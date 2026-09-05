@@ -88,6 +88,9 @@ export function ConnectionsScreen() {
   const sendApprovedPitch = useMutation(api.connections.sendApprovedPitch)
   const confirmConnected = useMutation(api.connections.confirmConnected)
   const reviseCurrentPitch = useMutation(api.connections.reviseCurrentPitch)
+  const refreshDeliveryStatus = useMutation(api.connections.refreshDeliveryStatus)
+  const expressInterest = useMutation(api.connections.expressInterest)
+  const retryReplySummary = useMutation(api.replySummaries.retry)
   const connection = useQuery(api.connections.latest, {
     clientSessionKey: sessionKey,
   })
@@ -101,7 +104,7 @@ export function ConnectionsScreen() {
     if (connection === null || connection === undefined) return 0
     if (connection.status === 'connected') return 6
     if (connection.status === 'replied') return 5
-    if (connection.status === 'contacted' || connection.status === 'contacting' || connection.status === 'send_failed') return 4
+    if (connection.status === 'contacted' || connection.status === 'contacting' || connection.status === 'send_failed' || connection.status === 'delivery_unknown') return 4
     return hasValidApproval ? 3 : 2
   })()
 
@@ -326,6 +329,17 @@ export function ConnectionsScreen() {
                 <div>
                   <h2>The words did not settle yet.</h2>
                   <p>No draft was saved, no consent was requested, and no email was sent.</p>
+                  <button type="button" className="paper-control paper-control--secondary" disabled={sendPending} onClick={async () => {
+                    setSendPending(true); setSendError(null)
+                    const requestId = sendRequestId.current ?? crypto.randomUUID()
+                    sendRequestId.current = requestId
+                    try {
+                      await expressInterest({ clientSessionKey: sessionKey, matchId: connection.matchId, clientRequestId: requestId })
+                      sendRequestId.current = null
+                    } catch { setSendError('The draft could not restart. After three attempts, wait ten minutes before trying again.') }
+                    finally { setSendPending(false) }
+                  }}>{sendPending ? 'Trying again…' : 'Try the private draft again'}</button>
+                  {sendError ? <p className="inline-error" role="alert">{sendError}</p> : null}
                 </div>
               </div>
             ) : pitch ? (
@@ -337,9 +351,9 @@ export function ConnectionsScreen() {
                   </div>
                   <div className="connection-recipient__status">
                     <p>
-                      {pitch.target.email ?? 'No verified email yet'}
+                      {pitch.target.email ?? 'No recipient added yet'}
                       <i className={pitch.target.status === 'configured' ? 'is-ready' : undefined}>
-                        {pitch.target.status === 'configured' ? 'Recipient verified' : 'Send locked'}
+                        {pitch.target.status === 'configured' ? 'Recipient added' : 'Send locked'}
                       </i>
                     </p>
                     {!connection.mail ? (
@@ -434,6 +448,8 @@ export function ConnectionsScreen() {
                       <strong>
                         {connection.mail.status === 'queued'
                           ? 'AgentMail is sending this exact message.'
+                          : connection.mail.status === 'status_unavailable'
+                            ? 'The delivery receipt is taking longer.'
                           : connection.mail.status === 'failed'
                             ? 'Delivery stopped safely.'
                             : connection.mail.status === 'replied' || connection.mail.status === 'connected'
@@ -443,10 +459,20 @@ export function ConnectionsScreen() {
                       <p>
                         {connection.mail.status === 'queued'
                           ? 'The approved payload is locked. Retries cannot create a second email.'
+                          : connection.mail.status === 'status_unavailable'
+                            ? 'Delivery is not yet confirmed. Checking again retrieves the same receipt and cannot resend this email.'
                           : connection.mail.status === 'failed'
                             ? 'AgentMail did not confirm delivery, and Might will not duplicate the outreach.'
                             : 'AgentMail returned a real thread receipt for this approved outreach.'}
                       </p>
+                      {connection.mail.status === 'status_unavailable' ? (
+                        <button className="paper-control paper-control--secondary" type="button" disabled={sendPending} onClick={async () => {
+                          setSendPending(true); setSendError(null)
+                          try { await refreshDeliveryStatus({ clientSessionKey: sessionKey, connectionId: connection.id }) }
+                          catch { setSendError('The receipt is not available yet. Wait 30 seconds, then check again.') }
+                          finally { setSendPending(false) }
+                        }}>{sendPending ? 'Checking receipt…' : 'Check delivery receipt'}</button>
+                      ) : null}
                     </div>
                   ) : hasValidApproval ? (
                     <div className="connection-send-ready">
@@ -477,7 +503,7 @@ export function ConnectionsScreen() {
                   ) : (
                     <div className="connection-send-locked">
                       <strong>Consent is not available yet.</strong>
-                      <p>Might needs a verified recipient before it can ask you to approve this exact message.</p>
+                      <p>Add a recipient and review the words first. This demo can send only to its configured test recipients.</p>
                     </div>
                   )}
                 </footer>
@@ -500,6 +526,28 @@ export function ConnectionsScreen() {
                     <span>{connection.status === 'connected' ? 'Connected' : 'They replied'}</span>
                     <h3>{connection.reply.subject}</h3>
                     <p>“{connection.reply.preview || 'A reply arrived in Might’s inbox.'}”</p>
+                    {connection.reply.summary?.status === 'completed' ? (
+                      <div className="connection-reply-summary">
+                        <small>Might’s reading of the reply excerpt · OpenAI</small>
+                        <p>{connection.reply.summary.summary}</p>
+                        <strong>A possible next step</strong>
+                        <p>{connection.reply.summary.nextStep}</p>
+                      </div>
+                    ) : connection.reply.summary?.status === 'processing' ? (
+                      <p role="status">Might is reading the reply excerpt…</p>
+                    ) : connection.reply.summary?.status === 'failed' ? (
+                      <div>
+                        <p>The summary paused. You can still read the reply above and choose to continue.</p>
+                        <button type="button" className="paper-control paper-control--secondary" disabled={connectPending} onClick={async () => {
+                          const summaryId = connection.reply?.summary?.id
+                          if (!summaryId) return
+                          setConnectPending(true); setConnectError(null)
+                          try { await retryReplySummary({ clientSessionKey: sessionKey, summaryId }) }
+                          catch { setConnectError('The summary is resting. Wait 30 seconds before trying again; you can still continue from the reply.') }
+                          finally { setConnectPending(false) }
+                        }}>Read the reply again</button>
+                      </div>
+                    ) : null}
                     <footer>
                       <small>From {connection.reply.from}</small>
                       {connection.status === 'replied' ? (

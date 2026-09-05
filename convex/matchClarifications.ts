@@ -185,11 +185,20 @@ export const submitAnswer = mutation({
       )
       .order("desc")
       .first();
-    if (reusable !== null) {
+    if (reusable !== null && reusable.status !== "failed") {
       if (reusable.answer !== answer) {
         throw new ConvexError("This clarification has already been answered.");
       }
       return { runId: reusable._id, created: false };
+    }
+    if (reusable?.status === "failed") {
+      if (reusable.answer !== answer) throw new ConvexError("Retry the saved private answer.");
+      const recent = await ctx.db.query("matchClarificationRuns")
+        .withIndex("by_anonymousSessionId_and_matchId_and_updatedAt", q => q.eq("anonymousSessionId", session._id).eq("matchId", match._id))
+        .order("desc").take(3);
+      if (recent.length === 3 && recent[2].startedAt > Date.now() - 600_000) {
+        throw new ConvexError("The re-check has paused after three attempts. Try again in ten minutes.");
+      }
     }
 
     if (

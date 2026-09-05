@@ -484,7 +484,7 @@ export const latest = query({
               storedMatch.status === "surfaced",
             canAnswerClarification:
               storedMatch.status === "needs_clarification" &&
-              clarificationRun === null,
+              (clarificationRun === null || clarificationRun.status === "failed"),
             canExpressInterest: storedMatch.status === "surfaced",
             supportingMemoryAvailable,
             clarification:

@@ -18,6 +18,7 @@ import {
   useAudioPreferences,
 } from '../../lib/audioPreferences'
 import { getOrCreateSessionKey } from '../../lib/session'
+import { useMightNoticing } from '../../lib/useMightNoticing'
 
 const navigation = [
   { to: '/talk', label: 'Talk', icon: MessageCircle },
@@ -37,6 +38,7 @@ export function AppShell({ children }: PropsWithChildren) {
     setSoundEffectsEnabled,
     setVolume,
   } = useAudioPreferences()
+  useMightNoticing(sessionKey, soundEffectsEnabled, volume)
 
   useEffect(() => {
     void ensureSession({ clientSessionKey: sessionKey }).catch(() => undefined)

@@ -1,5 +1,5 @@
 import { ConvexError, v } from "convex/values";
-import { MINUTE, RateLimiter } from "@convex-dev/rate-limiter";
+import { DAY, MINUTE, RateLimiter } from "@convex-dev/rate-limiter";
 import { components, internal } from "./_generated/api";
 import {
   env,
@@ -21,6 +21,7 @@ const MAX_FAILED_SCANS_PER_SESSION = 3;
 
 const rateLimiter = new RateLimiter(components.rateLimiter, {
   worldScan: { kind: "fixed window", rate: 2, period: MINUTE },
+  worldScanDaily: { kind: "fixed window", rate: 60, period: DAY },
 });
 
 const runStatusValidator = v.union(
@@ -171,18 +172,19 @@ export const requestScan = mutation({
       )
       .order("desc")
       .take(MAX_FAILED_SCANS_PER_SESSION + 1);
-    const reusable = recentRuns.find((run) => run.status !== "failed");
+    const reusable = recentRuns.find((run) => run.status === "processing" || (run.status === "completed" && run.updatedAt > Date.now() - 900_000));
     if (reusable) {
       return { runId: reusable._id, created: false };
     }
-    if (recentRuns.length >= MAX_FAILED_SCANS_PER_SESSION) {
+    if (recentRuns.filter(run => run.status === "failed" && run.updatedAt > Date.now() - 600_000).length >= MAX_FAILED_SCANS_PER_SESSION) {
       throw new ConvexError(
         "Might has paused world scans for this private session after repeated failures.",
       );
     }
 
     const budget = await rateLimiter.limit(ctx, "worldScan");
-    if (!budget.ok) {
+    const dailyBudget = await rateLimiter.limit(ctx, "worldScanDaily");
+    if (!budget.ok || !dailyBudget.ok) {
       throw new ConvexError(
         "The world scan is resting for a moment. Please try again shortly.",
       );

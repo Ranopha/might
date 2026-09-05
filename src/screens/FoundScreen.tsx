@@ -15,6 +15,7 @@ export function FoundScreen() {
   const [matchError, setMatchError] = useState<string | null>(null)
   const [clarificationDraft, setClarificationDraft] = useState('')
   const [clarificationError, setClarificationError] = useState<string | null>(null)
+  const [clarificationRetryPending, setClarificationRetryPending] = useState(false)
   const [dismissPending, setDismissPending] = useState(false)
   const [dismissError, setDismissError] = useState<string | null>(null)
   const [interestPending, setInterestPending] = useState(false)
@@ -208,6 +209,14 @@ export function FoundScreen() {
               <i>Convex saved</i>
             </div>
           </div>
+          <p className="world-source-freshness">
+            {firecrawlMode === 'cached' ? 'Reused source result' : 'Source checked'} {new Date(completedSignal.createdAt).toLocaleString()}.
+            {' '}This demo follows one public volunteer source.
+          </p>
+          <button type="button" className="paper-control paper-control--secondary paper-control--small" onClick={() => void listenToWorld()}>
+            Refresh public source
+          </button>
+          {requestError ? <p className="inline-error" role="alert">{requestError}</p> : null}
 
           <h2>{completedSignal.situation}</h2>
 
@@ -280,7 +289,7 @@ export function FoundScreen() {
                         ? 'One thing I’m not sure about'
                         : 'Worth exploring'}
                 </span>
-                <i>No consent requested</i>
+                <i>A separate Send decision</i>
               </div>
               <h3>
                 {finalMatchResult
@@ -332,6 +341,18 @@ export function FoundScreen() {
                 </p>
               )}
               {clarificationError ? <p className="inline-error" role="alert">{clarificationError}</p> : null}
+              {clarificationFailed && clarification ? (
+                <button type="button" className="paper-control paper-control--secondary" disabled={clarificationRetryPending} onClick={async () => {
+                  setClarificationRetryPending(true); setClarificationError(null)
+                  const requestId = pendingClarificationRequestId.current ?? crypto.randomUUID()
+                  pendingClarificationRequestId.current = requestId
+                  try {
+                    await submitClarification({ clientSessionKey: sessionKey, matchId: surfacedMatch.id, clientRequestId: requestId, answer: clarification.answer })
+                    pendingClarificationRequestId.current = null
+                  } catch { setClarificationError('The re-check could not restart. After three attempts, wait ten minutes before trying again.') }
+                  finally { setClarificationRetryPending(false) }
+                }}>{clarificationRetryPending ? 'Trying again…' : 'Retry with my saved answer'}</button>
+              ) : null}
               {surfacedMatch.canContinue ? (
                 <div className="match-choice-boundary">
                   <div className="match-choice-boundary__primary">
@@ -345,12 +366,12 @@ export function FoundScreen() {
                         }
                         void continuePrivately()
                       }}
-                      disabled={interestPending || clarificationPending || connection === undefined}
+                      disabled={interestPending || clarificationPending || connection === undefined || (!existingConnection && !surfacedMatch.canExpressInterest)}
                     >
                       {interestPending
                         ? 'Beginning a private draft…'
                         : existingConnection
-                          ? 'View my private draft'
+                          ? 'View my connection'
                           : 'I’m interested'}
                       {!interestPending ? <ArrowRight size={16} strokeWidth={1.5} aria-hidden="true" /> : null}
                     </button>
@@ -385,7 +406,7 @@ export function FoundScreen() {
                     : completedMatch?.status === 'dismissed'
                       ? 'Passed for now'
                     : surfacedMatch
-                      ? 'Reasoned, not shared'
+                      ? 'Contextual overlap'
                       : 'Observed, not matched'}
             </span>
             {isMatching ? (
@@ -401,6 +422,8 @@ export function FoundScreen() {
                   ? 'Might looked closely and did not find enough evidence to put this in front of you. Nothing was shared.'
                   : completedMatch?.status === 'dismissed'
                     ? 'You closed this possibility. It cannot continue to clarification, consent, or contact.'
+                  : existingConnection
+                    ? 'Review this introduction and follow its contact history in Connections.'
                   : surfacedMatch
                     ? 'This is a private suggestion. Consent has not been requested, and Might cannot contact anyone.'
                     : 'Might can compare this situation with only this session’s living memories—and stop before consent.'}
@@ -461,10 +484,10 @@ export function FoundScreen() {
       )}
 
       <aside className="editorial-note">
-        <span>{surfacedMatch ? 'Still private' : 'Evidence first'}</span>
+        <span>{surfacedMatch ? 'Your choice' : 'Evidence first'}</span>
         <p>
           {surfacedMatch
-            ? 'A contextual match is only a thought. Consent and contact are separate steps—and neither has happened.'
+            ? 'You choose what leaves Might. Review the exact message and follow your connection in Connections.'
             : 'Every discovery keeps its public source. Observation never authorizes contact.'}
         </p>
       </aside>

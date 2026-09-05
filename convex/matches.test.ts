@@ -235,7 +235,7 @@ test("one browser can receive one private source-backed match without granting c
   if (!matchId) {
     throw new Error("Expected a needs-clarification match.");
   }
-  const clarification = await t.mutation(
+  let clarification = await t.mutation(
     api.matchClarifications.submitAnswer,
     {
       clientSessionKey: browserAKey,
@@ -274,6 +274,13 @@ test("one browser can receive one private source-backed match without granting c
     runId: clarification.runId,
     created: false,
   });
+  const failedRunId = clarification.runId;
+  await t.mutation(internal.matchClarifications.failRun, { runId: failedRunId, errorCode: "CLARIFICATION_JUDGE_FAILED" });
+  clarification = await t.mutation(api.matchClarifications.submitAnswer, {
+    clientSessionKey: browserAKey, matchId, clientRequestId: "clarification-recovery-0003",
+    answer: "Yes. I would be comfortable volunteering, and I am usually available on weekends in Taoyuan.",
+  });
+  expect(clarification.runId).not.toBe(failedRunId);
   await expect(
     t.mutation(api.matchClarifications.submitAnswer, {
       clientSessionKey: browserBKey,

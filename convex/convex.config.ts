@@ -6,10 +6,9 @@ import staticHosting from "@convex-dev/static-hosting/convex.config";
 import { defineApp } from "convex/server";
 import { v } from "convex/values";
 
-// Keep the public app at the root while reserving /api for app-owned HTTP
-// routes such as the future AgentMail webhook.
+// App-owned routing keeps Auth discovery at /.well-known, the established
+// webhook at /api/agentmail/webhook, and Static Hosting as the root fallback.
 const app = defineApp({
-  httpPrefix: "/api",
   env: {
     OPENAI_API_KEY: v.optional(v.string()),
     OPENAI_BYOK_ENCRYPTION_KEY: v.optional(v.string()),
@@ -38,6 +37,6 @@ app.use(firecrawl, {
     FIRECRAWL_API_KEY: app.env.FIRECRAWL_API_KEY,
   },
 });
-app.use(staticHosting, { httpPrefix: "/" });
+app.use(staticHosting);
 
 export default app;

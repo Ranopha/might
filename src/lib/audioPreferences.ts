@@ -55,14 +55,29 @@ export function useAudioPreferences() {
   }
 }
 
-export async function playMightSoundPreview(volume: number) {
+let soundContext: AudioContext | null = null
+
+export function unlockMightAudio() {
   const AudioContextConstructor =
     window.AudioContext ??
     (window as typeof window & { webkitAudioContext?: typeof AudioContext })
       .webkitAudioContext
-  if (AudioContextConstructor === undefined || volume <= 0) return
+  if (AudioContextConstructor === undefined) return
+  try {
+    soundContext ??= new AudioContextConstructor()
+    void soundContext.resume().catch(() => undefined)
+  } catch { /* Sound is optional when the browser blocks audio. */ }
+}
 
-  const context = new AudioContextConstructor()
+export async function playMightSoundPreview(volume: number) {
+  unlockMightAudio()
+  await playMightCue(volume)
+}
+
+export async function playMightCue(volume: number) {
+  if (soundContext === null || soundContext.state !== 'running' || volume <= 0) return
+
+  const context = soundContext
   const master = context.createGain()
   master.gain.setValueAtTime(0.0001, context.currentTime)
   master.gain.exponentialRampToValueAtTime(
@@ -85,6 +100,5 @@ export async function playMightSoundPreview(volume: number) {
   second.start(context.currentTime + 0.16)
   second.stop(context.currentTime + 0.7)
 
-  await context.resume()
-  window.setTimeout(() => void context.close(), 900)
+  window.setTimeout(() => master.disconnect(), 900)
 }
