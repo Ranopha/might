@@ -28,13 +28,17 @@ clarification, exact-payload consent, AgentMail receipts, verified replies,
 reply-excerpt summaries, and explicit Connected confirmation. Separate private
 rooms support repeatable demonstrations without mixing memories.
 
-The September 5 release verifies real production OpenAI generation and authenticated
-BYOK use, and repairs Auth discovery at the public root. Its email recovery tests
-cover early replies, late receipts, transport idempotency and the provider's retry
-window. **Implementation and deployment are not complete E2E acceptance:** the
-latest controlled outbound/inbound run, final video, social post and submission
-must be recorded as verified in the build log before the hackathon build is called
-complete. See the [demo script](docs/submission/demo-script.md) and
+The September 5 production rehearsal completed one real path from the default
+orb through Connected. The owner approved two controlled messages; AgentMail sent
+each once, the signed inbound reply changed the same browser tab without refresh,
+and OpenAI summarized the reply excerpt. The
+[complete trace](docs/submission/evidence-2026-09-05-connected.json) links every
+stage. Authenticated BYOK use and root Auth discovery were separately verified.
+
+Email recovery tests cover early replies, late receipts, transport idempotency
+and the provider's retry window. A second full production rehearsal, final video,
+social post and final submission remain open; the hackathon build is not yet
+declared complete. See the [demo script](docs/submission/demo-script.md) and
 [entry draft](docs/submission/entry-draft.md).
 
 This competition slice observes one allowlisted public volunteer source. It uses

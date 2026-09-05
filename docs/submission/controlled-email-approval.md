@@ -1,8 +1,16 @@
-# Controlled E2E email approval — pending
+# Controlled E2E email approval — executed once
 
 Both inboxes are operated by this project. This is a fictional persona test, not
-outreach to the nonprofit. No message below has been sent. Approval applies only
-to these two messages, once each, with the reply bound to the received thread.
+outreach to the nonprofit. The owner approved these two exact messages with
+“核准” on September 5, 2026. Each was sent once, and the reply was bound to the
+received introduction. This approval is now consumed; it does not authorize a
+new recording run or another email.
+
+The real provider and browser evidence is in
+[`evidence-2026-09-05-connected.json`](evidence-2026-09-05-connected.json).
+AgentMail appended its service footer to both messages and quoted the original
+message in the reply. Authored content matched this approval, but the wire bodies
+were not byte-identical to the drafts below. The UI now discloses the service footer.
 
 ## 1. Introduction through Might
 

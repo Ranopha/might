@@ -417,6 +417,7 @@ export function ConnectionsScreen() {
                     <h2>{pitch.subject}</h2>
                     <span>Full message</span>
                     <p>{pitch.body}</p>
+                    <small>AgentMail adds “Sent via AgentMail” after the message.</small>
                   </section>
                 )}
 

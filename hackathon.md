@@ -12,7 +12,7 @@
 - **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-05T03:17:11Z
+- **Last updated:** 2026-09-05T03:45:19Z
 
 ## Log
 
@@ -699,3 +699,28 @@ setup. See `docs/worklogs/2026-09-05.md` for details and limits.
 The `/hackathon` slash-command interface was unavailable; the installed skill's
 workflow and log-format reference were applied manually. No slash invocation is
 claimed.
+
+### 2026-09-05 - working tree
+
+The owner approved the two prepared controlled messages. One real production
+path now connects original companion generation, conversation, four confirmed
+memories, Firecrawl source evidence, OpenAI match/clarification, exact-payload
+consent, AgentMail delivery, a signed inbound reply and Connected. Both emails
+were sent once. The same browser tab moved from contacted to replied without
+refresh, displayed the OpenAI reply-excerpt summary, then reached Connected after
+the approved continuation. See `docs/submission/evidence-2026-09-05-connected.json`.
+
+AgentMail added its service footer and quoted the original message in the reply;
+approved authored content was unchanged, while full wire bodies differed. Added
+the footer disclosure to the preview (`src/screens/ConnectionsScreen.tsx`), passed
+lint/typecheck/build, and published frontend release
+`87eb3b10-c810-4bb8-9f70-d6adec19221d`. The public bundle matches the local build;
+the completed connection persisted after later reload/navigation.
+
+This proves one production E2E run. A second run, final video, social publishing,
+registration/account verification and final submission remain open. The current
+browser tools cannot record/export video, and native Codex control is blocked;
+no recording was made. `docs/submission/recording-handoff.md` contains the 2:40
+inputs, narration and edit map. The official submission form requires sign-in.
+The unavailable `/hackathon` interface was handled by applying its installed
+skill manually; no slash invocation is claimed.

@@ -38,11 +38,11 @@ Try it: https://hushed-stork-401.convex.site
 ## Submission gates
 
 - Public app, repo and build log: verify the final deployed commit and signed-out access.
-- Real outbound/inbound demo: requires approval of its exact messages and successful receipts.
+- Real outbound/inbound demo: one approved production run reached Connected on September 5; both messages were sent once. Preserve the linked evidence and obtain fresh approval for any new send.
 - Final video: use the accompanying 2:40 script; attach only after export and playback QA.
 - Luma registration and entrant eligibility: verify the user's actual entry details.
 - Social post: publish only after explicit authorization of the final post and destination.
-- Vibe Apps: submit only after explicit authorization of the completed entry.
+- Vibe Apps: the signed-out official form was inspected on September 5 and requires sign-in or sign-up before its fields appear. Account access remains pending. Submit only after explicit authorization of the completed entry.
 
 Official submission endpoint:
 https://vibeapps.dev/judging/convex-all-gas-hackathon-openai/submit
