@@ -28,22 +28,31 @@ clarification, exact-payload consent, AgentMail receipts, verified replies,
 reply-excerpt summaries, and explicit Connected confirmation. Separate private
 rooms support repeatable demonstrations without mixing memories.
 
-The September 5 production rehearsal completed one real path from the default
-orb through Connected. The owner approved two controlled messages; AgentMail sent
-each once, the signed inbound reply changed the same browser tab without refresh,
-and OpenAI summarized the reply excerpt. The
-[complete trace](docs/submission/evidence-2026-09-05-connected.json) links every
-stage. Authenticated BYOK use and root Auth discovery were separately verified.
+Two isolated production rehearsals, on September 5 and 6, completed the real path
+from the default orb through Connected. In each run the owner approved two
+controlled messages and AgentMail sent each once. The signed inbound reply changed
+the same browser tab without refresh, and OpenAI summarized the reply excerpt.
+The [first trace](docs/submission/evidence-2026-09-05-connected.json) and
+[recorded repeat trace](docs/submission/evidence-2026-09-06-connected.json) link
+every stage. Authenticated BYOK use and root Auth discovery were separately verified.
 
 Email recovery tests cover early replies, late receipts, transport idempotency
-and the provider's retry window. A second full production rehearsal, final video,
-social post and final submission remain open; the hackathon build is not yet
+and the provider's retry window. A 160-second recording with English narration
+and captions has been rendered locally; see its
+[verification receipt](docs/submission/video-final-2026-09-06.json).
+Public video hosting, social publishing, eligibility verification and final
+submission remain open; the hackathon build is not yet
 declared complete. See the [demo script](docs/submission/demo-script.md) and
 [entry draft](docs/submission/entry-draft.md).
 
 This competition slice observes one allowlisted public volunteer source. It uses
 a fictional demo persona and controlled email recipients; it does not imply a
 partnership or real volunteer arrangement with the source organization.
+
+A known desktop layout issue remains: at 1600 × 900 the decorative consent note
+overlaps the center of the approval button. The visible upper-left part is usable;
+the recorded approval used an ordinary click there. The issue is documented in
+the repeat trace and has not been hidden by changing the recorded application.
 
 ## Local development
 

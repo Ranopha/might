@@ -12,7 +12,7 @@
 - **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-06T10:18:01Z
+- **Last updated:** 2026-09-06T10:48:12.192Z
 
 ## Log
 
@@ -725,7 +725,7 @@ inputs, narration and edit map. The official submission form requires sign-in.
 The unavailable `/hackathon` interface was handled by applying its installed
 skill manually; no slash invocation is claimed.
 
-### 2026-09-06 - working tree
+### 2026-09-06 - 02dca71
 
 The owner approved an isolated Playwright recording. A new production room
 completed and recorded original companion generation, Talk, four confirmed
@@ -740,3 +740,21 @@ ASR-aligned captions passed render/decode and visual checks
 (`docs/submission/video-preview-2026-09-06.json`). It stops before email approval.
 The installed hackathon workflow was applied manually; the slash interface is
 unavailable. See `docs/worklogs/2026-09-06.md` for artifacts and open gates.
+
+### 2026-09-06 - working tree
+
+The owner approved the exact new controlled message pair. Each was sent once,
+and the recorded room completed its real outbound, signed inbound, OpenAI
+reply-excerpt summary and Connected without refreshing during the reply
+transition. This verifies a second isolated production E2E with synthetic
+persona/test inboxes (docs/submission/evidence-2026-09-06-connected.json).
+
+Completed a local 160-second, 1080p product recording with English narration and
+captions. Twenty-one real source ranges preserve the continuous reply transition;
+shortened waits and controlled-demo provenance are disclosed. Full decode and
+visual checks passed (docs/submission/video-final-2026-09-06.json). The approved
+124-second prefix and nine voice files were preserved. No app or deployment
+changed. The existing consent-note overlap remains documented. Public video
+hosting, social publication, eligibility and final submission remain open.
+The installed hackathon workflow was applied manually; no slash invocation is
+claimed. See docs/worklogs/2026-09-06.md for verification and recovery details.

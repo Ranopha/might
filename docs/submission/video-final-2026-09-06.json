@@ -1,0 +1,115 @@
+{
+  "duration": 160,
+  "expectedDuration": 160,
+  "width": 1920,
+  "height": 1080,
+  "videoCodec": "h264",
+  "pixelFormat": "yuv420p",
+  "frameRate": "30/1",
+  "audioCodec": "aac",
+  "audioSampleRate": "48000",
+  "file": "renders/might-demo.mp4",
+  "bytes": 67072164,
+  "sha256": "c6fb798ad65ae5a3618463c451131fbaa88408afdbcfac5d0a3a1878ce559a47",
+  "renderExitCode": 0,
+  "renderStillRunning": false,
+  "renderSeconds": 306.9,
+  "completeDecodeExitCode": 0,
+  "decodedFrames": 4800,
+  "maxVolumeDbfs": -4.5,
+  "meanVolumeDbfs": -25.3,
+  "visualQa": "18 ending/cut snapshots before render; actual export 16-frame contact sheet plus full-size opening, reply transition at142.6/142.9, reply body, continuation and Connected ending frames inspected. No missing footage, invented states or final draft watermark.",
+  "audioQa": "ASR-aligned captions with verified transcript text and nine preserved voice hashes. Complete audio decode; no sample clipping. No human listening acceptance claimed.",
+  "acceptedPrefixAndVoicesUnchanged": true,
+  "evidence": "docs/submission/evidence-2026-09-06-connected.json",
+  "endingSelection": {
+    "source": "outreach.webm",
+    "sha256": "6bf64cb5c2559075ab92e85d36c884cdfa155e81fbe7ba91f7fe2113d38b70b2",
+    "ranges": {
+      "send": [
+        [
+          8.5,
+          6
+        ],
+        [
+          23,
+          10
+        ]
+      ],
+      "reply": [
+        [
+          53.6,
+          6
+        ],
+        [
+          95,
+          8
+        ]
+      ],
+      "connected": [
+        [
+          138,
+          3
+        ],
+        [
+          143,
+          3
+        ]
+      ]
+    },
+    "playbackRate": 1,
+    "replyTransition": {
+      "lastContactedSource": 56.32,
+      "firstRepliedSource": 56.36,
+      "timebaseFps": 25,
+      "continuousRange": [
+        53.6,
+        59.6
+      ],
+      "firstRepliedFinalTimeline": 142.76
+    }
+  },
+  "scope": "Local unpublished final 160-second demo. Fictional persona, controlled inboxes and AI narration disclosed. Real integration chain and same-page reply. Shortened waits labeled; no partnership or visit implied.",
+  "knownSourceIssue": "Original product note overlaps approval button center; successful normal corner click and one provider send retained without reconstruction.",
+  "artifact": "videos/might-demo.local/renders/might-demo.mp4",
+  "publiclyHosted": false,
+  "publicPlaybackUrl": null,
+  "verifiedAt": "2026-09-06T10:44:32.136Z",
+  "headerFollowup": {
+    "pngAndFreshMp4HeaderByteIdentical": true,
+    "pixelChannelDifferences": 0,
+    "continuousDecodedFrames": 43,
+    "continuousTimeRange": [
+      142.6,
+      144
+    ],
+    "headerDarkGlyphBounds": {
+      "brand": {
+        "yMin": [
+          19
+        ],
+        "yMax": [
+          46
+        ]
+      },
+      "wait": {
+        "yMin": [
+          24
+        ],
+        "yMax": [
+          41
+        ]
+      },
+      "label": {
+        "yMin": [
+          22
+        ],
+        "yMax": [
+          41
+        ]
+      }
+    },
+    "conclusion": "No clipping in the actual saved PNG or MP4. PNG header is RGB-byte-identical to a fresh MP4 extraction. All consecutive decoded headers retain the same full-height dark glyph bounds and top margin. The observed clipped whole-image presentation is outside the artifact; the exact display-layer cause is unverified.",
+    "renderChangeNeeded": false
+  }
+}

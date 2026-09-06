@@ -1,9 +1,9 @@
 # September 6 recording — exact email approval
 
-Status: prepared; no email sent and no product Send approval created for this recording room.
+Status: approved by the owner's “核准” on September 6 and executed once per message. Provider readback verified both messages and the Connected continuation; this authorization is consumed. See [the completed trace](evidence-2026-09-06-connected.json).
 
 Both inboxes are operated by this project. Alex is fictional. The public-source organization is not being contacted and is not a participant or partner in this test.
-September 5's approval was used once for each of its two emails; this is a new request.
+September 5's separate approval was used once for each of its two emails. This document preserves the exact September 6 approval and executed content.
 
 ## 1. Introduction through Might — once
 

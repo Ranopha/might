@@ -1,0 +1,372 @@
+{
+  "capturedAt": "2026-09-06T10:28:39.507Z",
+  "verifiedAt": "2026-09-06T10:30:43.281Z",
+  "deployment": "hushed-stork-401",
+  "classification": "SYNTHETIC_ONLY",
+  "verifiedThrough": "Second isolated production run from original companion through approved outreach, verified real inbound and Connected",
+  "productionFullRunsVerified": 2,
+  "repeatProductionRunVerified": true,
+  "authorization": "Owner approved the exact September 6 pair in recording-email-approval-2026-09-06.md with 核准 in the current task. Each email was sent once.",
+  "browserObservations": {
+    "sameTab": true,
+    "noReloadDuringContactedToReplied": true,
+    "sequence": [
+      "Your hello is on its way.",
+      "They replied.",
+      "OpenAI reply-excerpt summary appeared.",
+      "User-approved continuation clicked.",
+      "A possibility became a real hello."
+    ],
+    "source": "outreach.webm",
+    "eventLogSha256": "ea4ffe699218ccf1d34c7e9405079013ee4f4b188cd91ab53c23775d9acccd5e"
+  },
+  "providerChecks": {
+    "introSentCount": 1,
+    "introReceivedCount": 1,
+    "replySentCount": 1,
+    "replyReceivedCount": 1,
+    "approvedContentMatches": true,
+    "wireBodyByteIdentical": false,
+    "providerFooterAppended": true,
+    "providerQuotedOriginalInReply": true,
+    "componentOutbound": [
+      {
+        "id": "jh74xpzjz2sztd2wy0rqhpq1an8dw34g",
+        "status": "delivered"
+      }
+    ],
+    "reply": {
+      "messageId": "<010001a07641ac0e-69ade105-5dfc-4a10-9d01-9433a45ae41e-000000@email.amazonses.com>",
+      "parentMessageId": "<010001a076413d3f-bc67fcdd-ff44-4571-b5b9-f71c60b86605-000000@email.amazonses.com>",
+      "subject": "Re: [Might recording Sep 6] Furniture repair introduction",
+      "senderThreadId": "02debb2a-7070-471f-a45c-7467a0b9a3bb",
+      "partnerThreadId": "8a68c9b7-0cbc-43f0-b04a-5181363aa69b"
+    }
+  },
+  "recordings": [
+    {
+      "source": "capture.webm",
+      "width": 1600,
+      "height": 900,
+      "fps": 25,
+      "duration": 601.96,
+      "bytes": 46436518,
+      "continuousThrough": "pre-consent",
+      "containsAppAudio": false,
+      "sha256": "9605ae959f5daf8ad449e951c070c75c3c7ca17aa4e47761bc785860dea4545a"
+    },
+    {
+      "source": "outreach.webm",
+      "width": 1600,
+      "height": 900,
+      "fps": 25,
+      "duration": 147.8,
+      "bytes": 13013901,
+      "continuousThrough": "Exact approval, send, genuine incoming reply, reply summary and Connected in the same room",
+      "containsAppAudio": false,
+      "sha256": "6bf64cb5c2559075ab92e85d36c884cdfa155e81fbe7ba91f7fe2113d38b70b2"
+    }
+  ],
+  "recordedRelease": {
+    "checkedAt": "2026-09-06T10:15:00.165Z",
+    "sourceCommit": "09dda1ff0293941043f68d494667f714893c2abe",
+    "scriptAsset": "/assets/index-B0joWhAX.js",
+    "scriptSha256": "4d1ca82807147a74df4f14a2a5dc45f25d950d791b484c3f213ce9add46af675",
+    "matchesLocalBuild": true
+  },
+  "chainChecks": "Passed exact approval body/hash, connected status, linked message/thread/event/summary/continuation IDs, one send per approved direction, delivered official component receipt, provider body/footer/quoted-original validation, confirmed memory source links and live source/match links.",
+  "rows": {
+    "companionManifestations": [
+      {
+        "_id": "jh7ez7bt4w7n4e91drmc7xckmn8dwzms",
+        "createdAt": 1788688415759,
+        "imageModel": "gpt-image-2",
+        "imageRequestId": "req_d152ee7cc081425b84095c46845590e9",
+        "status": "ready",
+        "storageId": "kg2bcn2yj3cc4qrx03j9t7pk318dwsnz",
+        "textModel": "gpt-5.6-luna",
+        "textRequestId": "req_3020ed4577ee413fb5b7fba5a1c5edb0",
+        "updatedAt": 1788688474419
+      }
+    ],
+    "conversations": [
+      {
+        "_id": "j97da4jqa2ry77w908f2xp66418dws6t",
+        "createdAt": 1788688389615,
+        "updatedAt": 1788688510127
+      }
+    ],
+    "messages": [
+      {
+        "_id": "jd797dajmaaf41r9rckx44z9gd8dw70h",
+        "conversationId": "j97da4jqa2ry77w908f2xp66418dws6t",
+        "createdAt": 1788688510127,
+        "model": "gpt-5.6-luna",
+        "source": "assistant_generated",
+        "sourceMessageId": "jd7dhgnjf6kqqrxwc4etg5bd458dwqmv"
+      },
+      {
+        "_id": "jd7dhgnjf6kqqrxwc4etg5bd458dwqmv",
+        "conversationId": "j97da4jqa2ry77w908f2xp66418dws6t",
+        "createdAt": 1788688504325,
+        "source": "user_input"
+      }
+    ],
+    "talkTurns": [
+      {
+        "_id": "js787r3xw76mzs67435ht5zb498dxhkk",
+        "conversationId": "j97da4jqa2ry77w908f2xp66418dws6t",
+        "extractionResponseId": "req_eb42b7a237484e8e97204c35243a30f5",
+        "replyResponseId": "resp_0bf61e5ba7a16ca1006a9d3879a8d487d2873420934bb85750",
+        "sourceMessageId": "jd7dhgnjf6kqqrxwc4etg5bd458dwqmv",
+        "status": "completed",
+        "updatedAt": 1788688510127
+      }
+    ],
+    "memories": [
+      {
+        "_id": "jn771adw2xbrynt6wcdj9x67yn8dwmg1",
+        "createdAt": 1788688510127,
+        "extractionResponseId": "req_eb42b7a237484e8e97204c35243a30f5",
+        "lastConfirmedAt": 1788688583830,
+        "source": "conversation",
+        "sourceMessageId": "jd7dhgnjf6kqqrxwc4etg5bd458dwqmv",
+        "status": "active",
+        "updatedAt": 1788688583830
+      },
+      {
+        "_id": "jn7edbv1hrsy2bev6mzyvbfy9s8dw2r1",
+        "createdAt": 1788688510127,
+        "extractionResponseId": "req_eb42b7a237484e8e97204c35243a30f5",
+        "lastConfirmedAt": 1788688585460,
+        "source": "conversation",
+        "sourceMessageId": "jd7dhgnjf6kqqrxwc4etg5bd458dwqmv",
+        "status": "active",
+        "updatedAt": 1788688585460
+      },
+      {
+        "_id": "jn7d5vshrqjs3wrgrd5wxjvfyn8dwk46",
+        "createdAt": 1788688510127,
+        "extractionResponseId": "req_eb42b7a237484e8e97204c35243a30f5",
+        "lastConfirmedAt": 1788688587092,
+        "source": "conversation",
+        "sourceMessageId": "jd7dhgnjf6kqqrxwc4etg5bd458dwqmv",
+        "status": "active",
+        "updatedAt": 1788688587092
+      },
+      {
+        "_id": "jn7fntn83psn83tyr9r5968axn8dwh0d",
+        "createdAt": 1788688510127,
+        "extractionResponseId": "req_eb42b7a237484e8e97204c35243a30f5",
+        "lastConfirmedAt": 1788688588728,
+        "source": "conversation",
+        "sourceMessageId": "jd7dhgnjf6kqqrxwc4etg5bd458dwqmv",
+        "status": "active",
+        "updatedAt": 1788688588728
+      }
+    ],
+    "worldSignalRuns": [
+      {
+        "_id": "kh72ddfnb9xzb2m5fwvr0mxx2h8dw6sv",
+        "interpreterModel": "gpt-5.6-luna",
+        "interpreterResponseId": "req_d99cfb2f827243f091bd663ec405d6eb",
+        "provider": "firecrawl",
+        "providerRequestId": "01a07624-af7d-774f-bf6c-ad6b332749f3",
+        "sourceMode": "live",
+        "sourceUrl": "https://carpenter.org.tw/%E5%BF%97%E5%B7%A5%E5%A0%B1%E5%90%8D/",
+        "status": "completed",
+        "updatedAt": 1788688523550
+      }
+    ],
+    "worldSignals": [
+      {
+        "_id": "kn79wr6h8zx007gk43fncqtpnh8dw412",
+        "createdAt": 1788688523550,
+        "interpreterModel": "gpt-5.6-luna",
+        "interpreterResponseId": "req_d99cfb2f827243f091bd663ec405d6eb",
+        "provider": "firecrawl",
+        "providerRequestId": "01a07624-af7d-774f-bf6c-ad6b332749f3",
+        "runId": "kh72ddfnb9xzb2m5fwvr0mxx2h8dw6sv",
+        "sourceMode": "live",
+        "sourceUrl": "https://carpenter.org.tw/%E5%BF%97%E5%B7%A5%E5%A0%B1%E5%90%8D/"
+      }
+    ],
+    "matchRuns": [
+      {
+        "_id": "k976q3s6d7689fys963ase2c298dw625",
+        "judgeModel": "gpt-5.6-luna",
+        "judgeResponseId": "req_a179c39e9880417dba2f698d749da915",
+        "matchId": "kd79weqttjd7xjtt5skk616jf98dw4hz",
+        "status": "completed",
+        "updatedAt": 1788688528507,
+        "worldSignalId": "kn79wr6h8zx007gk43fncqtpnh8dw412"
+      }
+    ],
+    "matches": [
+      {
+        "_id": "kd79weqttjd7xjtt5skk616jf98dw4hz",
+        "createdAt": 1788688528507,
+        "judgeModel": "gpt-5.6-luna",
+        "judgeResponseId": "req_a179c39e9880417dba2f698d749da915",
+        "relevantMemoryIds": [
+          "jn771adw2xbrynt6wcdj9x67yn8dwmg1",
+          "jn7edbv1hrsy2bev6mzyvbfy9s8dw2r1",
+          "jn7d5vshrqjs3wrgrd5wxjvfyn8dwk46"
+        ],
+        "runId": "k976q3s6d7689fys963ase2c298dw625",
+        "status": "surfaced",
+        "updatedAt": 1788688665227,
+        "worldSignalId": "kn79wr6h8zx007gk43fncqtpnh8dw412"
+      }
+    ],
+    "matchClarificationRuns": [
+      {
+        "_id": "jx767zmwvbttp03cspwn8qw2s98dwyt7",
+        "judgeModel": "gpt-5.6-luna",
+        "judgeResponseId": "req_fbe941a50b7045d5b5ac74a7166f3495",
+        "matchId": "kd79weqttjd7xjtt5skk616jf98dw4hz",
+        "status": "completed",
+        "updatedAt": 1788688665227
+      }
+    ],
+    "matchClarifications": [
+      {
+        "_id": "k1743mgzmd0m5dqadthmm3ja0h8dxgr6",
+        "createdAt": 1788688665227,
+        "judgeModel": "gpt-5.6-luna",
+        "judgeResponseId": "req_fbe941a50b7045d5b5ac74a7166f3495",
+        "matchId": "kd79weqttjd7xjtt5skk616jf98dw4hz",
+        "relevantMemoryIds": [
+          "jn771adw2xbrynt6wcdj9x67yn8dwmg1",
+          "jn7edbv1hrsy2bev6mzyvbfy9s8dw2r1",
+          "jn7d5vshrqjs3wrgrd5wxjvfyn8dwk46"
+        ],
+        "runId": "jx767zmwvbttp03cspwn8qw2s98dwyt7",
+        "status": "surfaced",
+        "updatedAt": 1788688665227,
+        "worldSignalId": "kn79wr6h8zx007gk43fncqtpnh8dw412"
+      }
+    ],
+    "connections": [
+      {
+        "_id": "m570z1dfsx70kq8p8bvvkphyqx8dwgpz",
+        "createdAt": 1788688681077,
+        "matchId": "kd79weqttjd7xjtt5skk616jf98dw4hz",
+        "pitchRunId": "kx7ccszhqmvnn0hstee1954pnn8dx718",
+        "status": "connected",
+        "updatedAt": 1788690494974
+      }
+    ],
+    "connectionPitchRuns": [
+      {
+        "_id": "kx7ccszhqmvnn0hstee1954pnn8dx718",
+        "connectionId": "m570z1dfsx70kq8p8bvvkphyqx8dwgpz",
+        "matchId": "kd79weqttjd7xjtt5skk616jf98dw4hz",
+        "model": "gpt-5.6-luna",
+        "pitchId": "m17fb4ycbqw01cp15d0q6ckjc18dw6ya",
+        "responseId": "req_f825a74920ce492e8c1edbf0b71d1c40",
+        "status": "completed",
+        "updatedAt": 1788688687575
+      }
+    ],
+    "connectionPitches": [
+      {
+        "_id": "m17fb4ycbqw01cp15d0q6ckjc18dw6ya",
+        "connectionId": "m570z1dfsx70kq8p8bvvkphyqx8dwgpz",
+        "createdAt": 1788688687575,
+        "matchId": "kd79weqttjd7xjtt5skk616jf98dw4hz",
+        "model": "gpt-5.6-luna",
+        "payloadHash": "sha256:21ce01f266e34692307ec781d7e84142fb6ba6297a9e310211e18f26b9919934",
+        "pitchRunId": "kx7ccszhqmvnn0hstee1954pnn8dx718",
+        "responseId": "req_f825a74920ce492e8c1edbf0b71d1c40",
+        "revision": 3,
+        "selectedMemoryIds": [
+          "jn771adw2xbrynt6wcdj9x67yn8dwmg1",
+          "jn7edbv1hrsy2bev6mzyvbfy9s8dw2r1",
+          "jn7d5vshrqjs3wrgrd5wxjvfyn8dwk46"
+        ],
+        "updatedAt": 1788688745245
+      }
+    ],
+    "sendApprovals": [
+      {
+        "_id": "mh71csajvxpssywnsa6trym72s8dwzrw",
+        "approvedAt": 1788690367721,
+        "connectionId": "m570z1dfsx70kq8p8bvvkphyqx8dwgpz",
+        "createdAt": 1788690367721,
+        "payloadHash": "sha256:21ce01f266e34692307ec781d7e84142fb6ba6297a9e310211e18f26b9919934",
+        "pitchId": "m17fb4ycbqw01cp15d0q6ckjc18dw6ya",
+        "selectedMemoryIds": [
+          "jn771adw2xbrynt6wcdj9x67yn8dwmg1",
+          "jn7edbv1hrsy2bev6mzyvbfy9s8dw2r1",
+          "jn7d5vshrqjs3wrgrd5wxjvfyn8dwk46"
+        ]
+      }
+    ],
+    "mailThreads": [
+      {
+        "_id": "md76cp8esap3s85yy348dcc0vx8dwjkz",
+        "approvalId": "mh71csajvxpssywnsa6trym72s8dwzrw",
+        "connectionId": "m570z1dfsx70kq8p8bvvkphyqx8dwgpz",
+        "createdAt": 1788690381321,
+        "idempotencyKey": "might-jh74xpzjz2sztd2wy0rqhpq1an8dw34g",
+        "outboundId": "jh74xpzjz2sztd2wy0rqhpq1an8dw34g",
+        "payloadHash": "sha256:21ce01f266e34692307ec781d7e84142fb6ba6297a9e310211e18f26b9919934",
+        "pitchId": "m17fb4ycbqw01cp15d0q6ckjc18dw6ya",
+        "providerMessageId": "<010001a076413d3f-bc67fcdd-ff44-4571-b5b9-f71c60b86605-000000@email.amazonses.com>",
+        "sendCount": 1,
+        "status": "connected",
+        "threadId": "02debb2a-7070-471f-a45c-7467a0b9a3bb",
+        "updatedAt": 1788690494974
+      }
+    ],
+    "mailInboundEvents": [
+      {
+        "_id": "m97er8a80tj9z3fd239d99444d8dwdsw",
+        "connectionId": "m570z1dfsx70kq8p8bvvkphyqx8dwgpz",
+        "eventId": "ee851e34a3ebc8a944525a2216ea8223",
+        "mailThreadId": "md76cp8esap3s85yy348dcc0vx8dwjkz",
+        "messageId": "<010001a07641ac0e-69ade105-5dfc-4a10-9d01-9433a45ae41e-000000@email.amazonses.com>",
+        "processedAt": 1788690412612,
+        "receivedAt": 1788690410000,
+        "threadId": "02debb2a-7070-471f-a45c-7467a0b9a3bb"
+      }
+    ],
+    "replySummaries": [
+      {
+        "_id": "nn75z4zhp03xzvjkwj5bxyh75h8dwq7x",
+        "attempts": 1,
+        "createdAt": 1788690412612,
+        "inboundEventId": "m97er8a80tj9z3fd239d99444d8dwdsw",
+        "model": "gpt-5.6-luna",
+        "responseId": "resp_0b20acef21390875016a9d3fef04cc87d2aa25fa1fe8ef2c55",
+        "source": "reply_preview",
+        "status": "completed",
+        "updatedAt": 1788690417708
+      }
+    ],
+    "connectionContinuations": [
+      {
+        "_id": "ks7dqk7b8knk3mxae0jtv13qs18dx3ka",
+        "confirmedAt": 1788690494974,
+        "connectionId": "m570z1dfsx70kq8p8bvvkphyqx8dwgpz",
+        "mailThreadId": "md76cp8esap3s85yy348dcc0vx8dwjkz"
+      }
+    ]
+  },
+  "notes": [
+    "This is a controlled repeatability check with a fictional persona and project-operated inboxes; it is not a nonprofit partnership, visit or commercial acceptance.",
+    "The September 6 room resumed its own private saved session for outreach; no existing user dataset was cloned. The reply transition was recorded continuously without navigation or refresh.",
+    "The earlier pre-consent evidence remains an immutable checkpoint.",
+    "At 1600 by 900 the decorative consent note overlaps the center of the approval button. The failed preflight caused no approval or send. A normal click on the visible upper-left part succeeded; no force click, DOM mutation or application change was used. The overlap remains a documented UI issue.",
+    "This evidence verifies the product run only; video hosting, social publishing, eligibility and final entry submission are separate gates."
+  ],
+  "finalReleaseReadback": {
+    "checkedAt": "2026-09-06T10:34:04.173Z",
+    "liveUrl": "https://hushed-stork-401.convex.site",
+    "unauthenticatedHttpStatus": 200,
+    "scriptAsset": "/assets/index-B0joWhAX.js",
+    "scriptSha256": "4d1ca82807147a74df4f14a2a5dc45f25d950d791b484c3f213ce9add46af675",
+    "recordedBundleStillMatches": true
+  }
+}

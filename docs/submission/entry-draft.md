@@ -38,8 +38,8 @@ Try it: https://hushed-stork-401.convex.site
 ## Submission gates
 
 - Public app, repo and build log: verify the final deployed commit and signed-out access.
-- Real outbound/inbound demo: one approved production run reached Connected on September 5; both messages were sent once. Preserve the linked evidence and obtain fresh approval for any new send.
-- Final video: use the accompanying 2:40 script; attach only after export and playback QA.
+- Real outbound/inbound demo: two isolated production runs reached Connected on September 5 and 6. Each run's separately approved pair was sent once per message; the second run was recorded. Preserve the linked evidence and obtain fresh approval for any new send.
+- Final video: the 160-second local MP4 is rendered and verified; see `video-final-2026-09-06.json`. Upload the exact verified file to an accessible public or unlisted playback URL, then test it while signed out before attaching it to the entry.
 - Luma registration and entrant eligibility: verify the user's actual entry details.
 - Social post: publish only after explicit authorization of the final post and destination.
 - Vibe Apps: the signed-out official form was inspected on September 5 and requires sign-in or sign-up before its fields appear. Account access remains pending. Submit only after explicit authorization of the completed entry.
