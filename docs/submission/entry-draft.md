@@ -1,4 +1,6 @@
-# Might — submission draft
+# Might — submitted entry
+
+**Submitted:** https://vibeapps.dev/s/might — September 6, 2026, 19:46 Taiwan time.
 
 **Tagline:** You have more to offer than you know. Might finds where it matters.
 
@@ -37,15 +39,17 @@ Connected means two-way contact, without a deal, payment or scheduling commitmen
 
 ## Submission gates
 
-- Public app, repo and build log: verify the final deployed commit and signed-out access.
+- Public app, repo and build log: signed-out Chrome checks passed for release/source commit `08ecdf2`; see [public-link checks](public-links-2026-09-06.json).
 - Real outbound/inbound demo: two isolated production runs reached Connected on September 5 and 6. Each run's separately approved pair was sent once per message; the second run was recorded. Preserve the linked evidence and obtain fresh approval for any new send.
 - Final video: exact verified MP4 uploaded as unlisted to YouTube, with real screenshot thumbnail, AI disclosure and timed English SRT. Signed-out Chrome playback shows 2:40. YouTube checks completed without issues; see `video-final-2026-09-06.json`.
 - Luma registration and entrant eligibility: owner confirmed solo entry and eligibility; Luma displayed registration success.
 - Social post: X and Threads published and read back under the owner's explicit authorization. X includes all four sponsor mention links.
-- Vibe Apps: signed in through the owner's personal Google account; the real entry form is prepared. The owner authorized final submission on September 6. Video hosting, Luma registration and personal eligibility confirmation are complete. Final submission and readback follow the last public-link check.
+- Vibe Apps: successfully submitted through the official event form. The public page and owner profile show exactly one Might entry, with app/repo/video/build-log links, real screenshot, team size 1, the event and all four sponsor tags. See [submission receipt](submitted-2026-09-06.json).
 
 Official submission endpoint:
 https://vibeapps.dev/judging/convex-all-gas-hackathon-openai/submit
 
 Official deadline: September 22, 2026, 12:00 PM Pacific
 (September 23, 2026, 03:00 in Taiwan). Recheck the official page before submission.
+
+The optional-labeled LinkedIn field enforced a URL. It repeats the actual X announcement with an explicit explanation in the published description; no LinkedIn profile or post is claimed. A server error with six tags cleared after removing only the optional codex tag and checking that no earlier entry existed.

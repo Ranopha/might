@@ -1,0 +1,49 @@
+{
+  "status": "SUBMITTED_AND_PUBLIC",
+  "observedAt": "2026-09-06T11:48:44.814378+00:00",
+  "platformSubmittedLocalMinute": "2026-09-06T19:46+08:00",
+  "entryUrl": "https://vibeapps.dev/s/might",
+  "submissionRoute": "https://vibeapps.dev/judging/convex-all-gas-hackathon-openai/submit",
+  "successMessage": "Your submission has been received successfully.",
+  "sourceCommit": "08ecdf2ff4cc41d9f762d0125948940348b45103",
+  "frontendRelease": "ec8f8868-08a3-4d91-90e2-a1e41356cfab",
+  "readback": {
+    "profileSubmissionCount": 1,
+    "homepageListed": true,
+    "entryTitle": "Might",
+    "tagline": "You have more to offer than you know. Might finds where it matters.",
+    "liveUrl": "https://hushed-stork-401.convex.site",
+    "repoUrl": "https://github.com/Ranopha/might",
+    "buildLogUrl": "https://github.com/Ranopha/might/blob/main/hackathon.md",
+    "videoUrl": "https://youtu.be/VjZp9nPWEEU",
+    "embeddedYouTubePreviewVisible": true,
+    "actualProductScreenshotVisible": true,
+    "teamName": "Might",
+    "teamSize": 1,
+    "tags": [
+      "convex",
+      "AllGasHackathon",
+      "OpenAI",
+      "Firecrawl",
+      "AgentMail"
+    ],
+    "socialProof": "https://x.com/Enyen0129/status/2096556370728538525",
+    "privateContactEmailNotDisplayed": true,
+    "fullPageVisualReviewPassed": true
+  },
+  "formRecovery": {
+    "firstClick": "Browser validation blocked the empty LinkedIn field despite its optional helper text; no server submit at that point.",
+    "linkedinResolution": "The real X announcement was repeated in the LinkedIn field with an explicit description note. No LinkedIn identity or post was invented. Official rules accept X or LinkedIn.",
+    "firstServerAttempt": {
+      "requestId": "ce08ad53e24bbabc",
+      "result": "Server Error Called by client",
+      "profileCountAfterError": 0
+    },
+    "successfulRetry": "Removed only the optional codex tag, preserving the event and all four sponsors. Retried once after confirming no entry existed. Success page and exactly one public entry were then observed.",
+    "diagnosis": "A tag limit conflict is consistent with the successful retry and public source validation logic; the private server exception was not available, so exact root cause is not claimed."
+  },
+  "lumaRegistered": true,
+  "ownerEligibilityConfirmed": true,
+  "noAdditionalAppEmailOrModelCalls": true,
+  "boundary": "Competition entry received and publicly listed. This is not a judging result, prize claim or commercial acceptance."
+}

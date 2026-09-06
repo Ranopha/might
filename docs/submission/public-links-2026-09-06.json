@@ -1,0 +1,33 @@
+{
+  "checkedAt": "2026-09-06T11:41:00Z",
+  "method": "Real Chrome Incognito browser navigation and rendered UI readback; no authenticated HTTP session reused",
+  "sourceCommit": "08ecdf2ff4cc41d9f762d0125948940348b45103",
+  "links": [
+    {
+      "url": "https://hushed-stork-401.convex.site",
+      "result": "Initial orb and Convex live shown in a fresh private browser session earlier in this publication session; no provider call or email triggered"
+    },
+    {
+      "url": "https://github.com/Ranopha/might",
+      "result": "Public repository, Sign in link and commit 08ecdf2 visible while signed out"
+    },
+    {
+      "url": "https://github.com/Ranopha/might/blob/main/hackathon.md",
+      "result": "Rendered build log, sponsor components, live/video links, Public badge and Sign in link visible while signed out"
+    },
+    {
+      "url": "https://youtu.be/VjZp9nPWEEU",
+      "result": "Unlisted video played in a signed-out Chrome Incognito window; player duration 2:40; YouTube checks completed without issues",
+      "receipt": "video-final-2026-09-06.json"
+    },
+    {
+      "url": "https://x.com/Enyen0129/status/2096556370728538525",
+      "result": "Full original announcement, actual image, live app link and all four sponsor mention links visible alongside Log in or sign up for X"
+    },
+    {
+      "url": "https://www.threads.com/@ranopha/post/Dc8bWmGjz5r",
+      "result": "Original announcement plus published reply with video and precise memory explanation visible while signed out; login prompt also present"
+    }
+  ],
+  "boundary": "These checks verify public access to the competition artifacts. They do not represent another provider E2E run or an additional email authorization."
+}

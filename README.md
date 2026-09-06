@@ -4,6 +4,7 @@
 
 Might is a narrow, full-stack entry for the [Convex All Gas Hackathon](https://www.convex.dev/hackathons/all-gas). A person talks naturally; Might remembers meaningful context, notices a real public-world need, explains a possible overlap, asks for consent, and helps form a real connection.
 
+- **Submitted entry:** [Might on Vibe Apps](https://vibeapps.dev/s/might)
 - **Live app:** [hushed-stork-401.convex.site](https://hushed-stork-401.convex.site)
 - **Demo video:** [Watch the 2:40 product demo](https://youtu.be/VjZp9nPWEEU)
 - **Public repository:** [github.com/Ranopha/might](https://github.com/Ranopha/might)
@@ -43,9 +44,12 @@ and the provider's retry window. A 160-second recording with English narration
 and captions is [hosted on YouTube](https://youtu.be/VjZp9nPWEEU) and verified in a
 signed-out Chrome window; see its [verification receipt](docs/submission/video-final-2026-09-06.json).
 The X/Threads announcements and Luma registration are complete, and the owner
-confirmed personal eligibility. Final Vibe Apps submission is being completed;
-the hackathon build is not yet declared complete. See the [demo script](docs/submission/demo-script.md) and
-[entry draft](docs/submission/entry-draft.md).
+confirmed personal eligibility. The official Vibe Apps form received the entry on
+September 6 at 19:46 Taiwan time; the [public entry](https://vibeapps.dev/s/might)
+and exactly one submission on the owner profile were read back. The agreed
+hackathon build and submission are complete; judging is separate. See the
+[submission receipt](docs/submission/submitted-2026-09-06.json),
+[demo script](docs/submission/demo-script.md) and [entry record](docs/submission/entry-draft.md).
 
 This competition slice observes one allowlisted public volunteer source. It uses
 a fictional demo persona and controlled email recipients; it does not imply a

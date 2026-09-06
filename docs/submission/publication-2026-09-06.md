@@ -90,13 +90,21 @@ The Luma page displayed "報名成功" after registration with the existing pers
 Google account and X handle. Private ticket links and contact details are omitted
 from this public record.
 
-The official Vibe Apps form contains the product description, live URL, public
-repo, published X URL, hosted video, actual opening-frame screenshot,
-convex.site answer, approved entrant/team details and six relevant tags. Final
-submission/readback follows the last public-link check; it is not claimed yet.
+The official Vibe Apps form received the submission on September 6 at 19:46
+Taiwan time and displayed "Your submission has been received successfully."
+The public entry is https://vibeapps.dev/s/might. The homepage and owner's profile
+were read back; exactly one submission exists. The entry displays the reviewed
+product description, actual screenshot, app/repo/build-log/video links, team
+Might with 1 member, and the event plus four sponsor tags. The YouTube embed
+loads the correct video preview. See `submitted-2026-09-06.json`.
 
-The official requirement is an X or LinkedIn post. Threads is an additional
-authorized channel; no LinkedIn URL has been fabricated.
+The LinkedIn field said optional but enforced a URL. The actual X announcement
+was repeated there, with a plain explanation in the public description; no
+LinkedIn post or identity is claimed. Official rules accept X or LinkedIn.
+A six-tag attempt returned a server error (request ce08ad53e24bbabc), and the
+owner profile still showed zero submissions. Removing only the optional codex
+tag and retrying once succeeded. A tag-limit conflict is a supported inference,
+not a verified private-server diagnosis. No app behavior or provider state changed.
 
 ## Threads follow-up
 

@@ -13,7 +13,7 @@
 - **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-06T11:17:39.791214+00:00
+- **Last updated:** 2026-09-06T11:48:44.814378+00:00
 
 ## Log
 
@@ -761,7 +761,7 @@ The installed hackathon workflow was applied manually; no slash invocation is
 claimed. See docs/worklogs/2026-09-06.md for verification and recovery details.
 
 
-### 2026-09-06 - working tree
+### 2026-09-06 - 08ecdf2
 
 The owner authorized social publishing and completion through final submission.
 Fixed the desktop consent-note overlap with one CSS margin change. Fourteen
@@ -792,3 +792,17 @@ video plus clarification; original post text is retained. The final Vibe Apps
 form is prepared, with final submission/readback still pending. No new test
 email or model generation occurred. The installed hackathon workflow was applied
 manually; no slash invocation is claimed. See `docs/worklogs/2026-09-06.md`.
+
+### 2026-09-06 - working tree
+
+Submitted Might through the official event form and received its success message.
+The [public entry](https://vibeapps.dev/s/might) shows the actual screenshot,
+video, app/repo/build-log links, one-person team, event and four sponsor tags.
+The owner profile lists exactly one entry. Signed-out artifact checks passed;
+receipts are `docs/submission/submitted-2026-09-06.json` and
+`docs/submission/public-links-2026-09-06.json`. A required-but-optional-labeled
+social field was handled transparently with the real X proof. A server error
+cleared after reducing six tags to five; no duplicate entry or extra app email
+was created. The agreed competition build and submission are complete; judging
+is separate. Applied the installed hackathon workflow manually because the
+literal slash-command interface is unavailable; no slash invocation is claimed.
