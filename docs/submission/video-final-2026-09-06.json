@@ -69,11 +69,11 @@
       "firstRepliedFinalTimeline": 142.76
     }
   },
-  "scope": "Local unpublished final 160-second demo. Fictional persona, controlled inboxes and AI narration disclosed. Real integration chain and same-page reply. Shortened waits labeled; no partnership or visit implied.",
+  "scope": "Published final 160-second demo. Fictional persona, controlled inboxes and AI narration disclosed. Real integration chain and same-page reply. Shortened waits labeled; no partnership or visit implied.",
   "knownSourceIssue": "Original product note overlaps approval button center; successful normal corner click and one provider send retained without reconstruction.",
   "artifact": "videos/might-demo.local/renders/might-demo.mp4",
-  "publiclyHosted": false,
-  "publicPlaybackUrl": null,
+  "publiclyHosted": true,
+  "publicPlaybackUrl": "https://youtu.be/VjZp9nPWEEU",
   "verifiedAt": "2026-09-06T10:44:32.136Z",
   "headerFollowup": {
     "pngAndFreshMp4HeaderByteIdentical": true,
@@ -111,5 +111,19 @@
     },
     "conclusion": "No clipping in the actual saved PNG or MP4. PNG header is RGB-byte-identical to a fresh MP4 extraction. All consecutive decoded headers retain the same full-height dark glyph bounds and top margin. The observed clipped whole-image presentation is outside the artifact; the exact display-layer cause is unverified.",
     "renderChangeNeeded": false
+  },
+  "hosting": {
+    "platform": "YouTube",
+    "videoId": "VjZp9nPWEEU",
+    "visibility": "unlisted",
+    "publishedUiConfirmed": true,
+    "signedOutChromePlaybackVerified": true,
+    "publicPlayerDuration": "2:40",
+    "studioPreviewDuration": "2:41",
+    "copyrightCheck": "complete; no issues found",
+    "communityGuidelinesCheck": "complete; no issues found",
+    "aiContentDisclosure": true,
+    "englishTimedSrtImportedAndSaved": true,
+    "checkedAt": "2026-09-06T11:29:27.891794+00:00"
   }
 }

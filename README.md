@@ -5,7 +5,9 @@
 Might is a narrow, full-stack entry for the [Convex All Gas Hackathon](https://www.convex.dev/hackathons/all-gas). A person talks naturally; Might remembers meaningful context, notices a real public-world need, explains a possible overlap, asks for consent, and helps form a real connection.
 
 - **Live app:** [hushed-stork-401.convex.site](https://hushed-stork-401.convex.site)
+- **Demo video:** [Watch the 2:40 product demo](https://youtu.be/VjZp9nPWEEU)
 - **Public repository:** [github.com/Ranopha/might](https://github.com/Ranopha/might)
+- **Build announcement:** [X](https://x.com/Enyen0129/status/2096556370728538525) · [Threads](https://www.threads.com/@ranopha/post/Dc8ZhlOD294)
 
 ## The vertical slice
 
@@ -38,21 +40,22 @@ every stage. Authenticated BYOK use and root Auth discovery were separately veri
 
 Email recovery tests cover early replies, late receipts, transport idempotency
 and the provider's retry window. A 160-second recording with English narration
-and captions has been rendered locally; see its
-[verification receipt](docs/submission/video-final-2026-09-06.json).
-Public video hosting, social publishing, eligibility verification and final
-submission remain open; the hackathon build is not yet
-declared complete. See the [demo script](docs/submission/demo-script.md) and
+and captions is [hosted on YouTube](https://youtu.be/VjZp9nPWEEU) and verified in a
+signed-out Chrome window; see its [verification receipt](docs/submission/video-final-2026-09-06.json).
+The X/Threads announcements and Luma registration are complete, and the owner
+confirmed personal eligibility. Final Vibe Apps submission is being completed;
+the hackathon build is not yet declared complete. See the [demo script](docs/submission/demo-script.md) and
 [entry draft](docs/submission/entry-draft.md).
 
 This competition slice observes one allowlisted public volunteer source. It uses
 a fictional demo persona and controlled email recipients; it does not imply a
 partnership or real volunteer arrangement with the source organization.
 
-A known desktop layout issue remains: at 1600 × 900 the decorative consent note
-overlaps the center of the approval button. The visible upper-left part is usable;
-the recorded approval used an ordinary click there. The issue is documented in
-the repeat trace and has not been hidden by changing the recorded application.
+The consent note's desktop overlap was fixed after recording by placing it below
+the letter. Fourteen offline layout cases across seven widths verified normal
+approval/send clicks, and the corrected frontend is public. The recorded
+application's JavaScript is unchanged; the original trace and video are retained.
+See the [release receipt](docs/submission/consent-layout-release-2026-09-06.json).
 
 ## Local development
 

@@ -1,0 +1,49 @@
+{
+  "verifiedAt": "2026-09-06T11:08:17.680945+00:00",
+  "scope": "Frontend consent note layout only; no backend deployment or email send",
+  "deploymentId": "ec8f8868-08a3-4d91-90e2-a1e41356cfab",
+  "url": "https://hushed-stork-401.convex.site",
+  "httpStatus": 200,
+  "assets": [
+    {
+      "path": "/assets/index-B1LROJ4f.js",
+      "sha256": "4d1ca82807147a74df4f14a2a5dc45f25d950d791b484c3f213ce9add46af675",
+      "bytes": 520280,
+      "matchesLocalBuild": true
+    },
+    {
+      "path": "/assets/index-DfYnmQna.css",
+      "sha256": "a81f5de21e5a44eb85efc3bb6181686eecb4a0fed4d7a05764e889025bf9d3e4",
+      "bytes": 93064,
+      "matchesLocalBuild": true
+    }
+  ],
+  "previousDeploymentId": "87eb3b10-c810-4bb8-9f70-d6adec19221d",
+  "layoutVerification": {
+    "lint": 0,
+    "typecheck": 0,
+    "productionBuild": 0,
+    "diffCheck": 0,
+    "geometryWidths": [
+      1600,
+      1152,
+      981,
+      980,
+      721,
+      720,
+      390
+    ],
+    "states": [
+      "approve",
+      "send"
+    ],
+    "casesPassed": 14,
+    "ninePointHitTests": true,
+    "ordinaryFixtureClickOnce": true,
+    "horizontalOverflow": 0,
+    "noteLetterGapDesktop": 34,
+    "noteLetterGapMobile": 26
+  },
+  "browserReadback": "Existing Chrome room restored its own saved conversation. A new Chrome Incognito window showed only the initial orb welcome and Convex live, without the old room content.",
+  "rollback": "Revert the single CSS hunk, build with production VITE_CONVEX_URL and publish frontend only. No schema/data/provider changes."
+}

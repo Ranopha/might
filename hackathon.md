@@ -4,6 +4,7 @@
 - **Event:** Convex All Gas Hackathon
 - **What it does:** A consent-first companion that helps a person notice where something about them may matter in the real world.
 - **Live app:** https://hushed-stork-401.convex.site
+- **Demo:** https://youtu.be/VjZp9nPWEEU
 - **Repo:** https://github.com/Ranopha/might
 - **Frontend:** Convex static hosting
 - **Convex deployment:** https://hushed-stork-401.convex.cloud
@@ -12,7 +13,7 @@
 - **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-06T10:48:12.192Z
+- **Last updated:** 2026-09-06T11:17:39.791214+00:00
 
 ## Log
 
@@ -741,7 +742,7 @@ ASR-aligned captions passed render/decode and visual checks
 The installed hackathon workflow was applied manually; the slash interface is
 unavailable. See `docs/worklogs/2026-09-06.md` for artifacts and open gates.
 
-### 2026-09-06 - working tree
+### 2026-09-06 - b09c37d
 
 The owner approved the exact new controlled message pair. Each was sent once,
 and the recorded room completed its real outbound, signed inbound, OpenAI
@@ -758,3 +759,36 @@ changed. The existing consent-note overlap remains documented. Public video
 hosting, social publication, eligibility and final submission remain open.
 The installed hackathon workflow was applied manually; no slash invocation is
 claimed. See docs/worklogs/2026-09-06.md for verification and recovery details.
+
+
+### 2026-09-06 - working tree
+
+The owner authorized social publishing and completion through final submission.
+Fixed the desktop consent-note overlap with one CSS margin change. Fourteen
+local layout cases, lint/typecheck and the production build passed. Published
+frontend-only release `ec8f8868-08a3-4d91-90e2-a1e41356cfab`; public CSS/JS match
+the build and the JavaScript bytes are unchanged from the recorded E2E. A new
+Chrome Incognito window opens the initial orb and shows Convex live. See
+`docs/submission/consent-layout-release-2026-09-06.json`.
+
+Published and read back the [X announcement](https://x.com/Enyen0129/status/2096556370728538525)
+with @convex, @OpenAI, @firecrawl and @agentmail, and the additional
+[Threads post](https://www.threads.com/@ranopha/post/Dc8ZhlOD294). Both show a real
+product frame and link the public app. Vibe Apps and Luma sign-ins succeeded;
+the actual entry form is prepared. Exact publication text, video upload metadata
+and remaining gates are in `docs/submission/publication-2026-09-06.md`.
+
+The owner confirmed the YouTube upload terms and entrant eligibility. Published
+the exact final video at https://youtu.be/VjZp9nPWEEU as unlisted. A signed-out
+Chrome player shows and plays 2:40, and YouTube copyright/community checks
+completed without issues. Imported the timed English SRT and saved the real
+opening-frame thumbnail and AI disclosure. Luma registration succeeded.
+
+A review corrected the prepared claim that only confirmed memories are stored:
+private candidates exist before confirmation and may support matching. The
+published video description is precise, and a
+[Threads follow-up](https://www.threads.com/@ranopha/post/Dc8bWmGjz5r) carries the
+video plus clarification; original post text is retained. The final Vibe Apps
+form is prepared, with final submission/readback still pending. No new test
+email or model generation occurred. The installed hackathon workflow was applied
+manually; no slash invocation is claimed. See `docs/worklogs/2026-09-06.md`.

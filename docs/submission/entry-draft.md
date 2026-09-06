@@ -6,6 +6,8 @@
 
 **Public repository:** https://github.com/Ranopha/might
 
+**Video demo:** https://youtu.be/VjZp9nPWEEU
+
 **Build log:** https://github.com/Ranopha/might/blob/main/hackathon.md
 
 ## Description
@@ -27,22 +29,20 @@ The demonstration uses a fictional persona and project-controlled email inboxes.
 It does not claim a partnership with the nonprofit whose public page is cited.
 Connected means two-way contact, without a deal, payment or scheduling commitment.
 
-## Social post draft — not published
+## Published social posts
 
-Built Might for the All Gas Hackathon: a private companion that remembers what
-matters, notices a real-world need, and helps you connect only after you approve
-the exact message. Built with @convex @OpenAI @firecrawl @agentmail.
-
-Try it: https://hushed-stork-401.convex.site
+- X: https://x.com/Enyen0129/status/2096556370728538525
+- Threads: https://www.threads.com/@ranopha/post/Dc8ZhlOD294
+- Exact text and readback: [publication record](publication-2026-09-06.md).
 
 ## Submission gates
 
 - Public app, repo and build log: verify the final deployed commit and signed-out access.
 - Real outbound/inbound demo: two isolated production runs reached Connected on September 5 and 6. Each run's separately approved pair was sent once per message; the second run was recorded. Preserve the linked evidence and obtain fresh approval for any new send.
-- Final video: the 160-second local MP4 is rendered and verified; see `video-final-2026-09-06.json`. Upload the exact verified file to an accessible public or unlisted playback URL, then test it while signed out before attaching it to the entry.
-- Luma registration and entrant eligibility: verify the user's actual entry details.
-- Social post: publish only after explicit authorization of the final post and destination.
-- Vibe Apps: the signed-out official form was inspected on September 5 and requires sign-in or sign-up before its fields appear. Account access remains pending. Submit only after explicit authorization of the completed entry.
+- Final video: exact verified MP4 uploaded as unlisted to YouTube, with real screenshot thumbnail, AI disclosure and timed English SRT. Signed-out Chrome playback shows 2:40. YouTube checks completed without issues; see `video-final-2026-09-06.json`.
+- Luma registration and entrant eligibility: owner confirmed solo entry and eligibility; Luma displayed registration success.
+- Social post: X and Threads published and read back under the owner's explicit authorization. X includes all four sponsor mention links.
+- Vibe Apps: signed in through the owner's personal Google account; the real entry form is prepared. The owner authorized final submission on September 6. Video hosting, Luma registration and personal eligibility confirmation are complete. Final submission and readback follow the last public-link check.
 
 Official submission endpoint:
 https://vibeapps.dev/judging/convex-all-gas-hackathon-openai/submit

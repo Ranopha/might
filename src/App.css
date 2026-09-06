@@ -5408,7 +5408,8 @@
 .surface-story-screen > .editorial-note--paper {
   grid-column: 2;
   justify-self: end;
-  margin-top: -92px;
+  /* Keep the note below the letter's approval and send controls. */
+  margin-top: 0;
 }
 
 .connection-empty__footer > .editorial-note--paper {
