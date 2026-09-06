@@ -1,6 +1,6 @@
 # Might — recording handoff
 
-Status: real production E2E verified once; final video has not been recorded.
+Status: one complete production E2E verified; September 6 recording now reaches the exact consent preview. Final video remains unfinished.
 Target: 160 seconds, 16:9, product-led, English narration/captions, no autoplay music.
 
 ## Recording constraints
@@ -11,9 +11,12 @@ is explicitly blocked from CUA control. The attempted QuickTime setup did not
 start a recording, and no footage exists from that attempt. Do not substitute
 reconstructed screens or staged state changes for real product footage.
 
-The owner has been asked whether to explicitly select local Playwright for a
-fresh isolated browser recording. This is pending; no Playwright browser has
-been launched. The two messages already approved for Room 2 were each sent once.
+The owner approved local Playwright on September 6. A fresh isolated room has
+now been recorded through the exact draft and private disclosures. The raw
+601.96-second video is safely stored; no product source or deployment changed.
+See `evidence-2026-09-06-pre-consent.json` and the new exact-message request in
+`recording-email-approval-2026-09-06.md`. The two messages already approved for
+Room 2 were each sent once.
 That approval is consumed. Any new real send requires a new reviewed payload and
 approval, even if the demonstration text is reused.
 
@@ -71,3 +74,20 @@ Yes, I would be interested in an occasional furniture-repair volunteer project. 
 - Source organization is not represented as a participant or partner.
 - Audio/captions agree with visible state; no false live claim over retained results.
 - Public or unlisted playback works when signed out before final submission.
+
+## September 6 artifact and resume point
+
+The 124-second local preview is at
+`videos/might-demo.local/pre-consent-review/renders/Might-PRE-CONSENT-REVIEW.mp4`.
+Its source/editable project stays under `videos/might-demo.local/`; the source
+recording and its private session are in `docs/submission/recording-2026-09-06.local/`.
+Both directories are ignored. The public verification receipt is
+`video-preview-2026-09-06.json`. This is a pre-consent review, not the final entry.
+
+After approval of `recording-email-approval-2026-09-06.md`, restore the same
+recording room with `MIGHT_RECORDING_PHASE=outreach node
+docs/submission/recording-2026-09-06.local/resume-recording.mjs`. Confirm the hash
+and recipient again before the single product approval/send. Use the new
+recording-specific reply intent, never the consumed September 5 helper. Record
+the same page through the genuine reply and approved Connected continuation,
+then supply the last three source ranges to the preserved 160-second edit.

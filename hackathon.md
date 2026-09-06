@@ -12,7 +12,7 @@
 - **Auth:** Convex Auth
 - **AI models:** gpt-5.6-luna, gpt-image-2
 - **Started:** 2026-08-28T14:16:13Z
-- **Last updated:** 2026-09-05T03:45:19Z
+- **Last updated:** 2026-09-06T10:18:01Z
 
 ## Log
 
@@ -724,3 +724,19 @@ no recording was made. `docs/submission/recording-handoff.md` contains the 2:40
 inputs, narration and edit map. The official submission form requires sign-in.
 The unavailable `/hackathon` interface was handled by applying its installed
 skill manually; no slash invocation is claimed.
+
+### 2026-09-06 - working tree
+
+The owner approved an isolated Playwright recording. A new production room
+completed and recorded original companion generation, Talk, four confirmed
+memories, one live public source, contextual match, one clarification and the
+exact private email preview (`docs/submission/evidence-2026-09-06-pre-consent.json`).
+The 601.96-second source video was saved; the new room still has zero send
+approvals or mail. New exact-message approval is pending. Prepared the editable
+160-second video timeline, English narration and captions without changing the
+app, dependencies or deployment. No second full E2E or finished entry is claimed.
+A 124-second local pre-consent preview with real footage, English narration and
+ASR-aligned captions passed render/decode and visual checks
+(`docs/submission/video-preview-2026-09-06.json`). It stops before email approval.
+The installed hackathon workflow was applied manually; the slash interface is
+unavailable. See `docs/worklogs/2026-09-06.md` for artifacts and open gates.
